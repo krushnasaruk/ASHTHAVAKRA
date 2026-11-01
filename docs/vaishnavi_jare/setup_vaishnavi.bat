@@ -18,3 +18,4 @@ echo [3/3] Launching live Web UI with Instant Hot-Reload in Chrome...
 call flutter run -d chrome
 
 pause
+

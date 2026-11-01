@@ -60,7 +60,8 @@ All tiers of the system contain automated test suites:
 ## Documentation
 
 For comprehensive engineering details, refer to the documentation in [`docs/`](docs/):
-- [`docs/vaishnavi_jare/README.md`](docs/vaishnavi_jare/README.md) — **Dedicated Designer Workspace & Onboarding for Vaishnavi Jare**.
+- [`docs/vaishnavi_jare/START_HERE.md`](docs/vaishnavi_jare/START_HERE.md) — 🌸 **Quick Start Guide for Vaishnavi (Beginner-friendly & simple)**.
+- [`docs/vaishnavi_jare/README.md`](docs/vaishnavi_jare/README.md) — Dedicated Designer Workspace & Onboarding for Vaishnavi Jare.
 - [`docs/vaishnavi_jare/PRESENTATION_GUIDE.md`](docs/vaishnavi_jare/PRESENTATION_GUIDE.md) — Pitch scripts, slide structure, and live demo walkthrough.
 - [`docs/vaishnavi_jare/QNA_GUIDE.md`](docs/vaishnavi_jare/QNA_GUIDE.md) — Clinical & technical answers for evaluators and therapists.
 - [`docs/vaishnavi_jare/LARP.md`](docs/vaishnavi_jare/LARP.md) — **LARP Survival Guide**: Confident answers to buzzword and clueless hackathon judge questions.

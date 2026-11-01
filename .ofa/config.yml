@@ -8,32 +8,33 @@ zones:
       - mobile/packages/h10_core/lib/theme/
       - docs/vaishnavi_jare/
     owner: vaishnavijare60-hash
-    description: "Mobile & Web Patient UI screens, widgets, design tokens, and designer docs"
+    description: Mobile & Web Patient UI screens, widgets, design tokens, and designer docs
   backend:
     paths:
       - backend/
       - simulator/
     owner: null
-    description: "FastAPI backend server, SQLite database, and ESP32 device simulator"
+    description: FastAPI backend server, SQLite database, and ESP32 device simulator
   shared:
     paths:
       - shared/
       - mobile/packages/h10_core/
     owner: null
-    description: "Signal processing, protocols, and shared JSON schemas"
+    description: Signal processing, protocols, and shared JSON schemas
   ml:
     paths:
       - ml/
     owner: null
-    description: "ML pipeline, Colab notebooks, and feature extraction"
+    description: ML pipeline, Colab notebooks, and feature extraction
   docs:
     paths:
       - docs/
     owner: null
-    description: "Project documentation suite"
+    description: Project documentation suite
 rules:
-  - "Never modify files outside your claimed zone without prior approval"
-  - "Preserve mandatory non-medical disclaimer banner across all screens"
-  - "Use Okabe-Ito color-blind safe palette for all 5 finger channels"
-  - "Maintain minimum 48x48 px touch targets for patient accessibility"
-  - "Ensure responsive layout within 440px mobile canvas container"
+  - Never modify files outside your claimed zone without prior approval
+  - Preserve mandatory non-medical disclaimer banner across all screens
+  - Use Okabe-Ito color-blind safe palette for all 5 finger channels
+  - Maintain minimum 48x48 px touch targets for patient accessibility
+  - Ensure responsive layout within 440px mobile canvas container
+locks: []

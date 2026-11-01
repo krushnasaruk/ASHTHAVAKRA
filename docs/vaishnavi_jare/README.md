@@ -3,6 +3,8 @@
 
 Welcome to the **H10 / Asthavakra** project! This guide explains the entire project, our design philosophy, and step-by-step instructions on how you can run, design, and edit the application live in your web browser with instantaneous hot-reload.
 
+> 🌟 **New to the project? Start here!** 👉 **[`START_HERE.md`](./START_HERE.md)** for a super simple, step-by-step guide with zero jargon.
+
 ---
 
 ## 🌟 1. Project Overview: What is H10 / Asthavakra?
