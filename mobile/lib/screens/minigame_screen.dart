@@ -31,7 +31,15 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
   bool _isGameOver = false;
   final int _gameDurationSeconds = 60;
   int _elapsedSeconds = 0;
+  double _manualFlex = 50.0;
   final List<Repetition> _gameReps = [];
+
+  double get _currentFlex {
+    if (widget.deviceService.state == DeviceConnectionState.streaming) {
+      return widget.deviceService.latestNormalizedFlex[_targetFinger];
+    }
+    return _manualFlex;
+  }
 
   @override
   void initState() {
@@ -56,7 +64,7 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
 
         // Check if object reaches the catch zone (x >= 0.85)
         if (_objectX >= 0.85 && _objectX <= 0.95) {
-          final currentFlex = widget.deviceService.latestNormalizedFlex[_targetFinger] / 100.0;
+          final currentFlex = _currentFlex / 100.0;
           // Catch window: within ±15% of target height
           if ((currentFlex - _targetHeight).abs() <= 0.15) {
             _score++;
@@ -131,7 +139,7 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
   Widget build(BuildContext context) {
     final fingerName = H10Tokens.fingerNames[_targetFinger];
     final fingerColor = Color(H10Tokens.fingerColors[_targetFinger]);
-    final curFlex = widget.deviceService.latestNormalizedFlex[_targetFinger];
+    final curFlex = _currentFlex;
 
     return Scaffold(
       backgroundColor: const Color(H10Tokens.colorBackground),
@@ -240,7 +248,37 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+              // Interactive Control Slider (For mouse/touch demo or calibration)
+              if (widget.deviceService.state != DeviceConnectionState.streaming) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(H10Tokens.colorBorder)),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Mouse / Touch Control: $fingerName', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                          Text('${_manualFlex.toStringAsFixed(0)}% ROM', style: TextStyle(fontWeight: FontWeight.bold, color: fingerColor)),
+                        ],
+                      ),
+                      Slider(
+                        value: _manualFlex,
+                        min: 0,
+                        max: 100,
+                        activeColor: fingerColor,
+                        onChanged: (val) => setState(() => _manualFlex = val),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 12),
 
               // Live Flex Feedback
               Text(

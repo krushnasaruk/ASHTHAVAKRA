@@ -40,8 +40,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Range and Toggle Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
             children: [
               DropdownButton<int>(
                 value: _rangeDays,
@@ -55,6 +58,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 },
               ),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text('Include Simulated', style: TextStyle(fontSize: 12)),
                   Switch(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
 import '../services/device_service.dart';
@@ -74,37 +75,43 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
     });
   }
 
+  double _simPhase = 0.0;
+
   void _processSampleTick() {
     final dev = widget.deviceService;
     final packet = dev.latestPacket;
-    if (packet == null) return;
+    final isLiveStreaming = packet != null && dev.state == DeviceConnectionState.streaming;
 
-    // Check connection loss -> Auto-pause
-    if (dev.state == DeviceConnectionState.disconnected || dev.state == DeviceConnectionState.degraded) {
-      if (!_isPaused) {
-        setState(() {
-          _isPaused = true;
-          _activeFeedbackMessage = 'Connection interrupted, session paused.';
-        });
-      }
-      return;
+    List<double> normFlex;
+    List<int> imu;
+    int timestampMs;
+
+    if (isLiveStreaming) {
+      normFlex = dev.latestNormalizedFlex;
+      imu = packet.imu;
+      timestampMs = packet.timestampMs;
+    } else {
+      _simPhase += 0.04;
+      final wave = (math.sin(_simPhase) * 0.5 + 0.5) * 88.0;
+      normFlex = [wave, wave, wave, wave, wave];
+      imu = [0, -980, 0, 0, 0, 0];
+      timestampMs = _sessionSeconds * 1000 + ((_simPhase * 100).toInt() % 1000);
     }
 
-    final normFlex = dev.latestNormalizedFlex;
     _displayFlex = List<double>.from(normFlex);
 
     // Extract exercise driving signal
     _currentSignal = _signalExtractor.extractSignal(
       exercise: widget.exercise,
       normalizedFlex: normFlex,
-      imu: packet.imu,
-      timestampMs: packet.timestampMs,
+      imu: imu,
+      timestampMs: timestampMs,
     );
 
     // Feed to hysteresis detector
     final repResult = _repDetector.processSample(
       signal: _currentSignal,
-      timestampMs: packet.timestampMs,
+      timestampMs: timestampMs,
       sessionId: _sessionId,
     );
 

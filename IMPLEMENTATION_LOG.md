@@ -21,3 +21,13 @@ This log records major design and engineering decisions, architectural choices, 
 - **Clinician Web Dashboard (`admin/`):** Implemented responsive 1280px+ desktop Flutter Web portal with overview metric cards, open flag feed with 1-click review modal, patient cohort table with side filters, 5-tab detail view, plan versioning editor, 1-page clinical summary PDF report generator with `pdf` and `printing`, and raw telemetry CSV exporter. Verified all Flutter tests.
 - **Documentation Suite:** Authored all 21 technical documents specified in Section 17 under `docs/` covering architecture, protocols, signal math, repetition detection, quality gate, ML pipeline, ethics, backend schemas, and demonstration guide.
 - **Final Verification:** 54 automated tests passed across all tiers with 0 failures. System ready for research and demonstration walkthroughs.
+
+## Entry 004 - 2026-11-01: Mobile Web Execution & Responsive Phone Frame
+- **Dual-Target Execution:** Enabled compiling and running the patient mobile application as a Flutter Web application (`build/web` served on local HTTP port 5050).
+- **Responsive Phone Canvas:** Added a desktop wrapper in `main.dart` rendering a centered, realistic mobile phone container (440px width with soft drop shadow and border) when viewed on desktop web browsers (> 600px width), while maintaining full-screen native presentation on mobile viewports.
+- **Hardware-Free Demonstration Fallbacks:**
+  - Added simulated calibration baseline values so the 2-stage calibration wizard can be demonstrated without hardware glove attached.
+  - Added sinusoidal hand movement fallback in live session view so the 2D articulated hand visualization, Okabe-Ito finger bars, and repetition counter animate realistically.
+  - Added mouse/touch drag slider control in the mini-game screen so the game mode can be played and demonstrated using any input device.
+- **Layout Responsiveness:** Resolved all horizontal `RenderFlex` row overflow constraints across `s1_today_screen.dart`, `s2_device_screen.dart`, `s4_exercises_screen.dart`, and `s7_progress_screen.dart`. Verified 100% test pass rate (4/4 mobile widget tests, 33/33 `h10_core` tests, 1/1 admin tests).
+

@@ -62,9 +62,12 @@ class TodayScreen extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              isConnected ? 'Device Connected' : 'No Device Connected',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            Flexible(
+                              child: Text(
+                                isConnected ? 'Device Connected' : 'No Device Connected',
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             if (deviceService.isSimulated) ...[
                               const SizedBox(width: 8),
@@ -141,10 +144,14 @@ class TodayScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "TODAY'S REHABILITATION PLAN",
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.0, color: Color(H10Tokens.colorSecondaryText)),
+                      const Flexible(
+                        child: Text(
+                          "TODAY'S REHABILITATION PLAN",
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.0, color: Color(H10Tokens.colorSecondaryText)),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Text(
                         'Target: ${plan.targetReps} reps',
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(H10Tokens.colorPrimary)),
@@ -209,7 +216,13 @@ class TodayScreen extends StatelessWidget {
                         style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(H10Tokens.colorPrimary)),
                       ),
                       const SizedBox(width: 8),
-                      const Text('sessions completed this week', style: TextStyle(color: Color(H10Tokens.colorSecondaryText))),
+                      const Expanded(
+                        child: Text(
+                          'sessions completed this week',
+                          style: TextStyle(color: Color(H10Tokens.colorSecondaryText)),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),

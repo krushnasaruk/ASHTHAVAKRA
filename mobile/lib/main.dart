@@ -38,6 +38,36 @@ class H10PatientApp extends StatelessWidget {
           elevation: 1,
         ),
       ),
+      builder: (context, child) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth > 600) {
+              return Scaffold(
+                backgroundColor: const Color(0xFFF1F5F9),
+                body: Center(
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    decoration: BoxDecoration(
+                      color: const Color(H10Tokens.colorBackground),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.16),
+                          blurRadius: 30,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                      border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: child,
+                  ),
+                ),
+              );
+            }
+            return child ?? const SizedBox();
+          },
+        );
+      },
       home: const MainNavigationShell(),
     );
   }
@@ -131,6 +161,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -148,9 +179,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               ),
             ),
             const SizedBox(width: 8),
-            const Text(
-              'Hand Rehab',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const Flexible(
+              child: Text(
+                'Hand Rehab',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

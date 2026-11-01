@@ -132,36 +132,40 @@ class ExercisesScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: Text(title),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: instructions.map((i) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
-                                child: Text(i),
-                              )).toList(),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: Text(title),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: instructions.map((i) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Text(i),
+                                )).toList(),
+                              ),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+                              ],
                             ),
-                            actions: [
-                              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
-                            ],
-                          ),
-                        );
-                      },
-                      child: const Text('Instructions'),
-                    ),
-                    const Spacer(),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(H10Tokens.colorPrimary),
-                        foregroundColor: Colors.white,
+                          );
+                        },
+                        child: const Text('Instructions', overflow: TextOverflow.ellipsis),
                       ),
-                      onPressed: () => onSelectExercise(code),
-                      child: const Text('Start Exercise'),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(H10Tokens.colorPrimary),
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () => onSelectExercise(code),
+                        child: const Text('Start Exercise', overflow: TextOverflow.ellipsis),
+                      ),
                     ),
                   ],
                 ),

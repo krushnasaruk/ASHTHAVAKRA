@@ -25,6 +25,7 @@ H10 is an AI-assisted hand rehabilitation monitoring prototype. It is a research
 | **14. Clinician Dashboard (Web)** | **DONE** | 2026-11-01 | Flutter Web single-page app (1280px+), overview cards, patient cohort list, 5-tab detail, plan editor, 1-page PDF report generation, CSV export (all tests passed). |
 | **15. Mini-Game & Reminders** | **DONE** | 2026-11-01 | Hand-control target matching mini-game capturing real-time kinematic repetitions. |
 | **16. Integration, Tests & Verification** | **DONE** | 2026-11-01 | 54/54 tests passed across Python Simulator, ML Pipeline, Backend REST API, pure Dart `h10_core`, Mobile Flutter app, and Admin Flutter Web dashboard. 21 comprehensive docs authored. |
+| **17. Mobile Web Execution & UI Preview** | **DONE** | 2026-11-01 | Responsive 440px phone container frame for desktop web browsers; zero-hardware demonstration fallbacks; live at `http://localhost:5050`. |
 
 ---
 
