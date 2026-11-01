@@ -86,3 +86,4 @@ Have the web app open at `http://localhost:5050` or running live in Chrome. Foll
 5. **Step 5: Progress & Recovery (`s7_progress_screen.dart`)**
    - *Action:* Tap the **Progress** tab on the bottom bar.
    - *Say:* *"Finally, patients review their recovery over the last 2 weeks or 6 weeks. They see their Range of Motion improvements and consistency score without complex medical jargon."*
+

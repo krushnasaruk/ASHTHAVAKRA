@@ -160,14 +160,14 @@ Your designated ownership zone covers:
 
 ### How to Claim Your Zone Before Working:
 ```bash
-# Claim your zone for 24 hours so other agents don't touch your UI files
-ofa claim frontend --user vaishnavijare
+# Claim your zone for 48 hours so other agents don't touch your UI files
+ofa claim frontend --user vaishnavijare60-hash --ttl 48
 ```
 When you claim this zone, all AI agents used by other team members (Cursor, Copilot, Claude, Gemini) will automatically receive instructions **never to overwrite your UI files**.
 
 ### How to Release When Done:
 ```bash
-ofa release frontend --user vaishnavijare
+ofa release frontend --user vaishnavijare60-hash
 ```
 
 ---
@@ -177,3 +177,4 @@ ofa release frontend --user vaishnavijare
 * **[`PRESENTATION_GUIDE.md`](./PRESENTATION_GUIDE.md):** Complete script, slide structure, and elevator pitch for presenting H10 to judges and investors.
 * **[`QNA_GUIDE.md`](./QNA_GUIDE.md):** Clinical and technical answers to tough, legitimate questions from judges and physiotherapists.
 * **[`LARP.md`](./LARP.md):** The ultimate survival cheat sheet to confidently handle confused, buzzword-heavy, or misinformed judge questions!
+

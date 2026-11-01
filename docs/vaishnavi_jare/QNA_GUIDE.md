@@ -79,3 +79,4 @@ When presenting to clinical professionals, biomechanics researchers, or software
 **Answer:**
 > *"Model A is an on-device exercise recognition classifier. It extracts a 14-dimensional kinematic feature vector (`feat-v1`) across 2-second sliding windows (mean, standard deviation, and range per flex channel plus IMU magnitude) to classify whether the patient is performing a Fist Clench, Finger Tap, Pinch, or Wrist Rotation.  
 > It operates under a feature flag as an assistive verification layer to confirm exercise adherence without replacing our deterministic physics engine."*
+

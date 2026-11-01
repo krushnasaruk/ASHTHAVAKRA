@@ -200,3 +200,4 @@
 │ FDA Approved?     → Research prototype under Class I wellness.   │
 └──────────────────────────────────────────────────────────────────┘
 ```
+
