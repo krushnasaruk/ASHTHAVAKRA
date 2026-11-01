@@ -31,3 +31,10 @@ This log records major design and engineering decisions, architectural choices, 
   - Added mouse/touch drag slider control in the mini-game screen so the game mode can be played and demonstrated using any input device.
 - **Layout Responsiveness:** Resolved all horizontal `RenderFlex` row overflow constraints across `s1_today_screen.dart`, `s2_device_screen.dart`, `s4_exercises_screen.dart`, and `s7_progress_screen.dart`. Verified 100% test pass rate (4/4 mobile widget tests, 33/33 `h10_core` tests, 1/1 admin tests).
 
+## Entry 005 - 2026-11-01: Android APK Build (v1) & Header Version Badge
+- **Header Version Badge:** Added prominent `v1` version badge in the main navigation shell AppBar title row (`mobile/lib/main.dart`), visible continuously across all primary screens.
+- **Gradle & Build Tools Configuration:** Configured local Gradle wrapper to use local Gradle 8.13 distribution, Android SDK Build Tools 35.0.0, and suppressed compileSdk warnings in `gradle.properties`.
+- **APK Packaging:** Successfully executed Gradle `:app:assembleDebug` task producing `app-debug.apk` (82.94 MB) at `mobile/build/app/outputs/flutter-apk/app-debug.apk` and copied as `H10_Patient_App_v1.apk` in workspace root.
+- **Web App Synchronization:** Recompiled Flutter Web bundle to include the `v1` badge in the live browser preview at `http://localhost:5050`.
+
+

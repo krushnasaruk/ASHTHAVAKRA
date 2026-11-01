@@ -186,6 +186,23 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+              decoration: BoxDecoration(
+                color: const Color(H10Tokens.colorPrimary),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text(
+                'v1',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
           ],
         ),
         actions: [
