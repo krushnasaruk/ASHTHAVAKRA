@@ -50,3 +50,4 @@ class H10Tokens {
   // Touch Target Minimum
   static const double minTouchTargetDp = 48.0;
 }
+

@@ -118,3 +118,4 @@ class DatasetValidator:
                 report["details"].append({"trial_id": t_id, "errors": errors})
 
         return report
+

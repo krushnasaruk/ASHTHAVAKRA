@@ -173,3 +173,4 @@ class _HandPainter extends CustomPainter {
            oldDelegate.showFingerColors != showFingerColors;
   }
 }
+

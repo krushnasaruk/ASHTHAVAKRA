@@ -69,3 +69,4 @@ class RehabilitationPlan {
     version: json['version'] as int,
   );
 }
+

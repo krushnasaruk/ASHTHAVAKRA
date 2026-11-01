@@ -346,3 +346,4 @@ def get_scenario(name: str, seed: int = 42) -> SimulatorScenario:
     if name not in scenarios:
         raise ValueError(f"Unknown scenario '{name}'. Available: {list(scenarios.keys())}")
     return scenarios[name](seed=seed)
+

@@ -39,3 +39,4 @@ In this local prototype demonstration:
 | **Model Weight Tampering** | On-device ML loading verifies the SHA-256 cryptographic hash of `model_a.tflite` against `model_manifest.json` before initialization. |
 | **Unauthorized Plan Alteration** | Every plan update creates a new version with required clinical justification, clinician ID, and immutable logging in `audit_log`. |
 | **Silent Sensor Disconnection** | Session quality gate detects loss of variance ($\sigma = 0$) or out-of-bounds ADC readings ($< 50$ or $> 4000$), raising an immediate error. |
+

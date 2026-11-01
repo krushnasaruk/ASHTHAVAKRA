@@ -50,3 +50,4 @@ To prevent cross-subject data leakage and evaluate real-world clinical generaliz
 - Guarded by a user setting: *"Experimental ML Exercise Recognition"* (Disabled by default).
 - Threshold Guard: Classification decisions require confidence $\ge 0.70$. If confidence $< 0.70$, the inference result is marked `uncertain`, preserving deterministic rule execution.
 - Verification: SHA-256 cryptographic hash check matches `model_manifest.json` before loading model bytes.
+

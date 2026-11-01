@@ -122,3 +122,4 @@ def extract_window_features(window_samples: List[Dict[str, Any]]) -> List[float]
         features.extend(ch_feats)
         
     return features
+

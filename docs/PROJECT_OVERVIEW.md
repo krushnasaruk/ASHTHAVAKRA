@@ -39,3 +39,4 @@ H10 bridges this gap with an end-to-end modular pipeline consisting of:
 | **In Scope (MVP)** | Wi-Fi streaming (ESP32 / Simulator), 30-byte binary & JSON packet decoders, 2-stage calibration, 5 exercises, live biofeedback, repetition counter, dimensionless jerk smoothness, consistency score, fatigue drop index, offline local storage, idempotent backend sync, clinician dashboard, plan versioning, 1-page PDF export, CSV export, Colab ML training scripts. |
 | **Phase 2 (Architected)** | 3D hand rendering, tremor-band spectral analysis, bilateral comparison (unaffected reference), fingertip FSR pressure sensing, Bluetooth Low Energy (BLE) transport. |
 | **Out of Scope** | Clinical diagnosis, automatic difficulty progression, voice control, multi-clinic tenanting, PII storage, hospital EHR integration. |
+

@@ -93,3 +93,4 @@ class CalibrationRecord {
     status: json['status'] as String,
   );
 }
+

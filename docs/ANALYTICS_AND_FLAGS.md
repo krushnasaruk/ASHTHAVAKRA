@@ -44,3 +44,4 @@ Clinical flags highlight potential safety risks, compensation strategies, or pro
 - All raised flags remain open until a clinician reviews them on the Clinician Dashboard.
 - Clinicians enter a clinical note (e.g., *"Reviewed in clinic; decreased prescribed reps from 12 to 10"*).
 - The acknowledgment is timestamped, recorded with the clinician's ID, and saved to the audit log.
+

@@ -42,3 +42,4 @@ When recording a rehabilitation exercise trial:
 4. **Full Fist Baseline:** Patient curls hand into a full comfortable fist for $5.0\text{ seconds}$.
 5. **Prescribed Exercise Execution:** Perform 10–15 guided repetitions of the target movement at a natural, unhurried cadence ($1.5–2.5\text{ s}$ per repetition) with $2.0\text{ s}$ inter-rep rest intervals.
 6. **Post-Trial Self-Report:** Immediately log self-reported visual analogue pain ($0–10$) and Borg fatigue ($0–10$).
+

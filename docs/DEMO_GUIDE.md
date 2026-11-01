@@ -70,3 +70,4 @@ flutter run
 6. **Plan Editor Tab:** Tap **Update / Version Plan**, enter a clinical justification (e.g. *"Progressing target ROM by 5%"*), and verify that Version 3 is created with an audit trail.
 7. **Export Tab:** Tap **Generate 1-Page Summary PDF**. Observe the generated clinical summary document with complete baseline comparisons and mandatory research prototype disclaimers.
 8. Tap **Download Telemetry CSV** to view the raw telemetry records.
+

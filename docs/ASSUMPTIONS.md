@@ -33,3 +33,4 @@ This document records all baseline assumptions, design defaults, and operational
 | Model Training Execution | Google Colab scripts | Per user directive, Colab training pipeline scripts & notebooks generated to avoid long local training delays; on-device mock/fixture models supplied for integration tests. |
 | Report format | PDF from backend-provided JSON | Generated via PDF package in clinician dashboard. |
 | Real data consent | Strictly mandatory | Tooling blocks recording if consent flag is false. |
+

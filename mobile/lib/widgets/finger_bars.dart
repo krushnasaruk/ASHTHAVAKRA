@@ -118,3 +118,4 @@ class FingerBarsWidget extends StatelessWidget {
     );
   }
 }
+

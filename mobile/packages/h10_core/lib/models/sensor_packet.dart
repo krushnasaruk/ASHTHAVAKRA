@@ -213,3 +213,4 @@ class PacketDecoder {
     diagnostics.lastPacketTimeMillis = DateTime.now().millisecondsSinceEpoch;
   }
 }
+

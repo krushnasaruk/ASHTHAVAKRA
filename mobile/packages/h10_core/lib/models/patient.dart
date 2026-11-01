@@ -33,3 +33,4 @@ class Patient {
     dataSource: json['data_source'] as String? ?? 'real',
   );
 }
+

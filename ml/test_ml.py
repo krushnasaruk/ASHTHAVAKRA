@@ -68,3 +68,4 @@ def test_manifest_integrity_and_sha256():
         sha256.update(f.read())
     expected_hash = sha256.hexdigest()
     assert manifest["sha256"] == expected_hash, "Manifest SHA-256 does not match model file!"
+

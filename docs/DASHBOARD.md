@@ -52,3 +52,4 @@ flowchart TD
 
 ### 2.4 View 4: Clinical Action Audit Log
 - Immutable chronological ledger recording all plan updates, versions, and flag acknowledgments with clinician identifiers and justifications.
+

@@ -77,3 +77,4 @@ A responsive single-page web portal designed for physical therapists on 1280px+ 
 - Enforces strict pseudonymization (`P-XXX`), rejecting any payload containing identifiable PII.
 - Idempotent session ingestion: Duplicate identical submissions return `200 OK`; divergent payloads return `409 Conflict`.
 - Plan versioning with non-destructive tombstone archiving.
+

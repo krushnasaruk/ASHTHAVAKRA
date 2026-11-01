@@ -64,3 +64,4 @@ class SmoothnessCalculator {
     return normalized;
   }
 }
+

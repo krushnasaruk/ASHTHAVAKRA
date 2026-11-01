@@ -223,3 +223,4 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 }
+

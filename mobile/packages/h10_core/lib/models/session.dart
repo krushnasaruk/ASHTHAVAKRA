@@ -145,3 +145,4 @@ class SessionRecord {
     syncStatus: json['sync_status'] as String? ?? 'pending',
   );
 }
+

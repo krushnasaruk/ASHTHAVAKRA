@@ -68,3 +68,4 @@ The H10 backend is implemented in Python using FastAPI, providing high-performan
   - Body: `{"clinician_id": "Dr. Sarah Adams", "note": "Adjusted repetition targets."}`
 - **`GET /overview`**: Clinician dashboard aggregated metrics (total patients, open flags, sessions today, 7-day adherence rate).
 - **`GET /export`**: Telemetry data export in CSV or JSON format.
+

@@ -67,3 +67,4 @@ $$\Delta_{\text{drift}, i} = \frac{|x_{\text{rest}, i} - M_{\text{open}, i}|}{\D
 
 - **Drift Warning:** If $\Delta_{\text{drift}, i} > 15\%$, a non-blocking diagnostic notification appears: *"Sensor calibration drift detected. Recalibration recommended."*
 - **Auto-Prompt:** If drift persists across 3 consecutive sessions, the app flags a `calibration_drift_detected` clinical alert.
+

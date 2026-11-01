@@ -65,3 +65,4 @@ For browser debugging, unit testing, and fallbacks:
 - `POST /api/session/stop` -> Body: `{"session_id": "<uuid>"}`. 200 / 404
 - `POST /api/control/haptic` -> Body: `{"motor": "both", "duration_ms": 200}`. 200 / 501
 - `POST /api/control/rate` -> Body: `{"hz": 50}`. 200 / 422
+

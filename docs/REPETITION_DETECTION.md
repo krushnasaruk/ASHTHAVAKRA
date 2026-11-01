@@ -71,3 +71,4 @@ $$\text{Drop}\% = \frac{\bar{R}_{\text{first}} - \bar{R}_{\text{last}}}{\bar{R}_
 
 - **Fatigue Detected:** Triggered when $\text{Drop}\% \ge 20.0\%$ (or custom plan threshold).
 - **Clinical Implication:** Indicates excessive patient fatigue or unsustainable repetition volume, advising rest.
+

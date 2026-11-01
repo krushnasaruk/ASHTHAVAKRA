@@ -266,3 +266,4 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 }
+

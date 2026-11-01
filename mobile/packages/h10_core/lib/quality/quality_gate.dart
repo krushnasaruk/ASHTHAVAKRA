@@ -155,3 +155,4 @@ class SessionQualityGate {
     return results;
   }
 }
+

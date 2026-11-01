@@ -40,3 +40,4 @@
     "gyro_mag_mean", "gyro_mag_std", "gyro_mag_min", "gyro_mag_max", "gyro_mag_range", "gyro_mag_median", "gyro_mag_rms", "gyro_mag_mean_diff", "gyro_mag_mean_abs_diff", "gyro_mag_slope", "gyro_mag_peak_count", "gyro_mag_energy"
   ]
 }
+

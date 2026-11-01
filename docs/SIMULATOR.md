@@ -46,3 +46,4 @@ To run automated scenario tests:
 ```bash
 pytest simulator/test_simulator.py
 ```
+

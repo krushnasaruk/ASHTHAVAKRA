@@ -56,3 +56,4 @@ flowchart LR
 - **Network Modes:**
   - **Access Point (AP) Mode:** ESP32 broadcasts SSID `H10-Glove-AP` (default gateway `192.168.4.1`). The mobile app connects directly.
   - **Station (STA) Mode:** ESP32 joins the local clinical Wi-Fi network; the user inputs the assigned DHCP IP address into the app settings.
+

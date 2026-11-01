@@ -22,3 +22,4 @@ class EmaFilter {
     _lastValue = null;
   }
 }
+

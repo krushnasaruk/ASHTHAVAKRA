@@ -115,3 +115,4 @@ In case of error:
 - `POST /api/session/stop`: Concludes active recording session. Body: `{"session_id": "<uuid>"}`.
 - `POST /api/control/haptic`: Triggers haptic vibration pulse. Body: `{"motor": "index|both", "duration_ms": 200}`.
 - `POST /api/control/rate`: Configures sensor stream rate (25 or 50 Hz). Body: `{"hz": 50}`.
+

@@ -133,3 +133,4 @@ erDiagram
 ### 2.4 `repetitions`
 - Detailed breakdown of each segmented cycle within the session.
 - Tracks peak excursion, mean, dimensionless jerk smoothness, hold time, and validation status (`complete`, `interrupted`, `rejected`).
+

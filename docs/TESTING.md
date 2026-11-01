@@ -59,3 +59,4 @@ $ cd mobile && flutter test
 $ cd admin && flutter test
 00:02 +1: All tests passed!
 ```
+

@@ -48,3 +48,4 @@ Upon session completion, the system assigns one of three categorical data qualit
 - **`invalid`:**
   - Uncalibrated glove, severe packet loss ($> 15\%$), or flatlined sensor channel during $> 25\%$ of session duration.
   - Excluded from recovery analytics; clinician alerted to inspect hardware.
+

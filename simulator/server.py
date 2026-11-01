@@ -201,3 +201,4 @@ async def websocket_sensors(websocket: WebSocket):
         pass
     except Exception:
         pass
+

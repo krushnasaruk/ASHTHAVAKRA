@@ -114,3 +114,4 @@ class QualityStripWidget extends StatelessWidget {
     );
   }
 }
+

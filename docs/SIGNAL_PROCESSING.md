@@ -54,3 +54,4 @@ Different exercises map to different primary kinematic channels:
 - **Forearm Rotation (Pronation / Supination):** Trapezoidal numerical integration of the forearm-axis gyroscope ($g_y$):
   $$\theta[k] = \theta[k-1] + g_y[k] \cdot \Delta t$$
   Normalized against prescribed target angle (e.g. $\pm 60^\circ$).
+

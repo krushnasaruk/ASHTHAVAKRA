@@ -59,3 +59,4 @@ class ClinicalFlag {
     ackNote: json['ack_note'] as String?,
   );
 }
+

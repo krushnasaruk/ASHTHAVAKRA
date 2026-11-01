@@ -148,3 +148,4 @@ class CalibrationModel(Base):
     min_span_threshold = Column(Integer, default=300)
     fingers = Column(JSON, nullable=False)
     status = Column(String(20), default="valid")
+

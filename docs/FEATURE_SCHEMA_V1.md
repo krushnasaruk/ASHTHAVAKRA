@@ -61,3 +61,4 @@ For each angular velocity axis $g_x, g_y, g_z$:
 6. **Flexion Velocity Peak:** Maximum first derivative across all flex channels.
 7. **Zero-Crossing Rate (ZCR):** Number of mean crossings of primary control signal.
 8. **Signal Crest Factor:** Peak amplitude divided by RMS amplitude.
+

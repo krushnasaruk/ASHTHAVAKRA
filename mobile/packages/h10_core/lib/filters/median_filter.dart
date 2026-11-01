@@ -22,3 +22,4 @@ class MedianFilter {
     _buffer.clear();
   }
 }
+

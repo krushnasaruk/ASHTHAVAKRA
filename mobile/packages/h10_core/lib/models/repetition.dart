@@ -73,3 +73,4 @@ class Repetition {
     rejectReason: json['reject_reason'] as String?,
   );
 }
+

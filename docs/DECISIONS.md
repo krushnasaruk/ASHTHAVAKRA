@@ -45,3 +45,4 @@ Key architectural decisions, trade-offs, and design rationales made during the d
 - **Context:** Mobile apps operate in home environments with unreliable network connectivity, resulting in retry storms and duplicate HTTP requests.
 - **Decision:** Compute a deterministic SHA-256 hash of session telemetry. If an identical session ID is submitted with an identical hash, return `200 OK` (idempotent success). If submitted with differing telemetry, return `409 Conflict`.
 - **Consequences:** Guarantees zero duplicate database rows while preventing silent data overwrites.
+

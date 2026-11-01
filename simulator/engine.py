@@ -103,3 +103,4 @@ class SimulatorEngine:
             return False, pack_binary_packet(frame)
         else:
             return False, frame
+
