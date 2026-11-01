@@ -60,6 +60,10 @@ All tiers of the system contain automated test suites:
 ## Documentation
 
 For comprehensive engineering details, refer to the documentation in [`docs/`](docs/):
+- [`docs/vaishnavi_jare/README.md`](docs/vaishnavi_jare/README.md) — **Dedicated Designer Workspace & Onboarding for Vaishnavi Jare**.
+- [`docs/vaishnavi_jare/PRESENTATION_GUIDE.md`](docs/vaishnavi_jare/PRESENTATION_GUIDE.md) — Pitch scripts, slide structure, and live demo walkthrough.
+- [`docs/vaishnavi_jare/QNA_GUIDE.md`](docs/vaishnavi_jare/QNA_GUIDE.md) — Clinical & technical answers for evaluators and therapists.
+- [`docs/vaishnavi_jare/LARP.md`](docs/vaishnavi_jare/LARP.md) — **LARP Survival Guide**: Confident answers to buzzword and clueless hackathon judge questions.
 - [`docs/PROJECT_OVERVIEW.md`](docs/PROJECT_OVERVIEW.md) — System purpose, clinical boundaries, and user roles.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — System block diagram and subsystem descriptions.
 - [`docs/DEVICE_PROTOCOL.md`](docs/DEVICE_PROTOCOL.md) — WebSocket 30-byte binary packet specification and REST lifecycle.
