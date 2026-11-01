@@ -12,7 +12,7 @@ import sys
 import json
 import hashlib
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 import numpy as np
 
 # Ensure local imports work in Colab or repo clone
@@ -157,7 +157,7 @@ def train_and_evaluate(dataset_path: str, output_dir: str):
     manifest = {
         "model_name": "h10_exercise_recognizer",
         "model_version": "0.1.0",
-        "trained_at": datetime.utcnow().isoformat() + "Z",
+        "trained_at": datetime.now(timezone.utc).isoformat(),
         "feature_schema": "feat-v1",
         "classes": CLASSES,
         "sampling_hz": 50.0,
@@ -167,7 +167,7 @@ def train_and_evaluate(dataset_path: str, output_dir: str):
         "evaluation_ref": "evaluation_report.md",
         "sha256": model_hash
     }
-    with open(manifest_path, "w") as f:
+    with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
 
     # Generate Evaluation Markdown
@@ -199,7 +199,7 @@ Classes: {CLASSES}
 - SHA-256 Hash: `{model_hash}`
 - Confidence Threshold: 0.70 (Inference below 0.70 emits 'Unable to confidently identify this movement.')
 """
-    with open(report_path, "w") as f:
+    with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_md)
     print(f"Generated evaluation report to: {report_path}")
     print(f"Generated manifest to: {manifest_path}")

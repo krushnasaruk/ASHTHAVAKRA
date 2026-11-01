@@ -3,7 +3,7 @@
 ## 1. Overview
 - **Model Name:** `h10_exercise_recognizer`
 - **Architecture:** MLP / Random Forest Baseline
-- **Date Trained:** 2026-11-01T10:04:15.790688Z
+- **Date Trained:** 2026-11-01T16:10:36.917089+00:00
 - **Feature Schema:** `feat-v1` (84 features)
 - **Data Sources:** Real: 0, Simulated: 0, Synthetic: 40
 
@@ -12,8 +12,8 @@
 
 ## 2. Participant-Level Cross-Validation
 - **Number of Folds:** 4
-- **Accuracy (mean ± SD):** 1.0000 ± 0.0000
-- **Macro-F1 (mean ± SD):** 1.0000 ± 0.0000
+- **Accuracy (mean Â± SD):** 1.0000 Â± 0.0000
+- **Macro-F1 (mean Â± SD):** 1.0000 Â± 0.0000
 
 ## 3. Confusion Matrix
 Classes: ['fist_clench', 'finger_tap', 'pinch', 'wrist_rotation', 'rest_or_other']

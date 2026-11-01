@@ -1,7 +1,7 @@
 {
   "model_name": "h10_exercise_recognizer",
   "model_version": "0.1.0",
-  "trained_at": "2026-11-01T10:04:15.790688Z",
+  "trained_at": "2026-11-01T16:10:36.917089+00:00",
   "feature_schema": "feat-v1",
   "classes": [
     "fist_clench",

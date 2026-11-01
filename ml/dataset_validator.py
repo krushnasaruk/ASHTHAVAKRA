@@ -119,3 +119,26 @@ class DatasetValidator:
 
         return report
 
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Validate H10 dataset trials JSON")
+    parser.add_argument("--input", type=str, default="ml/data/synthetic_dataset.json", help="Path to dataset trial JSON")
+    args = parser.parse_args()
+
+    validator = DatasetValidator()
+    if os.path.exists(args.input):
+        res = validator.validate_dataset_file(args.input)
+        print(f"Validation Report for {args.input}:")
+        print(f"  Total trials: {res['total_trials']}")
+        print(f"  Valid trials: {res['valid_trials']}")
+        print(f"  Invalid trials: {res['invalid_trials']}")
+        if res["invalid_trials"] == 0:
+            print("  Result: [PASS] All trials meet strict H10 dataset standards.")
+        else:
+            print("  Result: [FAIL] Errors detected:")
+            for d in res["details"]:
+                print(f"    - {d}")
+    else:
+        print(f"Error: File not found: {args.input}")
+
