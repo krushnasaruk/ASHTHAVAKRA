@@ -1,0 +1,58 @@
+{
+  "description": "Ground truth expected outcomes for H10 simulator integration testing",
+  "scenarios": {
+    "open_hand_rest": {
+      "duration_s": 10.0,
+      "expected_reps": 0,
+      "expected_rejects": 0,
+      "quality_gate_result": "pass",
+      "expected_flags": []
+    },
+    "fist_repetitions": {
+      "duration_s": 62.0,
+      "expected_reps": 20,
+      "expected_rejects": 0,
+      "quality_gate_result": "pass",
+      "target_channel": "mean_all_fingers",
+      "expected_flags": []
+    },
+    "fast_repetitions": {
+      "duration_s": 17.0,
+      "expected_reps": 0,
+      "expected_rejects": 15,
+      "reject_reason": "too_fast",
+      "quality_gate_result": "pass"
+    },
+    "incomplete_repetitions": {
+      "duration_s": 39.5,
+      "expected_reps": 0,
+      "expected_rejects": 15,
+      "reject_reason": "incomplete",
+      "quality_gate_result": "pass"
+    },
+    "finger_tapping_index": {
+      "duration_s": 32.0,
+      "expected_reps": 15,
+      "expected_rejects": 0,
+      "target_channel": "flex_index"
+    },
+    "pinch_series": {
+      "duration_s": 39.5,
+      "expected_reps": 15,
+      "expected_rejects": 0,
+      "target_channel": "pinch"
+    },
+    "wrist_rotation": {
+      "duration_s": 32.0,
+      "expected_reps": 10,
+      "expected_rejects": 0,
+      "target_channel": "gyro_forearm"
+    },
+    "fault_injection": {
+      "duration_s": 20.0,
+      "expected_reps": 0,
+      "expected_quality_gate": "fail",
+      "expected_reasons": ["flatline_detected", "out_of_range", "packet_loss"]
+    }
+  }
+}

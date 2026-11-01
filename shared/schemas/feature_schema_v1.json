@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FeatureSchemaV1",
+  "description": "Definition of feat-v1 extracted features across 7 channels (5 flex, 1 accel mag, 1 gyro mag)",
+  "version": "feat-v1",
+  "window_samples": 75,
+  "stride_samples": 25,
+  "sampling_hz": 50,
+  "channels": [
+    "flex_thumb",
+    "flex_index",
+    "flex_middle",
+    "flex_ring",
+    "flex_pinky",
+    "accel_mag",
+    "gyro_mag"
+  ],
+  "metrics_per_channel": [
+    "mean",
+    "std",
+    "min",
+    "max",
+    "range",
+    "median",
+    "rms",
+    "mean_diff",
+    "mean_abs_diff",
+    "slope",
+    "peak_count",
+    "energy"
+  ],
+  "feature_count": 84,
+  "features": [
+    "flex_thumb_mean", "flex_thumb_std", "flex_thumb_min", "flex_thumb_max", "flex_thumb_range", "flex_thumb_median", "flex_thumb_rms", "flex_thumb_mean_diff", "flex_thumb_mean_abs_diff", "flex_thumb_slope", "flex_thumb_peak_count", "flex_thumb_energy",
+    "flex_index_mean", "flex_index_std", "flex_index_min", "flex_index_max", "flex_index_range", "flex_index_median", "flex_index_rms", "flex_index_mean_diff", "flex_index_mean_abs_diff", "flex_index_slope", "flex_index_peak_count", "flex_index_energy",
+    "flex_middle_mean", "flex_middle_std", "flex_middle_min", "flex_middle_max", "flex_middle_range", "flex_middle_median", "flex_middle_rms", "flex_middle_mean_diff", "flex_middle_mean_abs_diff", "flex_middle_slope", "flex_middle_peak_count", "flex_middle_energy",
+    "flex_ring_mean", "flex_ring_std", "flex_ring_min", "flex_ring_max", "flex_ring_range", "flex_ring_median", "flex_ring_rms", "flex_ring_mean_diff", "flex_ring_mean_abs_diff", "flex_ring_slope", "flex_ring_peak_count", "flex_ring_energy",
+    "flex_pinky_mean", "flex_pinky_std", "flex_pinky_min", "flex_pinky_max", "flex_pinky_range", "flex_pinky_median", "flex_pinky_rms", "flex_pinky_mean_diff", "flex_pinky_mean_abs_diff", "flex_pinky_slope", "flex_pinky_peak_count", "flex_pinky_energy",
+    "accel_mag_mean", "accel_mag_std", "accel_mag_min", "accel_mag_max", "accel_mag_range", "accel_mag_median", "accel_mag_rms", "accel_mag_mean_diff", "accel_mag_mean_abs_diff", "accel_mag_slope", "accel_mag_peak_count", "accel_mag_energy",
+    "gyro_mag_mean", "gyro_mag_std", "gyro_mag_min", "gyro_mag_max", "gyro_mag_range", "gyro_mag_median", "gyro_mag_rms", "gyro_mag_mean_diff", "gyro_mag_mean_abs_diff", "gyro_mag_slope", "gyro_mag_peak_count", "gyro_mag_energy"
+  ]
+}

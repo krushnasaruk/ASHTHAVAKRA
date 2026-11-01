@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SensorPacket",
+  "description": "Schema for logical sensor packet received from ESP32 or simulator via WebSocket",
+  "type": "object",
+  "required": ["v", "t", "flex", "imu", "fsr", "flags", "battery"],
+  "properties": {
+    "v": {
+      "type": "integer",
+      "const": 1,
+      "description": "Protocol version"
+    },
+    "t": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Timestamp in milliseconds since boot"
+    },
+    "flex": {
+      "type": "array",
+      "description": "Raw ADC readings for [thumb, index, middle, ring, pinky]",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 4095
+      },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "imu": {
+      "type": "array",
+      "description": "IMU raw readings [ax, ay, az, gx, gy, gz]. Accel in mg, gyro in 0.1 deg/s",
+      "items": {
+        "type": "integer",
+        "minimum": -32768,
+        "maximum": 32767
+      },
+      "minItems": 6,
+      "maxItems": 6
+    },
+    "fsr": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4095,
+      "description": "FSR tip sensor ADC reading (0 if unsupported)"
+    },
+    "flags": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "description": "Bit flags: bit0=calibrated, bit1=low_battery, bit2=session_active, bit3=simulated"
+    },
+    "battery": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Battery percentage (0-100)"
+    },
+    "simulated": {
+      "type": "boolean",
+      "description": "Explicit simulated flag"
+    }
+  },
+  "additionalProperties": false
+}

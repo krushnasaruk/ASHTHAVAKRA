@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Patient",
+  "description": "Patient record containing pseudonymous identifier only; no PII",
+  "type": "object",
+  "required": ["id", "pseudonym", "affected_hand", "created_at", "data_source"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "pseudonym": {
+      "type": "string",
+      "pattern": "^P-[0-9]{3,}$",
+      "description": "Pseudonymous identifier such as P-014"
+    },
+    "affected_hand": {
+      "type": "string",
+      "enum": ["left", "right", "unknown"]
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "notes": { "type": "string", "default": "" },
+    "data_source": {
+      "type": "string",
+      "enum": ["real", "simulated"],
+      "default": "real"
+    }
+  },
+  "additionalProperties": false
+}

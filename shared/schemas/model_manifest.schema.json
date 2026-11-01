@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ModelManifest",
+  "description": "Metadata manifest packaging an exercise recognition model",
+  "type": "object",
+  "required": [
+    "model_name", "model_version", "trained_at", "feature_schema",
+    "classes", "sampling_hz", "window_s", "stride_s", "data_sources",
+    "evaluation_ref", "sha256"
+  ],
+  "properties": {
+    "model_name": { "type": "string" },
+    "model_version": { "type": "string" },
+    "trained_at": { "type": "string", "format": "date-time" },
+    "feature_schema": { "type": "string", "const": "feat-v1" },
+    "classes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "sampling_hz": { "type": "number", "default": 50 },
+    "window_s": { "type": "number", "default": 1.5 },
+    "stride_s": { "type": "number", "default": 0.5 },
+    "data_sources": {
+      "type": "object",
+      "required": ["real", "simulated", "synthetic"],
+      "properties": {
+        "real": { "type": "integer", "minimum": 0 },
+        "simulated": { "type": "integer", "minimum": 0 },
+        "synthetic": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "evaluation_ref": { "type": "string" },
+    "sha256": { "type": "string" }
+  },
+  "additionalProperties": false
+}

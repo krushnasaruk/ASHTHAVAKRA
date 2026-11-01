@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Session",
+  "description": "Rehabilitation session record",
+  "type": "object",
+  "required": [
+    "id", "patient_id", "exercise_code", "plan_version", "started_at", "ended_at",
+    "duration_s", "reps_completed", "reps_target", "reps_interrupted", "mean_rom", "max_rom",
+    "mean_rep_duration_s", "hold_s", "pain_after", "fatigue_after", "data_quality",
+    "data_source", "device_id", "firmware", "calibration_ref", "client_version", "created_at"
+  ],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "patient_id": { "type": "string" },
+    "exercise_code": {
+      "type": "string",
+      "enum": ["fist_clench", "finger_tap", "pinch", "wrist_rotation", "hand_control_game"]
+    },
+    "plan_version": { "type": "integer", "minimum": 1 },
+    "started_at": { "type": "string", "format": "date-time" },
+    "ended_at": { "type": "string", "format": "date-time" },
+    "duration_s": { "type": "number", "minimum": 0 },
+    "reps_completed": { "type": "integer", "minimum": 0 },
+    "reps_target": { "type": "integer", "minimum": 1 },
+    "reps_interrupted": { "type": "integer", "minimum": 0, "default": 0 },
+    "mean_rom": { "type": "number", "minimum": 0, "maximum": 100 },
+    "max_rom": { "type": "number", "minimum": 0, "maximum": 100 },
+    "mean_rep_duration_s": { "type": "number", "minimum": 0 },
+    "smoothness": { "type": ["number", "null"] },
+    "hold_s": { "type": "number", "minimum": 0 },
+    "consistency": { "type": ["number", "null"] },
+    "consistency_components": {
+      "type": ["object", "null"],
+      "properties": {
+        "rom_ratio": { "type": ["number", "null"] },
+        "timing_score": { "type": ["number", "null"] },
+        "smooth_score": { "type": ["number", "null"] },
+        "is_available": { "type": "boolean" },
+        "missing_reason": { "type": ["string", "null"] }
+      }
+    },
+    "fatigue_drop_pct": { "type": ["number", "null"] },
+    "pain_before": { "type": ["integer", "null"], "minimum": 0, "maximum": 10 },
+    "pain_after": { "type": "integer", "minimum": 0, "maximum": 10 },
+    "fatigue_before": { "type": ["integer", "null"], "minimum": 0, "maximum": 10 },
+    "fatigue_after": { "type": "integer", "minimum": 0, "maximum": 10 },
+    "note": { "type": "string", "maxLength": 500, "default": "" },
+    "data_quality": { "type": "string", "enum": ["good", "reduced", "invalid"] },
+    "data_source": { "type": "string", "enum": ["real", "simulated"] },
+    "device_id": { "type": "string" },
+    "firmware": { "type": "string" },
+    "calibration_ref": { "type": "string" },
+    "model_version": { "type": ["string", "null"] },
+    "client_version": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "received_at": { "type": ["string", "null"], "format": "date-time" },
+    "sync_status": { "type": "string", "enum": ["pending", "synced", "conflict"], "default": "pending" }
+  },
+  "additionalProperties": false
+}

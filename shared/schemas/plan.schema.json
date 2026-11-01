@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RehabilitationPlan",
+  "description": "Prescribed rehabilitation plan entity with versioning",
+  "type": "object",
+  "required": [
+    "id", "patient_id", "exercise_id", "target_reps", "target_rom_min",
+    "target_rom_max", "hold_s", "rest_s", "sessions_per_week",
+    "stop_instruction", "fatigue_drop_threshold", "valid_from", "set_by", "version"
+  ],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "patient_id": { "type": "string" },
+    "exercise_id": { "type": "string" },
+    "target_reps": { "type": "integer", "minimum": 1, "maximum": 100 },
+    "target_rom_min": { "type": "number", "minimum": 0, "maximum": 100, "default": 70 },
+    "target_rom_max": { "type": "number", "minimum": 0, "maximum": 100, "default": 100 },
+    "hold_s": { "type": "number", "minimum": 0, "maximum": 10, "default": 0.5 },
+    "rest_s": { "type": "number", "minimum": 0, "maximum": 60, "default": 2.0 },
+    "sessions_per_week": { "type": "integer", "minimum": 1, "maximum": 28, "default": 5 },
+    "stop_instruction": { "type": "string", "default": "Stop if you feel sharp pain. Rest as needed." },
+    "fatigue_drop_threshold": { "type": "number", "minimum": 5, "maximum": 50, "default": 20 },
+    "valid_from": { "type": "string", "format": "date-time" },
+    "valid_to": { "type": ["string", "null"], "format": "date-time" },
+    "set_by": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 }
+  },
+  "additionalProperties": false
+}

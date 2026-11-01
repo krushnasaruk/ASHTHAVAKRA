@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClinicalFlag",
+  "description": "Rule-based assistive clinical flag generated from sensor metrics",
+  "type": "object",
+  "required": ["id", "patient_id", "type", "severity", "created_at", "message", "metric_values", "threshold_used"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "patient_id": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": [
+        "rom_below_plan",
+        "in_session_fatigue",
+        "pain_increase",
+        "adherence_low",
+        "missing_sessions",
+        "calibration_stale",
+        "data_quality_low",
+        "sudden_inconsistency"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "review"]
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "session_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "message": { "type": "string" },
+    "metric_values": {
+      "type": "object",
+      "additionalProperties": { "type": ["number", "string", "null"] }
+    },
+    "threshold_used": {
+      "type": "object",
+      "additionalProperties": { "type": ["number", "string", "null"] }
+    },
+    "acknowledged_at": { "type": ["string", "null"], "format": "date-time" },
+    "acknowledged_by": { "type": ["string", "null"] },
+    "ack_note": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

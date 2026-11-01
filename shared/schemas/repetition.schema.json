@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Repetition",
+  "description": "Per-repetition metrics record",
+  "type": "object",
+  "required": ["id", "session_id", "index", "start_ms", "end_ms", "duration_s", "peak", "mean", "min", "rom", "hold_s", "status", "quality"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "index": { "type": "integer", "minimum": 0 },
+    "start_ms": { "type": "integer", "minimum": 0 },
+    "end_ms": { "type": "integer", "minimum": 0 },
+    "duration_s": { "type": "number", "minimum": 0 },
+    "peak": { "type": "number", "minimum": 0, "maximum": 100 },
+    "mean": { "type": "number", "minimum": 0, "maximum": 100 },
+    "min": { "type": "number", "minimum": 0, "maximum": 100 },
+    "rom": { "type": "number", "minimum": 0, "maximum": 100 },
+    "hold_s": { "type": "number", "minimum": 0 },
+    "smoothness": { "type": ["number", "null"] },
+    "quality": { "type": "string", "enum": ["good", "reduced", "invalid"] },
+    "status": { "type": "string", "enum": ["complete", "interrupted", "rejected"] },
+    "reject_reason": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

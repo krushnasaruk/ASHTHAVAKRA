@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DatasetTrial",
+  "description": "Recorded rehabilitation exercise trial for machine learning dataset",
+  "type": "object",
+  "required": [
+    "participant_id", "session_id", "trial_id", "exercise_label", "source",
+    "consent_given", "calibration_ref", "device_firmware", "sampling_hz",
+    "quality", "recorder_app_version", "samples"
+  ],
+  "properties": {
+    "participant_id": { "type": "string" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "trial_id": { "type": "string", "format": "uuid" },
+    "exercise_label": {
+      "type": "string",
+      "enum": ["fist_clench", "finger_tap", "pinch", "wrist_rotation", "rest_or_other"]
+    },
+    "movement_phase": {
+      "type": "string",
+      "enum": ["rest", "start", "peak", "return"]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["real", "simulated", "synthetic"]
+    },
+    "consent_given": {
+      "type": "boolean",
+      "description": "Required true for real source data collection"
+    },
+    "calibration_ref": { "type": "string" },
+    "device_firmware": { "type": "string" },
+    "sampling_hz": { "type": "number", "default": 50 },
+    "quality": {
+      "type": "string",
+      "enum": ["good", "noisy", "invalid"]
+    },
+    "recorder_app_version": { "type": "string" },
+    "samples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["t", "flex", "imu"],
+        "properties": {
+          "t": { "type": "integer" },
+          "flex": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "minItems": 5,
+            "maxItems": 5
+          },
+          "imu": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "minItems": 6,
+            "maxItems": 6
+          },
+          "fsr": { "type": "integer", "default": 0 }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,23 @@
+{
+  "model_name": "h10_exercise_recognizer",
+  "model_version": "0.1.0",
+  "trained_at": "2026-11-01T10:04:15.790688Z",
+  "feature_schema": "feat-v1",
+  "classes": [
+    "fist_clench",
+    "finger_tap",
+    "pinch",
+    "wrist_rotation",
+    "rest_or_other"
+  ],
+  "sampling_hz": 50.0,
+  "window_s": 1.5,
+  "stride_s": 0.5,
+  "data_sources": {
+    "real": 0,
+    "simulated": 0,
+    "synthetic": 40
+  },
+  "evaluation_ref": "evaluation_report.md",
+  "sha256": "96490476473cc7f40849f3e995442e99fd04da2ee130d986fa5ec247ef50660f"
+}

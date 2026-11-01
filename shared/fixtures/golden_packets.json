@@ -1,0 +1,95 @@
+[
+  {
+    "id": "standard_rest",
+    "description": "Resting hand pose, calibrated, 95% battery",
+    "hex": "e803000008076c07d0079e073a071900f1ffd4030200ffff00000000015f",
+    "byte_length": 30,
+    "expected": {
+      "timestamp_ms": 1000,
+      "flex": [
+        1800,
+        1900,
+        2000,
+        1950,
+        1850
+      ],
+      "imu": [
+        25,
+        -15,
+        980,
+        2,
+        -1,
+        0
+      ],
+      "fsr": 0,
+      "flags": 1,
+      "is_calibrated": true,
+      "is_low_battery": false,
+      "is_session_active": false,
+      "is_simulated": false,
+      "battery_pct": 95
+    }
+  },
+  {
+    "id": "fist_active_simulated",
+    "description": "Fist flexion, session active, simulated",
+    "hex": "c4090000800c480d160de40c1c0c78005500b6032d00ecff0c0096000d50",
+    "byte_length": 30,
+    "expected": {
+      "timestamp_ms": 2500,
+      "flex": [
+        3200,
+        3400,
+        3350,
+        3300,
+        3100
+      ],
+      "imu": [
+        120,
+        85,
+        950,
+        45,
+        -20,
+        12
+      ],
+      "fsr": 150,
+      "flags": 13,
+      "is_calibrated": true,
+      "is_low_battery": false,
+      "is_session_active": true,
+      "is_simulated": true,
+      "battery_pct": 80
+    }
+  },
+  {
+    "id": "boundary_low_battery",
+    "description": "Min/max ADC and IMU ranges, low battery flag",
+    "hex": "a0ffffffff0f0000ff0f000000080080ff7f18fc00000cfef401ff0f0208",
+    "byte_length": 30,
+    "expected": {
+      "timestamp_ms": 4294967200,
+      "flex": [
+        4095,
+        0,
+        4095,
+        0,
+        2048
+      ],
+      "imu": [
+        -32768,
+        32767,
+        -1000,
+        0,
+        -500,
+        500
+      ],
+      "fsr": 4095,
+      "flags": 2,
+      "is_calibrated": false,
+      "is_low_battery": true,
+      "is_session_active": false,
+      "is_simulated": false,
+      "battery_pct": 8
+    }
+  }
+]
