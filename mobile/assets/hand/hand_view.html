@@ -92,9 +92,18 @@
 
     let currentRenderMode = 'skin'; // 'skin' | 'mesh' | 'xray'
     let scene, camera, renderer, handMesh, skeletonBones = {}, restRotations = {};
+    let handRootNode = null;
     let skinMaterial, meshMaterial, xrayMaterial;
     let skeletonGroup, boneLines = [];
     let isModelLoaded = false;
+
+    // Interactive Drag Rotation
+    let isDragging = false;
+    let prevMouseX = 0, prevMouseY = 0;
+    let targetRotY = -0.22;
+    let targetRotX = 3.05;
+    let currentRotY = -0.22;
+    let currentRotX = 3.05;
 
     function initScene() {
       const container = document.getElementById('canvas-container');
@@ -106,8 +115,8 @@
       scene.background = new THREE.Color(0x0a0a0a);
 
       // 2. Camera Setup (Positioned for natural anatomical perspective)
-      camera = new THREE.PerspectiveCamera(38, w / h, 0.01, 100);
-      camera.position.set(0.0, 0.05, 0.38);
+      camera = new THREE.PerspectiveCamera(36, w / h, 0.01, 100);
+      camera.position.set(0.0, 0.0, 0.30);
       camera.lookAt(0.0, 0.0, 0.0);
 
       // 3. Renderer with antialiasing and shadow support
@@ -145,11 +154,35 @@
       // 6. Load 3D Hand Model
       loadHandModel();
 
-      // 7. Window resize handler
+      // 7. Interactive Drag-to-Rotate
+      setupInteraction(container);
+
+      // 8. Window resize handler
       window.addEventListener('resize', onWindowResize);
 
-      // 8. Start Animation Loop
+      // 9. Start Animation Loop
       animate();
+    }
+
+    function setupInteraction(container) {
+      container.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevMouseX;
+        const dy = e.clientY - prevMouseY;
+        targetRotY += dx * 0.008;
+        targetRotX = Math.max(2.6, Math.min(3.6, targetRotX + dy * 0.008));
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+      });
+
+      window.addEventListener('pointerup', () => { isDragging = false; });
+      window.addEventListener('pointercancel', () => { isDragging = false; });
     }
 
     function createMaterials() {
@@ -211,9 +244,10 @@
           }
         });
 
-        // Center and orient model for optimal viewing
-        root.position.set(0.0, -0.06, 0.0);
-        root.rotation.set(-0.2, 3.14159, 0.0); // Facing camera palm forward
+        // Center and orient model upright: fingers point UP (+Y), wrist at bottom (-Y), palm faces forward (+Z)
+        root.position.set(-0.005, -0.035, 0.0);
+        root.rotation.set(targetRotX, targetRotY, 0.0);
+        handRootNode = root;
         scene.add(root);
 
         // Build internal skeleton visualization for X-Ray mode
@@ -417,7 +451,13 @@
       currentImu.qy += (targetImu.qy - currentImu.qy) * LERP_FACTOR;
       currentImu.qz += (targetImu.qz - currentImu.qz) * LERP_FACTOR;
 
-      if (isModelLoaded) {
+      if (isModelLoaded && handRootNode) {
+        // Smoothly lerp hand orientation from user drag
+        currentRotY += (targetRotY - currentRotY) * 0.12;
+        currentRotX += (targetRotX - currentRotX) * 0.12;
+        handRootNode.rotation.y = currentRotY;
+        handRootNode.rotation.x = currentRotX;
+
         // Apply curl to Measured fingers
         applyThumbCurl(currentCurl.thumb);
         applyFingerCurl('index-finger', currentCurl.index);

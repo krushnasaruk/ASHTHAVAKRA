@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
+import '../theme/app_theme.dart';
 
 class RepetitionRingWidget extends StatelessWidget {
   final int completedReps;
@@ -50,6 +51,7 @@ class RepetitionRingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     final progress = targetReps > 0 ? (completedReps / targetReps).clamp(0.0, 1.0) : 0.0;
     final stateColor = _stateColor();
 
@@ -63,10 +65,12 @@ class RepetitionRingWidget extends StatelessWidget {
           SizedBox(
             width: size,
             height: size,
-            child: const CircularProgressIndicator(
+            child: CircularProgressIndicator(
               value: 1.0,
-              strokeWidth: 10,
-              valueColor: AlwaysStoppedAnimation(Color(0xFFE4E9E6)),
+              strokeWidth: 8,
+              valueColor: AlwaysStoppedAnimation(
+                c.isDark ? const Color(0xFF1E2822) : const Color(0xFFE4E9E6),
+              ),
             ),
           ),
           // Active Progress
@@ -75,9 +79,11 @@ class RepetitionRingWidget extends StatelessWidget {
             height: size,
             child: CircularProgressIndicator(
               value: progress,
-              strokeWidth: 10,
+              strokeWidth: 8,
               strokeCap: StrokeCap.round,
-              valueColor: const AlwaysStoppedAnimation(Color(H10Tokens.colorPrimary)),
+              valueColor: AlwaysStoppedAnimation(
+                c.isDark ? const Color(0xFFC8F05F) : const Color(0xFF009E73),
+              ),
             ),
           ),
           // Inner Count & State
@@ -91,35 +97,35 @@ class RepetitionRingWidget extends StatelessWidget {
                 children: [
                   Text(
                     '$completedReps',
-                    style: const TextStyle(
-                      fontSize: 34,
+                    style: TextStyle(
+                      fontSize: size > 90 ? 32 : 22,
                       fontWeight: FontWeight.bold,
-                      fontFeatures: [FontFeature.tabularFigures()],
-                      color: Color(H10Tokens.colorPrimary),
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                      color: c.textPrimary,
                     ),
                   ),
                   Text(
                     ' / $targetReps',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(H10Tokens.colorSecondaryText),
+                    style: TextStyle(
+                      fontSize: size > 90 ? 15 : 12,
+                      fontWeight: FontWeight.w600,
+                      color: c.textSecondary,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 2),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
-                  color: stateColor.withOpacity(0.12),
+                  color: stateColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   _stateLabel(),
                   style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                    fontSize: size > 90 ? 9.5 : 8,
+                    fontWeight: FontWeight.w800,
                     letterSpacing: 0.8,
                     color: stateColor,
                   ),

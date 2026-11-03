@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
 import '../dev/mock_data.dart';
+import '../theme/app_theme.dart';
 
 class QualityStripWidget extends StatelessWidget {
   final bool isConnected;
@@ -32,12 +33,13 @@ class QualityStripWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: H10Tokens.space12, vertical: H10Tokens.space8),
       decoration: BoxDecoration(
-        color: const Color(H10Tokens.colorCard),
+        color: c.card,
         borderRadius: BorderRadius.circular(H10Tokens.radiusCard),
-        border: Border.all(color: const Color(H10Tokens.colorBorder)),
+        border: Border.all(color: c.cardBorder),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -56,7 +58,11 @@ class QualityStripWidget extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 isConnected ? 'Connected' : 'Disconnected',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: c.textPrimary,
+                ),
               ),
               if (isSimulated && kUseMockData) ...[
                 const SizedBox(width: 8),
@@ -86,10 +92,10 @@ class QualityStripWidget extends StatelessWidget {
             children: [
               Text(
                 '${packetRateHz}Hz',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
-                  fontFeatures: [FontFeature.tabularFigures()],
-                  color: Color(H10Tokens.colorSecondaryText),
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                  color: c.textSecondary,
                 ),
               ),
               const SizedBox(width: 8),
