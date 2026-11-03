@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProtocolV1Packet",
+  "description": "RehabBridge NEXUS / H10 Protocol v1 newline-delimited JSON stream packet",
+  "type": "object",
+  "required": [
+    "v",
+    "seq",
+    "t_ms",
+    "flex",
+    "fsr",
+    "imu",
+    "fsr_ok",
+    "imu_ok",
+    "adc_ok",
+    "flags"
+  ],
+  "properties": {
+    "v": {
+      "type": "integer",
+      "const": 1,
+      "description": "Protocol version (must be 1)"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "description": "Monotonically increasing sequence number (uint32)"
+    },
+    "t_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "description": "Milliseconds elapsed on device since boot (uint32)"
+    },
+    "flex": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 32767
+      },
+      "minItems": 3,
+      "maxItems": 5,
+      "description": "Raw ADC conversion counts for configured flex channels"
+    },
+    "fsr": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "maximum": 32767,
+      "description": "Raw ADC conversion count for FSR contact sensor, or null if unsupported"
+    },
+    "imu": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": -32768,
+        "maximum": 32767
+      },
+      "minItems": 6,
+      "maxItems": 6,
+      "description": "Raw int16 readings [ax, ay, az, gx, gy, gz]"
+    },
+    "fsr_ok": {
+      "type": "boolean",
+      "description": "FSR sensor health and I2C/ADC continuity"
+    },
+    "imu_ok": {
+      "type": "boolean",
+      "description": "IMU sensor health and I2C continuity"
+    },
+    "adc_ok": {
+      "type": "boolean",
+      "description": "ADS1115 ADC operational health"
+    },
+    "flags": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "description": "Bitmask: bit 0 = calib loaded, bit 1 = stream active, bit 2 = operator marker pending"
+    }
+  },
+  "additionalProperties": false
+}

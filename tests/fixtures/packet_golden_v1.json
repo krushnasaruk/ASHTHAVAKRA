@@ -1,0 +1,17 @@
+{
+  "source": "synthetic_test_fixture",
+  "description": "Golden protocol v1 packet matching RehabBridge NEXUS / H10 Section 4.3 specification",
+  "raw_line": "{\"v\":1,\"seq\":1241,\"t_ms\":58719,\"flex\":[14322,17211,15010],\"fsr\":9214,\"imu\":[1002,-38,-60,12,-7,3],\"fsr_ok\":true,\"imu_ok\":true,\"adc_ok\":true,\"flags\":0}",
+  "packet": {
+    "v": 1,
+    "seq": 1241,
+    "t_ms": 58719,
+    "flex": [14322, 17211, 15010],
+    "fsr": 9214,
+    "imu": [1002, -38, -60, 12, -7, 3],
+    "fsr_ok": true,
+    "imu_ok": true,
+    "adc_ok": true,
+    "flags": 0
+  }
+}

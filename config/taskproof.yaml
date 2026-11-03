@@ -1,0 +1,66 @@
+# TaskProof state machine configuration
+# All parameters marked provisional until validated with ground-truth trials
+
+timers:
+  attempt_timeout_s:
+    value: 20.0
+    unit: "seconds"
+    status: "provisional"
+    source: "spec_v3_default"
+  lift_window_s:
+    value: 4.0
+    unit: "seconds"
+    status: "provisional"
+    source: "spec_v3_default"
+  source_visible_hold_ms:
+    value: 500
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+  target_reached_hold_ms:
+    value: 300
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+  release_confirmed_hold_ms:
+    value: 500
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+
+thresholds:
+  min_source_detection_rate:
+    value: 0.80
+    unit: "fraction"
+    status: "provisional"
+    source: "spec_v3_default"
+  max_occlusion_ms:
+    value: 150
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+  max_frame_age_ms:
+    value: 200
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+  max_sensor_packet_age_ms:
+    value: 200
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+  min_attempt_camera_visibility:
+    value: 0.80
+    unit: "fraction"
+    status: "provisional"
+    source: "spec_v3_default"
+  contact_grip_max_separation_s:
+    value: 1.0
+    unit: "seconds"
+    status: "provisional"
+    source: "spec_v3_default"
+  zone_boundary_hysteresis_px:
+    value: 10.0
+    unit: "pixels"
+    status: "provisional"
+    source: "spec_v3_default"

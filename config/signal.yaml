@@ -1,0 +1,129 @@
+# Rehabilitation signal processing configuration
+# All parameters marked provisional until calibrated on volunteer hardware
+
+calibration:
+  max_capture_std:
+    value: 40
+    unit: "ADC counts"
+    status: "provisional"
+    source: "spec_v3_default"
+  min_span:
+    value: 300
+    unit: "ADC counts"
+    status: "provisional"
+    source: "spec_v3_default"
+  sample_rate_hz:
+    value: 25
+    unit: "Hz"
+    status: "measured"
+    source: "ads1115_loop_constraint"
+
+filters:
+  flex_display_ema_alpha:
+    value: 0.25
+    unit: "dimensionless"
+    status: "provisional"
+    source: "spec_v3_default"
+  flex_detection_median_window:
+    value: 5
+    unit: "samples"
+    status: "provisional"
+    source: "spec_v3_default"
+  flex_detection_ema_alpha:
+    value: 0.15
+    unit: "dimensionless"
+    status: "provisional"
+    source: "spec_v3_default"
+  fsr_median_window:
+    value: 3
+    unit: "samples"
+    status: "provisional"
+    source: "spec_v3_default"
+  fsr_ema_alpha:
+    value: 0.30
+    unit: "dimensionless"
+    status: "provisional"
+    source: "spec_v3_default"
+
+contact:
+  k_on:
+    value: 4.0
+    unit: "std_deviations"
+    status: "provisional"
+    source: "spec_v3_default"
+  k_off:
+    value: 2.0
+    unit: "std_deviations"
+    status: "provisional"
+    source: "spec_v3_default"
+  min_contact_ms:
+    value: 100
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+  min_release_ms:
+    value: 150
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+  fsr_rail_threshold:
+    value: 31000
+    unit: "ADC counts"
+    status: "provisional"
+    source: "spec_v3_default"
+  rail_fault_duration_ms:
+    value: 300
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+
+grip:
+  grip_delta_pct:
+    value: 15.0
+    unit: "percent"
+    status: "provisional"
+    source: "spec_v3_default"
+  window_ms:
+    value: 400
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+  hold_ms:
+    value: 150
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+
+imu:
+  accel_scale_lsb_per_g:
+    value: 8192.0
+    unit: "LSB/g"
+    status: "measured"
+    source: "mpu6050_datasheet_pm4g"
+  gyro_scale_lsb_per_deg_s:
+    value: 65.5
+    unit: "LSB/(deg/s)"
+    status: "measured"
+    source: "mpu6050_datasheet_pm500dps"
+  tilt_filter_alpha:
+    value: 0.98
+    unit: "dimensionless"
+    status: "provisional"
+    source: "spec_v3_default"
+  motion_rms_window_ms:
+    value: 500
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"
+
+stillness:
+  still_px:
+    value: 6.0
+    unit: "pixels"
+    status: "provisional"
+    source: "spec_v3_default"
+  still_duration_ms:
+    value: 500
+    unit: "ms"
+    status: "provisional"
+    source: "spec_v3_default"

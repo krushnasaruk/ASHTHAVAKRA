@@ -1,0 +1,18 @@
+{
+  "source": "provisional_default",
+  "updated_at": "2026-11-03T00:00:00Z",
+  "zone_a": [
+    [100, 200],
+    [300, 200],
+    [300, 400],
+    [100, 400]
+  ],
+  "zone_b": [
+    [500, 200],
+    [700, 200],
+    [700, 400],
+    [500, 400]
+  ],
+  "marker_side_mm": 40.0,
+  "homography_calibrated": false
+}
