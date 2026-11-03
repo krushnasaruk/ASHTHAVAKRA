@@ -21,11 +21,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mobile_app"
+        applicationId = "com.asthavakra.v2"
         minSdk = 21
         targetSdk = 34
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        versionCode = 2
+        versionName = "2.0.0"
     }
 
     buildTypes {

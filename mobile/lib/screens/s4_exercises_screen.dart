@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
 import '../services/storage_service.dart';
+import '../theme/app_theme.dart';
 
 class ExercisesScreen extends StatelessWidget {
   final StorageService storageService;
@@ -16,6 +17,7 @@ class ExercisesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     final exercises = [
       {
         'code': ExerciseCode.fistClench,
@@ -56,9 +58,9 @@ class ExercisesScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF141A17),
+              color: c.card,
               borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
+              border: Border.all(color: c.cardBorder, width: 1.2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,25 +71,25 @@ class ExercisesScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E2822),
+                        color: c.iconContainer,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text(
+                      child: Text(
                         'TASKPROOF EVENT',
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFC8F05F),
+                          color: c.iconTint,
                         ),
                       ),
                     ),
-                    const Icon(Icons.verified_outlined, size: 18, color: Color(0xFFC8F05F)),
+                    Icon(Icons.verified_outlined, size: 18, color: c.iconTint),
                   ],
                 ),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'Object Transfer Verification',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: c.textPrimary),
                 ),
                 const SizedBox(height: 14),
                 SizedBox(
@@ -96,7 +98,7 @@ class ExercisesScreen extends StatelessWidget {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFC8F05F),
-                      foregroundColor: const Color(0xFF0B0F0E),
+                      foregroundColor: const Color(0xFF121715),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                       elevation: 0,
                     ),
@@ -108,9 +110,9 @@ class ExercisesScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 22),
-          const Text(
+          Text(
             'Exercise Library',
-            style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold, color: c.textPrimary),
           ),
           const SizedBox(height: 12),
         ],
@@ -124,12 +126,12 @@ class ExercisesScreen extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 14),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF141A17),
+              color: c.card,
               borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
+              border: Border.all(color: c.cardBorder, width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withOpacity(c.isDark ? 0.15 : 0.03),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -144,24 +146,24 @@ class ExercisesScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: c.textPrimary),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E2822),
+                        color: c.iconContainer,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         target,
-                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFFC8F05F)),
+                        style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: c.iconTint),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(desc, style: const TextStyle(fontSize: 12.5, color: Color(0xFF8E958E))),
+                Text(desc, style: TextStyle(fontSize: 12.5, color: c.textSecondary)),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -169,7 +171,7 @@ class ExercisesScreen extends StatelessWidget {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFC8F05F),
-                      foregroundColor: const Color(0xFF0B0F0E),
+                      foregroundColor: const Color(0xFF121715),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
                       elevation: 0,
                     ),

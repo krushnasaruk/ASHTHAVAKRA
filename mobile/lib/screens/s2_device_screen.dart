@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
 import '../services/device_service.dart';
+import '../theme/app_theme.dart';
 
 class DeviceScreen extends StatefulWidget {
   final DeviceService deviceService;
@@ -37,6 +38,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     final dev = widget.deviceService;
     final isConnected = dev.state == DeviceConnectionState.streaming;
 
@@ -46,9 +48,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. Connection Mode Selector (Preserves 'CONNECTION SOURCE' and 'Simulator (Localhost)')
-          const Text(
+          Text(
             'CONNECTION SOURCE',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(0xFF7A837E)),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: c.textSecondary),
           ),
           const SizedBox(height: 8),
           Row(
@@ -58,10 +60,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   label: const Text('Simulator (Localhost)'),
                   selected: dev.mode == ConnectionMode.simulator,
                   selectedColor: const Color(0xFFC8F05F),
+                  backgroundColor: c.card,
                   labelStyle: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 11.5,
-                    color: dev.mode == ConnectionMode.simulator ? const Color(0xFF121715) : const Color(0xFF7A837E),
+                    color: dev.mode == ConnectionMode.simulator ? const Color(0xFF121715) : c.textSecondary,
                   ),
                   onSelected: (selected) {
                     if (selected) {
@@ -78,10 +81,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   label: const Text('ESP32 Glove (Wi-Fi)'),
                   selected: dev.mode == ConnectionMode.esp32,
                   selectedColor: const Color(0xFFC8F05F),
+                  backgroundColor: c.card,
                   labelStyle: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 11.5,
-                    color: dev.mode == ConnectionMode.esp32 ? const Color(0xFF121715) : const Color(0xFF7A837E),
+                    color: dev.mode == ConnectionMode.esp32 ? const Color(0xFF121715) : c.textSecondary,
                   ),
                   onSelected: (selected) {
                     if (selected) {
@@ -100,9 +104,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: const Color(0xFF141A17),
+              color: c.card,
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
+              border: Border.all(color: c.cardBorder, width: 1.2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,11 +114,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Device Socket Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5, color: Colors.white)),
+                    Text('Device Socket Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5, color: c.textPrimary)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: dev.state == DeviceConnectionState.streaming ? const Color(0xFFC8F05F) : const Color(0xFF1E2822),
+                        color: dev.state == DeviceConnectionState.streaming ? const Color(0xFFC8F05F) : c.iconContainer,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -122,7 +126,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         style: TextStyle(
                           fontSize: 9.5,
                           fontWeight: FontWeight.bold,
-                          color: dev.state == DeviceConnectionState.streaming ? const Color(0xFF121715) : const Color(0xFF8E958E),
+                          color: dev.state == DeviceConnectionState.streaming ? const Color(0xFF121715) : c.textSecondary,
                         ),
                       ),
                     ),
@@ -135,13 +139,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       flex: 3,
                       child: TextField(
                         controller: _ipController,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: c.textPrimary),
                         decoration: InputDecoration(
                           labelText: 'IP / Host',
-                          labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF8E958E)),
+                          labelStyle: TextStyle(fontSize: 12, color: c.textSecondary),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFF222B26)),
+                            borderSide: BorderSide(color: c.cardBorder),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -157,13 +161,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       child: TextField(
                         controller: _portController,
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: c.textPrimary),
                         decoration: InputDecoration(
                           labelText: 'Port',
-                          labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF8E958E)),
+                          labelStyle: TextStyle(fontSize: 12, color: c.textSecondary),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFF222B26)),
+                            borderSide: BorderSide(color: c.cardBorder),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -280,14 +284,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: const Color(0xFF141A17),
+              color: c.card,
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
+              border: Border.all(color: c.cardBorder, width: 1.2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('HARDWARE CONTROLS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(0xFF8E958E))),
+                Text('HARDWARE CONTROLS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: c.textSecondary)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -296,8 +300,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         icon: const Icon(Icons.vibration, size: 18),
                         label: Text(_isTestingHaptic ? 'Pulsing...' : 'Test Haptic', style: const TextStyle(fontWeight: FontWeight.bold)),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: const BorderSide(color: Color(0xFF222B26), width: 1.2),
+                          foregroundColor: c.textPrimary,
+                          side: BorderSide(color: c.cardBorder, width: 1.2),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                           minimumSize: const Size(0, 44),
                         ),

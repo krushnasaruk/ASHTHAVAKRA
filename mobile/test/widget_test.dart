@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/main.dart';
 
@@ -45,5 +46,28 @@ void main() {
     // Verify Device tab content
     expect(find.text('CONNECTION SOURCE'), findsOneWidget);
     expect(find.text('Simulator (Localhost)'), findsOneWidget);
+  });
+
+  testWidgets('H10 Patient App theme toggle test (Dark and Light modes)', (WidgetTester tester) async {
+    await tester.pumpWidget(const H10PatientApp());
+    await tester.pump();
+
+    // Verify initial theme toggle icon exists
+    expect(find.byTooltip('Switch to Light Theme'), findsOneWidget);
+
+    // Tap to switch to Light Theme
+    await tester.tap(find.byTooltip('Switch to Light Theme'));
+    await tester.pumpAndSettle();
+
+    // Verify switched to Light mode
+    expect(H10PatientApp.themeNotifier.value, ThemeMode.light);
+    expect(find.byTooltip('Switch to Dark Theme'), findsOneWidget);
+
+    // Tap to switch back to Dark Theme
+    await tester.tap(find.byTooltip('Switch to Dark Theme'));
+    await tester.pumpAndSettle();
+
+    expect(H10PatientApp.themeNotifier.value, ThemeMode.dark);
+    expect(find.byTooltip('Switch to Light Theme'), findsOneWidget);
   });
 }

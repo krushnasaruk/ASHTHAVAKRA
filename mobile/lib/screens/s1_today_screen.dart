@@ -6,6 +6,7 @@ import 's10_taskproof_screen.dart';
 import '../widgets/preflight_dialog.dart';
 import '../widgets/holographic_hand_scan.dart';
 import '../widgets/vector_icons.dart';
+import '../theme/app_theme.dart';
 
 class TodayScreen extends StatelessWidget {
   final DeviceService deviceService;
@@ -23,6 +24,7 @@ class TodayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     final isStreaming = deviceService.state == DeviceConnectionState.streaming;
     final plan = storageService.activePlan;
     final sessions = storageService.sessions;
@@ -210,7 +212,7 @@ class TodayScreen extends StatelessWidget {
             children: [
               _buildSquircleAction(
                 context,
-                iconWidget: VectorIcon.taskProof(size: 20, color: const Color(0xFFC8F05F)),
+                iconWidget: VectorIcon.taskProof(size: 20, color: c.iconTint),
                 label: 'TaskProof',
                 onTap: () {
                   Navigator.push(
@@ -228,7 +230,7 @@ class TodayScreen extends StatelessWidget {
               const SizedBox(width: 10),
               _buildSquircleAction(
                 context,
-                iconWidget: VectorIcon.judge(size: 20, color: const Color(0xFFC8F05F)),
+                iconWidget: VectorIcon.judge(size: 20, color: c.iconTint),
                 label: 'Judge View',
                 onTap: () {
                   Navigator.push(
@@ -246,14 +248,14 @@ class TodayScreen extends StatelessWidget {
               const SizedBox(width: 10),
               _buildSquircleAction(
                 context,
-                iconWidget: VectorIcon.routines(size: 20, color: const Color(0xFFC8F05F)),
+                iconWidget: VectorIcon.routines(size: 20, color: c.iconTint),
                 label: 'Routines',
                 onTap: onStartExercise,
               ),
               const SizedBox(width: 10),
               _buildSquircleAction(
                 context,
-                iconWidget: VectorIcon.preflight(size: 20, color: const Color(0xFFC8F05F)),
+                iconWidget: VectorIcon.preflight(size: 20, color: c.iconTint),
                 label: 'Preflight',
                 onTap: () => PreflightDialog.show(context),
               ),
@@ -261,17 +263,17 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // 3. Care Team & Investigators Horizontal Avatars (Obsidian Dark Style)
+          // 3. Care Team & Investigators Horizontal Avatars
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Flexible(
+              Flexible(
                 child: Text(
                   'Care Team & Investigators',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: c.textPrimary,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -279,12 +281,12 @@ class TodayScreen extends StatelessWidget {
               const SizedBox(width: 8),
               InkWell(
                 onTap: () => PreflightDialog.show(context),
-                child: const Text(
+                child: Text(
                   'Team >',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF8E958E),
+                    color: c.textSecondary,
                   ),
                 ),
               ),
@@ -295,15 +297,15 @@ class TodayScreen extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildCareAvatar('VJ', 'Vaishnavi', const Color(0xFF56B4E9)),
+                _buildCareAvatar(context, 'VJ', 'Vaishnavi', const Color(0xFF56B4E9)),
                 const SizedBox(width: 16),
-                _buildCareAvatar('RP', 'Rajendra', const Color(0xFFE69F00)),
+                _buildCareAvatar(context, 'RP', 'Rajendra', const Color(0xFFE69F00)),
                 const SizedBox(width: 16),
-                _buildCareAvatar('GS', 'Gautam', const Color(0xFF009E73)),
+                _buildCareAvatar(context, 'GS', 'Gautam', const Color(0xFF009E73)),
                 const SizedBox(width: 16),
-                _buildCareAvatar('KS', 'Krushna', const Color(0xFFC8F05F)),
+                _buildCareAvatar(context, 'KS', 'Krushna', const Color(0xFFC8F05F)),
                 const SizedBox(width: 16),
-                _buildCareAvatar('DJ', 'Dr. Joshi', const Color(0xFFE4C41B)),
+                _buildCareAvatar(context, 'DJ', 'Dr. Joshi', const Color(0xFFE4C41B)),
               ],
             ),
           ),
@@ -388,17 +390,17 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // 5. Prescribed Plan Card (Spacious & Clean Obsidian Card)
+          // 5. Prescribed Plan Card (Adaptive Dual-Mode Card)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF141A17),
+              color: c.card,
               borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
+              border: Border.all(color: c.cardBorder, width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.20),
+                  color: Colors.black.withOpacity(c.isDark ? 0.20 : 0.04),
                   blurRadius: 14,
                   offset: const Offset(0, 4),
                 ),
@@ -427,10 +429,10 @@ class TodayScreen extends StatelessWidget {
                     ),
                     Text(
                       'Target: ${plan.targetReps} reps',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: c.textPrimary,
                       ),
                     ),
                   ],
@@ -443,21 +445,21 @@ class TodayScreen extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E2822),
+                        color: c.iconContainer,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
-                        child: VectorIcon.routines(size: 22, color: const Color(0xFFC8F05F)),
+                        child: VectorIcon.routines(size: 22, color: c.iconTint),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Fist Clench & Release',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: c.textPrimary,
                         ),
                       ),
                     ),
@@ -470,19 +472,19 @@ class TodayScreen extends StatelessWidget {
                   children: [
                     Text(
                       '${sessions.length} / ${plan.sessionsPerWeek}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: c.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 6),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'sessions completed this week',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF8E958E),
+                          color: c.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -495,7 +497,7 @@ class TodayScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: (sessions.length / plan.sessionsPerWeek).clamp(0.0, 1.0),
-                    backgroundColor: const Color(0xFF1E2822),
+                    backgroundColor: c.iconContainer,
                     color: const Color(0xFFC8F05F),
                     minHeight: 8,
                   ),
@@ -540,7 +542,7 @@ class TodayScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // 6. Recent Activity
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -548,7 +550,7 @@ class TodayScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: c.textPrimary,
                 ),
               ),
               Text(
@@ -556,7 +558,7 @@ class TodayScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF8E958E),
+                  color: c.textSecondary,
                 ),
               ),
             ],
@@ -564,32 +566,35 @@ class TodayScreen extends StatelessWidget {
           const SizedBox(height: 12),
 
           _buildActivityCard(
+            context,
             title: 'Fist Clench Routine',
             subtitle: 'Today, 10:30 AM',
             badge: 'VERIFIED 4.2s',
             badgeColor: const Color(0xFFC8F05F),
             badgeTextColor: const Color(0xFF121715),
-            iconWidget: VectorIcon.routines(size: 18, color: const Color(0xFFC8F05F)),
+            iconWidget: VectorIcon.routines(size: 18, color: c.iconTint),
           ),
           const SizedBox(height: 10),
 
           _buildActivityCard(
+            context,
             title: 'ArUco Marker Transfer',
             subtitle: 'Object Handover Task #42',
             badge: 'JUDGE VERIFIED',
-            badgeColor: const Color(0xFF1E2822),
+            badgeColor: c.isDark ? const Color(0xFF1E2822) : const Color(0xFF121715),
             badgeTextColor: const Color(0xFFC8F05F),
-            iconWidget: VectorIcon.qrCode(size: 18, color: const Color(0xFFC8F05F)),
+            iconWidget: VectorIcon.qrCode(size: 18, color: c.iconTint),
           ),
           const SizedBox(height: 10),
 
           _buildActivityCard(
+            context,
             title: 'Thumb-Index Pinch',
             subtitle: 'Ch1 Thumb + Ch2 Index • 12 Reps',
             badge: '+84% ROM',
-            badgeColor: const Color(0xFF1E2822),
-            badgeTextColor: const Color(0xFFC8F05F),
-            iconWidget: VectorIcon.pinch(size: 18, color: const Color(0xFFC8F05F)),
+            badgeColor: c.isDark ? const Color(0xFF1E2822) : const Color(0xFFE2E7DE),
+            badgeTextColor: c.isDark ? const Color(0xFFC8F05F) : const Color(0xFF161C19),
+            iconWidget: VectorIcon.pinch(size: 18, color: c.iconTint),
           ),
 
           // Ample bottom breathing room so content scrolls completely above floating dock
@@ -605,6 +610,7 @@ class TodayScreen extends StatelessWidget {
     required String label,
     required VoidCallback onTap,
   }) {
+    final c = AppColors.of(context);
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -612,12 +618,12 @@ class TodayScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 2),
           decoration: BoxDecoration(
-            color: const Color(0xFF141A17),
+            color: c.card,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFF222B26), width: 1.2),
+            border: Border.all(color: c.cardBorder, width: 1.2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.20),
+                color: Colors.black.withOpacity(c.isDark ? 0.20 : 0.03),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -629,8 +635,8 @@ class TodayScreen extends StatelessWidget {
               Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E2822),
+                decoration: BoxDecoration(
+                  color: c.iconContainer,
                   shape: BoxShape.circle,
                 ),
                 child: Center(child: iconWidget),
@@ -638,10 +644,10 @@ class TodayScreen extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: c.textPrimary,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -654,7 +660,8 @@ class TodayScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCareAvatar(String initials, String name, Color color) {
+  Widget _buildCareAvatar(BuildContext context, String initials, String name, Color color) {
+    final c = AppColors.of(context);
     return Column(
       children: [
         Container(
@@ -686,17 +693,18 @@ class TodayScreen extends StatelessWidget {
         const SizedBox(height: 5),
         Text(
           name,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: c.textPrimary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildActivityCard({
+  Widget _buildActivityCard(
+    BuildContext context, {
     required String title,
     required String subtitle,
     required String badge,
@@ -704,12 +712,13 @@ class TodayScreen extends StatelessWidget {
     required Color badgeTextColor,
     required Widget iconWidget,
   }) {
+    final c = AppColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF141A17),
+        color: c.card,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF222B26), width: 1.2),
+        border: Border.all(color: c.cardBorder, width: 1.2),
       ),
       child: Row(
         children: [
@@ -717,7 +726,7 @@ class TodayScreen extends StatelessWidget {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: const Color(0xFF1E2822),
+              color: c.iconContainer,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(child: iconWidget),
@@ -729,17 +738,17 @@ class TodayScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: c.textPrimary,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: Color(0xFF8E958E),
+                    color: c.textSecondary,
                   ),
                 ),
               ],

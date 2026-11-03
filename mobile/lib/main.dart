@@ -14,6 +14,7 @@ import 'screens/minigame_screen.dart';
 import 'screens/s10_taskproof_screen.dart';
 import 'widgets/preflight_dialog.dart';
 import 'widgets/vector_icons.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,59 +24,88 @@ void main() {
 class H10PatientApp extends StatelessWidget {
   const H10PatientApp({super.key});
 
+  /// Global reactive theme mode notifier allowing seamless switching between Dark & Light themes.
+  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.dark);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ASHTHAVAKRA Patient App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0B0F0E),
-        colorScheme: const ColorScheme.dark(
-          surface: Color(0xFF141A17),
-          primary: Color(0xFFC8F05F),
-          secondary: Color(0xFFC8F05F),
-          onSurface: Colors.white,
-          onPrimary: Color(0xFF0B0F0E),
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF0B0F0E),
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-      ),
-      builder: (context, child) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth > 600) {
-              return Scaffold(
-                backgroundColor: const Color(0xFF050706),
-                body: Center(
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 440),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0B0F0E),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.50),
-                          blurRadius: 36,
-                          offset: const Offset(0, 12),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, currentMode, _) {
+        final isDark = currentMode == ThemeMode.dark;
+        return MaterialApp(
+          title: 'ASHTHAVAKRA Patient App',
+          debugShowCheckedModeBanner: false,
+          themeMode: currentMode,
+          theme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: const Color(0xFFF4F6F0),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF121715),
+              primary: const Color(0xFF121715),
+              secondary: const Color(0xFFC8F05F),
+              surface: const Color(0xFFFFFFFF),
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFFF4F6F0),
+              foregroundColor: Color(0xFF161C19),
+              elevation: 0,
+            ),
+          ),
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: const Color(0xFF0B0F0E),
+            colorScheme: const ColorScheme.dark(
+              surface: Color(0xFF141A17),
+              primary: Color(0xFFC8F05F),
+              secondary: Color(0xFFC8F05F),
+              onSurface: Colors.white,
+              onPrimary: Color(0xFF0B0F0E),
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF0B0F0E),
+              foregroundColor: Colors.white,
+              elevation: 0,
+            ),
+          ),
+          builder: (context, child) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth > 600) {
+                  return Scaffold(
+                    backgroundColor: isDark ? const Color(0xFF050706) : const Color(0xFFE5E7EB),
+                    body: Center(
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 440),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF0B0F0E) : const Color(0xFFF4F6F0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(isDark ? 0.50 : 0.18),
+                              blurRadius: 36,
+                              offset: const Offset(0, 12),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: isDark ? const Color(0xFF1E2822) : const Color(0xFFCBD5E1),
+                            width: 1.5,
+                          ),
                         ),
-                      ],
-                      border: Border.all(color: const Color(0xFF1E2822), width: 1.5),
+                        clipBehavior: Clip.antiAlias,
+                        child: child,
+                      ),
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: child,
-                  ),
-                ),
-              );
-            }
-            return child ?? const SizedBox();
+                  );
+                }
+                return child ?? const SizedBox();
+              },
+            );
           },
+          home: const MainNavigationShell(),
         );
       },
-      home: const MainNavigationShell(),
     );
   }
 }
@@ -179,25 +209,28 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       ),
     ];
 
+    final c = AppColors.of(context);
+    final isDark = c.isDark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0F0E),
+      backgroundColor: c.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(66),
         child: Container(
-          color: const Color(0xFF0B0F0E),
+          color: c.background,
           padding: const EdgeInsets.only(top: 8, left: 14, right: 14, bottom: 4),
           child: SafeArea(
             bottom: false,
             child: Row(
               children: [
-                // Patient Avatar (Clean Paytin Dark Style)
+                // Patient Avatar (Adaptive Dark/Light Style)
                 Stack(
                   children: [
                     Container(
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF141A17),
+                        color: isDark ? const Color(0xFF141A17) : const Color(0xFF121715),
                         shape: BoxShape.circle,
                         border: Border.all(color: const Color(0xFFC8F05F), width: 1.5),
                       ),
@@ -221,7 +254,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         decoration: BoxDecoration(
                           color: const Color(0xFF2E7D32),
                           shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFF0B0F0E), width: 1.5),
+                          border: Border.all(color: c.background, width: 1.5),
                         ),
                       ),
                     ),
@@ -235,77 +268,80 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Flexible(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                'ASHTAVAKRA',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 0.6,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 5),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFC8F05F),
-                              borderRadius: BorderRadius.circular(4),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFFC8F05F).withOpacity(0.4),
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: const Text(
-                              'v2',
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'ASHTAVAKRA',
                               style: TextStyle(
-                                fontSize: 9.5,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF0B0F0E),
+                                letterSpacing: 0.6,
+                                color: c.textPrimary,
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 5),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFC8F05F),
+                                borderRadius: BorderRadius.circular(4),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFC8F05F).withOpacity(0.4),
+                                    blurRadius: 4,
+                                  ),
+                                ],
+                              ),
+                              child: const Text(
+                                'v2',
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF0B0F0E),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 1),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'Hand Rehab',
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              color: Color(0xFF8E958E),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0.5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1E2822),
-                              borderRadius: BorderRadius.circular(3),
-                              border: Border.all(color: const Color(0xFF2E3D34), width: 0.8),
-                            ),
-                            child: const Text(
-                              '3-CH',
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Hand Rehab',
                               style: TextStyle(
-                                fontSize: 8,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFC8F05F),
+                                fontSize: 10.5,
+                                color: c.textSecondary,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0.5),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF1E2822) : const Color(0xFF121715),
+                                borderRadius: BorderRadius.circular(3),
+                                border: Border.all(color: const Color(0xFF2E3D34), width: 0.8),
+                              ),
+                              child: const Text(
+                                '3-CH',
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFC8F05F),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -345,11 +381,28 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 2),
+
+                // Quick Theme Toggle Button (Dark Mode / Light Mode)
+                IconButton(
+                  icon: Icon(
+                    isDark ? Icons.light_mode : Icons.dark_mode,
+                    size: 20,
+                    color: isDark ? const Color(0xFFC8F05F) : const Color(0xFF161C19),
+                  ),
+                  tooltip: isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  onPressed: () {
+                    H10PatientApp.themeNotifier.value =
+                        isDark ? ThemeMode.light : ThemeMode.dark;
+                  },
+                ),
+                const SizedBox(width: 2),
 
                 // Settings Button
                 IconButton(
-                  icon: const Icon(Icons.settings, size: 20, color: Colors.white),
+                  icon: Icon(Icons.settings, size: 20, color: c.textPrimary),
                   tooltip: 'Settings',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -400,7 +453,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       ),
       // Paytin Floating Bottom Capsule Dock
       bottomNavigationBar: Container(
-        color: const Color(0xFF0B0F0E),
+        color: c.background,
         padding: const EdgeInsets.only(left: 14, right: 14, bottom: 14, top: 4),
         child: Container(
           height: 64,

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
 import '../services/storage_service.dart';
+import '../theme/app_theme.dart';
 
 class ProgressScreen extends StatefulWidget {
   final StorageService storageService;
@@ -18,6 +19,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     final allSessions = widget.storageService.sessions;
     final cutoff = DateTime.now().subtract(Duration(days: _rangeDays));
 
@@ -42,24 +44,24 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Statistics',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                  color: c.textPrimary,
                 ),
               ),
               Row(
                 children: [
-                  const Text('Simulated', style: TextStyle(fontSize: 11, color: Color(0xFF8E958E))),
+                  Text('Simulated', style: TextStyle(fontSize: 11, color: c.textSecondary)),
                   const SizedBox(width: 4),
                   Transform.scale(
                     scale: 0.75,
                     child: Switch(
                       value: _includeSimulated,
                       activeColor: const Color(0xFFC8F05F),
-                      activeTrackColor: const Color(0xFF1E2822),
+                      activeTrackColor: c.isDark ? const Color(0xFF1E2822) : const Color(0xFFE2E7DE),
                       onChanged: (v) => setState(() => _includeSimulated = v),
                     ),
                   ),
@@ -74,13 +76,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildTimePill('Today', 1),
+                _buildTimePill(context, 'Today', 1),
                 const SizedBox(width: 8),
-                _buildTimePill('Last 2 Weeks', 14),
+                _buildTimePill(context, 'Last 2 Weeks', 14),
                 const SizedBox(width: 8),
-                _buildTimePill('Last 6 Weeks', 42),
+                _buildTimePill(context, 'Last 6 Weeks', 42),
                 const SizedBox(width: 8),
-                _buildTimePill('All Time', 365),
+                _buildTimePill(context, 'All Time', 365),
               ],
             ),
           ),
@@ -284,12 +286,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF141A17),
+              color: c.card,
               borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
+              border: Border.all(color: c.cardBorder, width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.18),
+                  color: Colors.black.withOpacity(c.isDark ? 0.18 : 0.04),
                   blurRadius: 14,
                   offset: const Offset(0, 4),
                 ),
@@ -301,13 +303,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Flexible(
+                    Flexible(
                       child: Text(
                         'Overview & Adherence',
                         style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: c.textPrimary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -316,15 +318,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E2822),
+                        color: c.iconContainer,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.tune, size: 12, color: Color(0xFFC8F05F)),
-                          SizedBox(width: 4),
-                          Text('Filters', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                          Icon(Icons.tune, size: 12, color: c.iconTint),
+                          const SizedBox(width: 4),
+                          Text('Filters', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: c.textPrimary)),
                         ],
                       ),
                     ),
@@ -336,20 +338,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Session Adherence',
-                          style: TextStyle(fontSize: 11, color: Color(0xFF8E958E)),
+                          style: TextStyle(fontSize: 11, color: c.textSecondary),
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
                           '94% Completed',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                            color: c.textPrimary,
                           ),
                         ),
                       ],
@@ -358,9 +360,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
+                          Text(
                             'Baseline Mean ROM',
-                            style: TextStyle(fontSize: 11, color: Color(0xFF8E958E)),
+                            style: TextStyle(fontSize: 11, color: c.textSecondary),
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -384,13 +386,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      _buildStackedBar('Mon', 0.5, 0.3),
-                      _buildStackedBar('Tue', 0.7, 0.4),
-                      _buildStackedBar('Wed', 0.4, 0.2),
-                      _buildStackedBar('Thu', 0.8, 0.5),
-                      _buildStackedBar('Fri', 1.0, 0.8, hasTooltip: true, tooltip: '10 Reps • Fri'),
-                      _buildStackedBar('Sat', 0.6, 0.4),
-                      _buildStackedBar('Sun', 0.9, 0.7),
+                      _buildStackedBar(context, 'Mon', 0.5, 0.3),
+                      _buildStackedBar(context, 'Tue', 0.7, 0.4),
+                      _buildStackedBar(context, 'Wed', 0.4, 0.2),
+                      _buildStackedBar(context, 'Thu', 0.8, 0.5),
+                      _buildStackedBar(context, 'Fri', 1.0, 0.8, hasTooltip: true, tooltip: '10 Reps • Fri'),
+                      _buildStackedBar(context, 'Sat', 0.6, 0.4),
+                      _buildStackedBar(context, 'Sun', 0.9, 0.7),
                     ],
                   ),
                 ),
@@ -403,17 +405,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Recent Sessions',
                 style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: c.textPrimary,
                 ),
               ),
               Text(
                 '${filteredSessions.length} sessions',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF8E958E)),
+                style: TextStyle(fontSize: 12, color: c.textSecondary),
               ),
             ],
           ),
@@ -423,9 +425,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               alignment: Alignment.center,
-              child: const Text(
+              child: Text(
                 'No sessions recorded in this time range.',
-                style: TextStyle(color: Color(0xFF8E958E)),
+                style: TextStyle(color: c.textSecondary),
               ),
             )
           else
@@ -434,9 +436,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF141A17),
+                  color: c.card,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFF222B26)),
+                  border: Border.all(color: c.cardBorder),
                 ),
                 child: Row(
                   children: [
@@ -444,10 +446,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E2822),
+                        color: c.iconContainer,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.show_chart, color: Color(0xFFC8F05F), size: 18),
+                      child: Icon(Icons.show_chart, color: c.iconTint, size: 18),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -456,11 +458,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         children: [
                           Text(
                             s.exerciseCode.toUpperCase(),
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: c.textPrimary),
                           ),
                           Text(
                             '${s.startedAt.month}/${s.startedAt.day} • ${s.startedAt.hour.toString().padLeft(2, '0')}:${s.startedAt.minute.toString().padLeft(2, '0')}',
-                            style: const TextStyle(fontSize: 11, color: Color(0xFF8E958E)),
+                            style: TextStyle(fontSize: 11, color: c.textSecondary),
                           ),
                         ],
                       ),
@@ -470,11 +472,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       children: [
                         Text(
                           '${s.meanRom.toStringAsFixed(1)}%',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFC8F05F)),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: c.isDark ? const Color(0xFFC8F05F) : const Color(0xFF121715)),
                         ),
                         Text(
                           'Max ${s.maxRom.toStringAsFixed(0)}%',
-                          style: const TextStyle(fontSize: 10.5, color: Color(0xFF8E958E)),
+                          style: TextStyle(fontSize: 10.5, color: c.textSecondary),
                         ),
                       ],
                     ),
@@ -488,7 +490,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildTimePill(String title, int days) {
+  Widget _buildTimePill(BuildContext context, String title, int days) {
+    final c = AppColors.of(context);
     final isSelected = _rangeDays == days;
     return InkWell(
       onTap: () => setState(() => _rangeDays = days),
@@ -496,10 +499,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFC8F05F) : const Color(0xFF141A17),
+          color: isSelected ? const Color(0xFFC8F05F) : c.card,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFFC8F05F) : const Color(0xFF222B26),
+            color: isSelected ? const Color(0xFFC8F05F) : c.cardBorder,
             width: 1.2,
           ),
           boxShadow: isSelected
@@ -517,7 +520,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           style: TextStyle(
             fontSize: 11.5,
             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-            color: isSelected ? const Color(0xFF0B0F0E) : Colors.white,
+            color: isSelected ? const Color(0xFF0B0F0E) : c.textPrimary,
           ),
         ),
       ),
@@ -535,7 +538,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildStackedBar(String day, double totalHeightFraction, double limeFraction, {bool hasTooltip = false, String tooltip = ''}) {
+  Widget _buildStackedBar(BuildContext context, String day, double totalHeightFraction, double limeFraction, {bool hasTooltip = false, String tooltip = ''}) {
+    final c = AppColors.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -579,7 +583,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           style: TextStyle(
             fontSize: 10,
             fontWeight: hasTooltip ? FontWeight.bold : FontWeight.w500,
-            color: hasTooltip ? const Color(0xFF121715) : const Color(0xFF7A837E),
+            color: hasTooltip ? c.textPrimary : c.textSecondary,
           ),
         ),
       ],
