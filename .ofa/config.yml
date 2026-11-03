@@ -7,9 +7,8 @@ zones:
       - mobile/lib/widgets/
       - mobile/packages/h10_core/lib/theme/
       - docs/vaishnavi_jare/
-    owner: Bot
+    owner: vaishnavijare60-hash
     description: Mobile & Web Patient UI screens, widgets, design tokens, and designer docs
-    claimed_at: '2026-11-03T11:14:23.358Z'
   backend:
     paths:
       - backend/
@@ -38,9 +37,4 @@ rules:
   - Use Okabe-Ito color-blind safe palette for all 5 finger channels
   - Maintain minimum 48x48 px touch targets for patient accessibility
   - Ensure responsive layout within 440px mobile canvas container
-locks:
-  - zone: frontend
-    owner: Bot
-    claimed_at: '2026-11-03T11:14:23.358Z'
-    expires_at: '2026-11-04T11:14:23.359Z'
-    ttl_hours: 24
+locks: []

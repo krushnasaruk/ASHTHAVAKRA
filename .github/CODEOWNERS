@@ -6,7 +6,7 @@
 # Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # Zone: frontend — Mobile & Web Patient UI screens, widgets, design tokens, and designer docs
-/mobile/lib/screens/    @Bot
-/mobile/lib/widgets/    @Bot
-/mobile/packages/h10_core/lib/theme/    @Bot
-/docs/vaishnavi_jare/    @Bot
+/mobile/lib/screens/    @vaishnavijare60-hash
+/mobile/lib/widgets/    @vaishnavijare60-hash
+/mobile/packages/h10_core/lib/theme/    @vaishnavijare60-hash
+/docs/vaishnavi_jare/    @vaishnavijare60-hash

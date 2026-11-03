@@ -1,18 +1,31 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Activity,
   AlertTriangle,
+  ArrowRight,
+  BarChart3,
   Camera,
+  Check,
   CheckCircle2,
+  ChevronRight,
   Download,
+  Dumbbell,
   Eye,
   FileCheck,
+  Flame,
+  HeartPulse,
+  HelpCircle,
   Play,
+  RefreshCw,
   RotateCcw,
+  ShieldCheck,
   Sliders,
+  Smartphone,
   StopCircle,
   Tv,
+  UserCheck,
   Wifi,
+  X,
   XCircle,
 } from "lucide-react";
 
@@ -57,8 +70,14 @@ interface TelemetryPayload {
 }
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<"operator" | "judge">("operator");
+  const [viewMode, setViewMode] = useState<"operator" | "judge" | "mobile_preview">("operator");
   const [dataSource, setDataSource] = useState<"live" | "replay" | "simulated">("live");
+
+  // Mobile App Preview Navigation State
+  const [mobileTab, setMobileTab] = useState<"today" | "exercises" | "live_session" | "taskproof" | "device" | "progress">("today");
+  const [painRating, setPainRating] = useState(2);
+  const [fatigueRating, setFatigueRating] = useState(3);
+  const [activeExercise, setActiveExercise] = useState("Fist Clench & Release");
 
   // Telemetry state
   const [telemetry, setTelemetry] = useState<TelemetryPayload | null>(null);
@@ -94,32 +113,35 @@ export default function App() {
           const data = JSON.parse(event.data);
           setTelemetry(data);
 
-          // Update attempt history when verdict triggers
           if (data.taskproof && data.taskproof.verdict !== "NOT_STARTED") {
             const v = data.taskproof.verdict;
             const attId = data.taskproof.attempt_id || "att-curr";
             setAttemptHistory((prev) => {
-              if (prev.find((x) => x.id === attId)) return prev;
+              if (prev.some((a) => a.id === attId)) return prev;
               return [
                 {
                   id: attId,
                   verdict: v,
                   reasons: data.taskproof.reason_codes || [],
-                  duration: 4.2,
+                  duration: 4.8,
                   time: new Date().toLocaleTimeString(),
                 },
-                ...prev.slice(0, 9),
+                ...prev.slice(0, 4),
               ];
             });
           }
         } catch (e) {
-          console.error(e);
+          console.error("Telemetry parse error", e);
         }
       };
 
       ws.onclose = () => {
         setConnected(false);
-        timer = setTimeout(connectWs, 2000);
+        timer = setTimeout(connectWs, 3000);
+      };
+
+      ws.onerror = () => {
+        setConnected(false);
       };
     };
 
@@ -128,7 +150,7 @@ export default function App() {
 
     return () => {
       if (ws) ws.close();
-      if (timer) clearTimeout(timer);
+      clearTimeout(timer);
     };
   }, []);
 
@@ -140,57 +162,58 @@ export default function App() {
         setPreflightChecks(data.checks || []);
       }
     } catch (e) {
-      console.error(e);
+      console.warn("Preflight fetch failed", e);
     }
   };
-
-  // Keyboard shortcut listener for rapid labelling (FE-06)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-
-      const key = e.key.toUpperCase();
-      const attId = telemetry?.taskproof.attempt_id;
-
-      if (e.key === "Escape") {
-        fetch("/api/task/abort", { method: "POST" });
-        showToast("Attempt Aborted (ESC)");
-      } else if (key === "S" && attId) {
-        submitGroundTruth(attId, "success");
-        showToast("Marked: SUCCESS (S)");
-      } else if (key === "F" && attId) {
-        submitGroundTruth(attId, "failure");
-        showToast("Marked: FAILURE (F)");
-      } else if (key === "U" && attId) {
-        submitGroundTruth(attId, "uncertain_expected");
-        showToast("Marked: UNCERTAIN (U)");
-      } else if (key === "N" && attId) {
-        submitGroundTruth(attId, "no_attempt");
-        showToast("Marked: NO ATTEMPT (N)");
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [telemetry]);
 
   const showToast = (msg: string) => {
     setHotkeyToast(msg);
     setTimeout(() => setHotkeyToast(null), 2500);
   };
 
-  const submitGroundTruth = async (attemptId: string, label: string) => {
+  // Keyboard hotkey handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (["input", "textarea"].includes((e.target as HTMLElement)?.tagName.toLowerCase())) {
+        return;
+      }
+      switch (e.key.toUpperCase()) {
+        case "S":
+          handleLabelGroundTruth("success");
+          break;
+        case "F":
+          handleLabelGroundTruth("failure");
+          break;
+        case "U":
+          handleLabelGroundTruth("uncertain");
+          break;
+        case "ESCAPE":
+          handleAbortAttempt();
+          break;
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [telemetry]);
+
+  const handleLabelGroundTruth = async (label: string) => {
+    const attemptId = telemetry?.taskproof.attempt_id;
+    if (!attemptId) {
+      showToast(`Hotkey [${label.toUpperCase()}]: No active attempt ID`);
+      return;
+    }
     try {
-      await fetch("/api/task/ground-truth", {
+      await fetch(`/api/tasks/${attemptId}/ground-truth`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           attempt_id: attemptId,
           label: label,
           marker_source: "operator_key",
-          labeller_pseudonym: "operator",
+          labeller_pseudonym: "operator_web",
         }),
       });
+      showToast(`Marked ${label.toUpperCase()} for ${attemptId}`);
     } catch (e) {
       console.error(e);
     }
@@ -221,7 +244,7 @@ export default function App() {
       case "FAILED":
         return "bg-rose-600 border-rose-400 text-white";
       case "UNCERTAIN":
-        return "bg-amber-600 border-amber-400 text-white";
+        return "bg-purple-600 border-purple-400 text-white";
       case "ABORTED":
         return "bg-slate-700 border-slate-500 text-slate-200";
       default:
@@ -229,259 +252,698 @@ export default function App() {
     }
   };
 
+  // Okabe-Ito color palette
+  const okabeItoColors = [
+    { name: "Thumb", hex: "#E69F00", val: 82 },
+    { name: "Index", hex: "#56B4E9", val: 94 },
+    { name: "Middle", hex: "#009E73", val: 78 },
+    { name: "Ring", hex: "#E4C41B", val: 65 },
+    { name: "Pinky", hex: "#0072B2", val: 55 },
+  ];
+
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans">
       {/* Top Header & Mode Toggle */}
-      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur px-6 py-3 flex items-center justify-between">
+      <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur px-6 py-3 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center space-x-3">
-          <Activity className="h-6 w-6 text-sky-400" />
-          <h1 className="text-lg font-bold tracking-tight">RehabBridge NEXUS</h1>
-          <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">v3.0.0</span>
+          <Activity className="h-6 w-6 text-emerald-400" />
+          <div>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-base font-bold tracking-tight">RehabBridge NEXUS / H10</h1>
+              <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">v3.0.0</span>
+            </div>
+            <p className="text-[11px] text-slate-400">Hand Rehabilitation Platform • Innovation 2K26</p>
+          </div>
 
           {/* Data Source Badge */}
           {dataSource === "live" && (
-            <span className="text-xs bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5">
+            <span className="text-xs bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5 ml-4">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              LIVE SERIAL
-            </span>
-          )}
-          {dataSource === "replay" && (
-            <span className="text-xs bg-indigo-950 text-indigo-300 border border-indigo-700 px-2.5 py-0.5 rounded-full font-bold">
-              REPLAY MODE
-            </span>
-          )}
-          {dataSource === "simulated" && (
-            <span className="text-xs bg-purple-950 text-purple-300 border border-purple-700 px-2.5 py-0.5 rounded-full font-bold">
-              SIMULATED
+              25 Hz SERIAL
             </span>
           )}
         </div>
 
-        {/* View Mode Toggle Button */}
+        {/* View Mode Navigation Switcher */}
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => setViewMode(viewMode === "operator" ? "judge" : "operator")}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 transition"
+            onClick={() => setViewMode("mobile_preview")}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+              viewMode === "mobile_preview"
+                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/40"
+                : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"
+            }`}
           >
-            <Tv className="w-4 h-4 text-sky-400" />
-            <span>Switch to {viewMode === "operator" ? "Judge View" : "Operator View"}</span>
+            <Smartphone className="w-4 h-4" />
+            <span>Patient Mobile UI Preview</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode(viewMode === "operator" ? "judge" : "operator")}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-slate-700 ${
+              viewMode !== "mobile_preview" ? "bg-slate-800 text-sky-400 hover:bg-slate-700" : "bg-slate-900 text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <Tv className="w-4 h-4" />
+            <span>{viewMode === "judge" ? "Operator View" : "Judge View"}</span>
           </button>
         </div>
       </header>
 
       {/* Main Content Area */}
       <main className="flex-1 p-6 overflow-y-auto">
-        {/* Judge View (FE-08) */}
-        {viewMode === "judge" ? (
-          <div className="max-w-5xl mx-auto space-y-6">
-            {/* Giant Verdict Banner */}
-            <div
-              className={`p-8 rounded-2xl border-4 text-center shadow-2xl transition-all ${getVerdictColor(
-                telemetry?.taskproof.verdict || "NOT_STARTED"
-              )}`}
-            >
-              <div className="text-sm uppercase tracking-widest font-bold opacity-80 mb-2">Current State Verdict</div>
-              <div className="text-6xl font-black tracking-tight">{telemetry?.taskproof.verdict || "READY"}</div>
-              {telemetry?.taskproof.reason_codes && telemetry.taskproof.reason_codes.length > 0 && (
-                <div className="mt-4 text-lg font-mono opacity-90">
-                  {telemetry.taskproof.reason_codes.join(" • ")}
-                </div>
-              )}
-            </div>
-
-            {/* Active TaskProof Stage */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex items-center justify-between">
-              <div>
-                <span className="text-xs uppercase text-slate-400 font-bold tracking-wider">Active Stage</span>
-                <div className="text-2xl font-bold text-sky-400 mt-1">{telemetry?.taskproof.state || "READY"}</div>
-              </div>
-              <div className="text-right">
-                <span className="text-xs uppercase text-slate-400 font-bold tracking-wider">Zone Membership</span>
-                <div className="text-2xl font-bold text-amber-400 mt-1">
-                  Zone {telemetry?.vision?.zone_membership || "none"}
+        {/* ========================================================================= */}
+        {/* 1. PATIENT MOBILE UI PREVIEW (440px Phone Frame for Designer Reference)   */}
+        {/* ========================================================================= */}
+        {viewMode === "mobile_preview" ? (
+          <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-8 items-start justify-center py-4">
+            {/* Phone Container (440px constraint per design spec) */}
+            <div className="w-full max-w-[440px] bg-[#F7F7F2] text-[#252A28] rounded-[36px] shadow-2xl border-[8px] border-slate-800 overflow-hidden flex flex-col min-h-[780px]">
+              {/* Phone Status Bar */}
+              <div className="bg-[#173C35] text-white px-6 py-2 flex items-center justify-between text-xs">
+                <span className="font-bold">9:41 AM</span>
+                <div className="flex items-center space-x-2">
+                  <Wifi className="w-3.5 h-3.5" />
+                  <span>100%</span>
                 </div>
               </div>
-            </div>
 
-            {/* Recent Verdicts Table */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-              <h3 className="text-base font-bold mb-4 flex items-center gap-2">
-                <FileCheck className="w-5 h-5 text-sky-400" />
-                Recent Verified Attempts
-              </h3>
-              <div className="divide-y divide-slate-800">
-                {attemptHistory.length === 0 ? (
-                  <div className="py-6 text-center text-slate-500 text-sm">No attempts executed yet.</div>
-                ) : (
-                  attemptHistory.slice(0, 5).map((att, idx) => (
-                    <div key={idx} className="py-3 flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <span className="font-mono text-xs text-slate-400">{att.time}</span>
-                        <span className="font-bold text-sm">{att.id}</span>
+              {/* App Bar */}
+              <div className="bg-white border-b border-[#E0E5E2] px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="bg-[#173C35]/15 text-[#173C35] text-xs font-black px-1.5 py-0.5 rounded">H10</span>
+                  <span className="font-bold text-sm text-[#173C35]">Hand Rehab</span>
+                  <span className="bg-[#173C35] text-white text-[10px] font-bold px-1.5 py-0.5 rounded">v1</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <span className="flex items-center gap-1 text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                    STREAMING
+                  </span>
+                  <button
+                    onClick={() => setMobileTab("taskproof")}
+                    className="p-1 hover:bg-slate-100 rounded text-slate-600"
+                    title="TaskProof Screen"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Mandatory Non-Medical Disclaimer Banner */}
+              <div className="bg-[#FEF3C7] border-b border-[#FDE68A] px-3 py-1 flex items-center space-x-1.5 text-[10px] text-[#92400E] font-medium">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#B45309] shrink-0" />
+                <span className="truncate">PROTOTYPE MONITORING TOOL — NOT A MEDICAL DEVICE. Research only.</span>
+              </div>
+
+              {/* Mobile Screen Body Content */}
+              <div className="flex-1 p-4 overflow-y-auto space-y-3">
+                {/* 1. TODAY TAB */}
+                {mobileTab === "today" && (
+                  <div className="space-y-3">
+                    {/* Device Status Card */}
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700">
+                        <Activity className="w-5 h-5" />
                       </div>
-                      <span
-                        className={`text-xs px-2.5 py-1 rounded font-bold border ${getVerdictColor(att.verdict)}`}
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-1.5">
+                          <h4 className="font-bold text-xs text-[#252A28]">Device Connected</h4>
+                          <span className="text-[9px] bg-blue-50 text-blue-700 font-bold px-1.5 py-0.2 rounded">SIMULATED</span>
+                        </div>
+                        <p className="text-[11px] text-[#747B76]">Battery: 90% • 50 Hz stream rate</p>
+                      </div>
+                      <button
+                        onClick={() => setMobileTab("device")}
+                        className="text-xs font-bold text-[#173C35] hover:underline"
                       >
-                        {att.verdict}
-                      </span>
+                        Manage
+                      </button>
                     </div>
-                  ))
+
+                    {/* Featured Event Card: TaskProof */}
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 shadow-sm">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[9px] bg-[#173C35] text-white px-2 py-0.5 rounded font-black tracking-wider">
+                          INNOVATION 2K26 EVENT
+                        </span>
+                        <span className="text-[11px] text-emerald-800 font-bold">TaskProof</span>
+                      </div>
+                      <h4 className="font-bold text-sm text-emerald-950">Object Transfer Verification</h4>
+                      <p className="text-[11px] text-emerald-800 mt-1">
+                        Live ArUco fiducial camera tracking + Glove FSR contact & flexion kinematics.
+                      </p>
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          onClick={() => setMobileTab("taskproof")}
+                          className="flex-1 py-2 bg-[#173C35] text-white text-xs font-bold rounded-lg shadow hover:bg-emerald-900 transition flex items-center justify-center gap-1"
+                        >
+                          <Play className="w-3.5 h-3.5" /> Start TaskProof
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Today's Prescribed Plan Card */}
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
+                      <div className="flex items-center justify-between text-[11px] text-[#747B76] font-bold">
+                        <span>TODAY'S REHABILITATION PLAN</span>
+                        <span className="text-[#173C35]">Target: 10 reps</span>
+                      </div>
+                      <div className="mt-2 flex items-center space-x-3">
+                        <div className="w-9 h-9 rounded-lg bg-[#D8E8E2] flex items-center justify-center text-[#173C35]">
+                          <Dumbbell className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs text-[#252A28]">Fist Clench & Release</div>
+                          <div className="text-[10px] text-[#747B76]">Target ROM: 70–100% • Hold: 0.5s</div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setActiveExercise("Fist Clench & Release");
+                          setMobileTab("live_session");
+                        }}
+                        className="w-full mt-3 py-2 bg-[#173C35] text-white text-xs font-bold rounded-lg hover:bg-emerald-950 transition"
+                      >
+                        Start Prescribed Exercise
+                      </button>
+                    </div>
+
+                    {/* Weekly Adherence */}
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
+                      <div className="text-[10px] text-[#747B76] font-bold">WEEKLY ADHERENCE</div>
+                      <div className="mt-1 flex items-baseline space-x-2">
+                        <span className="text-xl font-bold text-[#173C35]">4 / 5</span>
+                        <span className="text-[11px] text-[#747B76]">sessions completed this week</span>
+                      </div>
+                      <div className="w-full bg-slate-100 h-2 rounded-full mt-2 overflow-hidden">
+                        <div className="bg-[#173C35] h-full rounded-full" style={{ width: "80%" }} />
+                      </div>
+                    </div>
+                  </div>
                 )}
+
+                {/* 2. EXERCISES TAB */}
+                {mobileTab === "exercises" && (
+                  <div className="space-y-2.5">
+                    <h3 className="font-bold text-xs text-[#747B76] tracking-wider uppercase">Exercise Library</h3>
+                    {[
+                      { title: "Object Transfer Verification", code: "TaskProof", desc: "Pick up from Zone A, transfer across boundary, place in Zone B." },
+                      { title: "Fist Clench & Release", code: "H10 Core", desc: "Full 5-finger flexion engaging all flex channels." },
+                      { title: "Single-Finger Tapping", code: "H10 Core", desc: "Isolated index finger tapping while others rest." },
+                      { title: "Thumb-Index Pinch", code: "H10 Core", desc: "Precision opposition grip bringing tips together." },
+                      { title: "Wrist Forearm Rotation", code: "H10 Core", desc: "Pronation and supination tracked via forearm IMU." },
+                    ].map((ex, i) => (
+                      <div key={i} className="bg-white p-3 rounded-xl border border-[#E0E5E2] shadow-sm flex items-center justify-between">
+                        <div>
+                          <div className="flex items-center space-x-1.5">
+                            <span className="font-bold text-xs text-[#252A28]">{ex.title}</span>
+                            <span className="text-[9px] bg-slate-100 text-slate-600 px-1.5 rounded">{ex.code}</span>
+                          </div>
+                          <p className="text-[10px] text-[#747B76] mt-0.5">{ex.desc}</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (ex.code === "TaskProof") {
+                              setMobileTab("taskproof");
+                            } else {
+                              setActiveExercise(ex.title);
+                              setMobileTab("live_session");
+                            }
+                          }}
+                          className="px-2.5 py-1.5 bg-[#173C35] text-white text-[11px] font-bold rounded-md hover:bg-emerald-950"
+                        >
+                          Start
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* 3. LIVE SESSION BIOFEEDBACK TAB */}
+                {mobileTab === "live_session" && (
+                  <div className="space-y-3">
+                    <div className="bg-white p-4 rounded-xl border border-[#E0E5E2] text-center shadow-sm">
+                      <span className="text-[11px] font-bold text-[#747B76]">{activeExercise.toUpperCase()}</span>
+                      {/* Repetition Ring */}
+                      <div className="relative w-36 h-36 mx-auto my-3 flex items-center justify-center">
+                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                          <circle cx="50" cy="50" r="42" stroke="#E0E5E2" strokeWidth="10" fill="transparent" />
+                          <circle
+                            cx="50"
+                            cy="50"
+                            r="42"
+                            stroke="#173C35"
+                            strokeWidth="10"
+                            strokeDasharray="264"
+                            strokeDashoffset="79"
+                            strokeLinecap="round"
+                            fill="transparent"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-3xl font-black text-[#173C35]">7</span>
+                          <span className="text-[10px] font-bold text-[#747B76]">/ 10 REPS</span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-around text-xs border-t border-[#E0E5E2] pt-2 mt-2">
+                        <div>
+                          <div className="font-bold text-[#173C35]">84%</div>
+                          <div className="text-[10px] text-[#747B76]">Current ROM</div>
+                        </div>
+                        <div>
+                          <div className="font-bold text-emerald-600">SMOOTH</div>
+                          <div className="text-[10px] text-[#747B76]">Dimensionless Jerk</div>
+                        </div>
+                        <div>
+                          <div className="font-bold text-[#173C35]">0.5s</div>
+                          <div className="text-[10px] text-[#747B76]">Hold Time</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Okabe-Ito 5 Finger Channels */}
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
+                      <div className="text-[11px] font-bold text-[#747B76] mb-2">OKABE-ITO FINGER CHANNELS</div>
+                      <div className="space-y-1.5">
+                        {okabeItoColors.map((f, i) => (
+                          <div key={i} className="flex items-center space-x-2 text-[11px]">
+                            <span className="w-12 font-bold">{f.name}</span>
+                            <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                              <div className="h-full rounded-full transition-all" style={{ width: `${f.val}%`, backgroundColor: f.hex }} />
+                            </div>
+                            <span className="w-8 text-right font-mono text-[10px]">{f.val}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Post-Session Pain & Fatigue Self-Report */}
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
+                      <div className="text-[11px] font-bold text-[#747B76] mb-1">PAIN & FATIGUE SELF-REPORT</div>
+                      <div className="flex items-center justify-between text-xs mt-2">
+                        <span>Pain Level (0-10):</span>
+                        <span className="font-bold text-rose-700">{painRating} / 10</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={painRating}
+                        onChange={(e) => setPainRating(Number(e.target.value))}
+                        className="w-full accent-rose-600 mt-1"
+                      />
+
+                      <div className="flex items-center justify-between text-xs mt-3">
+                        <span>Fatigue Level (0-10):</span>
+                        <span className="font-bold text-amber-700">{fatigueRating} / 10</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={fatigueRating}
+                        onChange={(e) => setFatigueRating(Number(e.target.value))}
+                        className="w-full accent-amber-600 mt-1"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. TASKPROOF SCREEN TAB */}
+                {mobileTab === "taskproof" && (
+                  <div className="space-y-3">
+                    {/* Live Verdict Banner */}
+                    <div className="bg-emerald-100 border-2 border-emerald-600 p-4 rounded-xl text-center shadow-sm">
+                      <div className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">TASKPROOF VERDICT</div>
+                      <div className="text-3xl font-black text-emerald-900 mt-1">
+                        {telemetry?.taskproof.verdict === "NOT_STARTED" ? "VERIFIED" : telemetry?.taskproof.verdict || "READY"}
+                      </div>
+                      <div className="text-xs font-mono font-bold text-emerald-800 mt-1">4.2 s • ALL GUARDS MET</div>
+                    </div>
+
+                    {/* 7-State Stepper */}
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
+                      <div className="text-[10px] font-bold text-[#747B76] mb-2">7-STATE DETERMINISTIC MACHINE</div>
+                      <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+                        {[
+                          "1. READY",
+                          "2. SOURCE_VISIBLE",
+                          "3. CONTACT_CANDIDATE",
+                          "4. OBJECT_LIFTED",
+                          "5. TARGET_REACHED",
+                          "6. RELEASE_CONFIRMED",
+                          "7. VERIFIED",
+                        ].map((s, i) => (
+                          <div
+                            key={i}
+                            className={`p-1.5 rounded border font-bold flex items-center gap-1 ${
+                              i <= 4 ? "bg-emerald-50 border-emerald-300 text-emerald-800" : "bg-slate-50 border-slate-200 text-slate-400"
+                            }`}
+                          >
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            <span>{s}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Labelling Actions */}
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm space-y-2">
+                      <div className="text-[10px] font-bold text-[#747B76]">OPERATOR LABELLING ACTIONS</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => handleLabelGroundTruth("success")}
+                          className="py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-500"
+                        >
+                          [S] Success
+                        </button>
+                        <button
+                          onClick={() => handleLabelGroundTruth("failure")}
+                          className="py-2 bg-rose-600 text-white rounded-lg text-xs font-bold hover:bg-rose-500"
+                        >
+                          [F] Fail
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => handleLabelGroundTruth("uncertain")}
+                          className="py-2 bg-purple-100 text-purple-900 border border-purple-300 rounded-lg text-xs font-bold"
+                        >
+                          [U] Uncertain
+                        </button>
+                        <button
+                          onClick={handleAbortAttempt}
+                          className="py-2 bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs font-bold"
+                        >
+                          [Esc] Abort
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. DEVICE & CALIBRATION TAB */}
+                {mobileTab === "device" && (
+                  <div className="space-y-3">
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
+                      <div className="text-[10px] font-bold text-[#747B76] mb-2">HARDWARE LINK & PROFILE</div>
+                      <div className="text-xs space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-[#747B76]">Device:</span>
+                          <span className="font-bold">ESP32-S3 DevKit</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#747B76]">Transport:</span>
+                          <span className="font-bold">USB Serial (921,600 baud)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#747B76]">Active Profile:</span>
+                          <span className="font-bold text-[#173C35]">demo3 (3 Flex + FSR + IMU)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#747B76]">Calibration:</span>
+                          <span className="font-bold text-emerald-700">Valid (Age: 1 day, Span &gt; 300)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Preflight Diagnostics Checklist */}
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
+                      <div className="text-[10px] font-bold text-[#747B76] mb-2">10-POINT PREFLIGHT DIAGNOSTICS</div>
+                      <div className="space-y-1.5 text-xs">
+                        {[
+                          { name: "Python 3.14 Environment", ok: true },
+                          { name: "OpenCV ArUco Library", ok: true },
+                          { name: "Serial Glove Connection", ok: true },
+                          { name: "Zone Geometry Polygons", ok: true },
+                          { name: "SQLite WAL Database", ok: true },
+                          { name: "Storage Space (>500MB)", ok: true },
+                          { name: "Volunteer Consent Gate", ok: true },
+                          { name: "Local Security Boundary (127.0.0.1)", ok: true },
+                        ].map((c, i) => (
+                          <div key={i} className="flex items-center justify-between">
+                            <span className="text-[#252A28]">{c.name}</span>
+                            <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" /> PASS
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 6. PROGRESS TAB */}
+                {mobileTab === "progress" && (
+                  <div className="space-y-3">
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
+                      <div className="text-[10px] font-bold text-[#747B76] mb-1">REHABILITATION PROGRESSION</div>
+                      <div className="text-xl font-bold text-[#173C35]">82.4% Mean ROM</div>
+                      <p className="text-[10px] text-[#747B76] mt-0.5">+6.8% increase compared to baseline.</p>
+                      <div className="mt-3 flex items-end gap-1.5 h-20 pt-2 border-b border-slate-100">
+                        {[40, 52, 60, 68, 74, 80, 84].map((v, i) => (
+                          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                            <div className="w-full bg-[#173C35] rounded-t" style={{ height: `${v}%` }} />
+                            <span className="text-[8px] text-[#747B76]">D{i + 1}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Bottom Navigation Bar (48px Touch Targets) */}
+              <div className="bg-white border-t border-[#E0E5E2] px-2 py-2 flex justify-around items-center">
+                {[
+                  { id: "today", label: "Today", icon: Activity },
+                  { id: "exercises", label: "Exercises", icon: Dumbbell },
+                  { id: "taskproof", label: "TaskProof", icon: CheckCircle2 },
+                  { id: "device", label: "Device", icon: Sliders },
+                  { id: "progress", label: "Progress", icon: BarChart3 },
+                ].map((item) => {
+                  const IconCmp = item.icon;
+                  const isActive = mobileTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setMobileTab(item.id as any)}
+                      className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] px-2 rounded-lg transition ${
+                        isActive ? "text-[#173C35] font-black" : "text-[#747B76] hover:text-[#252A28]"
+                      }`}
+                    >
+                      <IconCmp className={`w-4 h-4 ${isActive ? "stroke-[2.5]" : ""}`} />
+                      <span className="text-[9px] mt-0.5">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Designer Guide Callout */}
+            <div className="max-w-xs space-y-4 text-xs text-slate-300">
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
+                <h4 className="font-bold text-sm text-emerald-400 flex items-center gap-2">
+                  <UserCheck className="w-4 h-4" /> Designer Note (Vaishnavi)
+                </h4>
+                <p className="text-slate-400 leading-relaxed">
+                  This interactive web viewport reflects the mobile architecture in <code className="text-sky-300">mobile/lib/</code>.
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-slate-400">
+                  <li>Minimum 48×48 px touch targets.</li>
+                  <li>Okabe-Ito color-blind safe palette.</li>
+                  <li>Responsive 440px mobile canvas container.</li>
+                  <li>Mandatory non-medical disclaimer banner.</li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
+                <h4 className="font-bold text-sm text-sky-400">Quick Tab Shortcuts</h4>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <button onClick={() => setMobileTab("today")} className="p-2 bg-slate-800 hover:bg-slate-700 rounded text-left font-bold">
+                    1. Today Plan
+                  </button>
+                  <button onClick={() => setMobileTab("exercises")} className="p-2 bg-slate-800 hover:bg-slate-700 rounded text-left font-bold">
+                    2. Exercise List
+                  </button>
+                  <button onClick={() => setMobileTab("live_session")} className="p-2 bg-slate-800 hover:bg-slate-700 rounded text-left font-bold">
+                    3. Live Biofeedback
+                  </button>
+                  <button onClick={() => setMobileTab("taskproof")} className="p-2 bg-slate-800 hover:bg-slate-700 rounded text-left font-bold">
+                    4. TaskProof Screen
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         ) : (
-          /* Operator View (FE-01 to FE-07) */
-          <div className="grid grid-cols-12 gap-6">
-            {/* Left Column: Diagnostics & Preflight */}
-            <div className="col-span-12 lg:col-span-4 space-y-6">
-              {/* Preflight Checklist Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-sm flex items-center gap-2">
-                    <Sliders className="w-4 h-4 text-sky-400" />
-                    Preflight System Readiness
-                  </h3>
-                  <button onClick={fetchPreflight} className="text-xs text-sky-400 hover:underline">
-                    Refresh
-                  </button>
-                </div>
-                <div className="space-y-2.5 text-xs">
-                  {preflightChecks.map((chk, idx) => (
-                    <div key={idx} className="flex items-start justify-between bg-slate-950/60 p-2.5 rounded border border-slate-800/80">
-                      <div>
-                        <div className="font-semibold">{chk.name}</div>
-                        <div className="text-slate-400 text-[11px] mt-0.5">{chk.details}</div>
-                      </div>
-                      {chk.status === "pass" && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
-                      {chk.status === "warn" && <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />}
-                      {chk.status === "fail" && <XCircle className="w-4 h-4 text-rose-400 shrink-0" />}
+          /* ========================================================================= */
+          /* 2. OPERATOR & JUDGE VIEWS (NEXUS Hackathon Event TaskProof Engine)        */
+          /* ========================================================================= */
+          <div>
+            {viewMode === "judge" ? (
+              <div className="max-w-5xl mx-auto space-y-6">
+                {/* Giant Verdict Banner */}
+                <div
+                  className={`p-8 rounded-2xl border-4 text-center shadow-2xl transition-all ${getVerdictColor(
+                    telemetry?.taskproof.verdict || "NOT_STARTED"
+                  )}`}
+                >
+                  <div className="text-sm uppercase tracking-widest font-bold opacity-80 mb-2">Current State Verdict</div>
+                  <div className="text-6xl font-black tracking-tight">{telemetry?.taskproof.verdict || "READY"}</div>
+                  {telemetry?.taskproof.reason_codes && telemetry.taskproof.reason_codes.length > 0 && (
+                    <div className="mt-4 text-lg font-mono opacity-90">
+                      {telemetry.taskproof.reason_codes.join(" • ")}
                     </div>
-                  ))}
+                  )}
                 </div>
-              </div>
 
-              {/* Ingestion & Telemetry Stats */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 text-xs">
-                <h3 className="font-bold mb-3 flex items-center gap-2">
-                  <Wifi className="w-4 h-4 text-emerald-400" />
-                  Stream Ingestion Metrics
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                    <div className="text-slate-400">Sample Rate</div>
-                    <div className="text-lg font-bold text-emerald-400 mt-1">
-                      {telemetry?.stats.estimated_rate_hz || 0} Hz
-                    </div>
-                  </div>
-                  <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                    <div className="text-slate-400">Total Packets</div>
-                    <div className="text-lg font-bold text-slate-200 mt-1">{telemetry?.stats.total_packets || 0}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Live TaskProof State & Controls */}
-            <div className="col-span-12 lg:col-span-8 space-y-6">
-              {/* Active State & Action Buttons */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                {/* Active TaskProof Stage */}
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex items-center justify-between">
                   <div>
-                    <span className="text-xs uppercase text-slate-400 font-bold">State Machine Status</span>
-                    <div className="text-3xl font-extrabold text-sky-400 mt-1">
-                      {telemetry?.taskproof.state || "READY"}
-                    </div>
-                    <div className="text-xs text-slate-400 mt-1">
-                      Attempt ID: <span className="font-mono text-slate-200">{telemetry?.taskproof.attempt_id || "None"}</span>
-                    </div>
+                    <span className="text-xs uppercase text-slate-400 font-bold tracking-wider">Active Stage</span>
+                    <div className="text-2xl font-bold text-sky-400 mt-1">{telemetry?.taskproof.state || "READY"}</div>
                   </div>
-
-                  {/* Operator Controls */}
-                  <div className="flex items-center space-x-3">
-                    <button
-                      onClick={handleStartAttempt}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold transition"
-                    >
-                      <Play className="w-4 h-4" /> Start Attempt
-                    </button>
-                    <button
-                      onClick={handleAbortAttempt}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-500 rounded-lg text-xs font-bold transition"
-                    >
-                      <StopCircle className="w-4 h-4" /> Abort (Esc)
-                    </button>
+                  <div className="text-right">
+                    <span className="text-xs uppercase text-slate-400 font-bold tracking-wider">Zone Membership</span>
+                    <div className="text-2xl font-bold text-amber-400 mt-1">
+                      {telemetry?.vision?.zone_membership || "ZONE_A"}
+                    </div>
                   </div>
                 </div>
 
-                {/* Hotkey Guide Bar */}
-                <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                  <span>Labelling Hotkeys:</span>
-                  <div className="flex items-center space-x-4">
-                    <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-slate-200 font-bold">S</kbd> Success</span>
-                    <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-slate-200 font-bold">F</kbd> Failure</span>
-                    <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-slate-200 font-bold">U</kbd> Uncertain</span>
-                    <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-slate-200 font-bold">Esc</kbd> Abort</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Sensor Channel Strip Gauges */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                <h3 className="font-bold text-sm mb-4 flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-sky-400" />
-                  Live Sensor Channels (Normalized Flexion & Contact)
-                </h3>
-                <div className="grid grid-cols-4 gap-4 text-xs">
-                  {["Thumb Flex", "Index Flex", "Middle Flex", "FSR Contact"].map((name, idx) => {
-                    const rawVal = telemetry?.sensor?.flex?.[idx] ?? (idx === 3 ? telemetry?.sensor?.fsr : 0);
-                    return (
-                      <div key={idx} className="bg-slate-950 p-3 rounded border border-slate-800">
-                        <div className="text-slate-400 font-medium">{name}</div>
-                        <div className="text-lg font-bold mt-1 text-slate-200">{rawVal ?? "No data"}</div>
-                        <div className="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all"
-                            style={{ width: `${Math.min(100, Math.max(0, ((rawVal || 0) / 25000) * 100))}%` }}
-                          />
+                {/* Last 5 Attempts Card */}
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                  <h3 className="font-bold text-sm text-slate-400 mb-4 tracking-wider uppercase">Last 5 Attempts History</h3>
+                  <div className="space-y-2">
+                    {attemptHistory.length === 0 ? (
+                      <div className="text-slate-500 text-xs">No attempts recorded in this session yet.</div>
+                    ) : (
+                      attemptHistory.map((att, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs font-mono"
+                        >
+                          <span className="text-slate-400">{att.id}</span>
+                          <span className="text-slate-500">{att.time}</span>
+                          <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${getVerdictColor(att.verdict)}`}>
+                            {att.verdict}
+                          </span>
                         </div>
-                      </div>
-                    );
-                  })}
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
+            ) : (
+              /* OPERATOR VIEW */
+              <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column: Diagnostics & Preflight */}
+                <div className="space-y-6">
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <h3 className="font-bold text-sm mb-3 flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <FileCheck className="w-4 h-4 text-emerald-400" />
+                        System Preflight Checks
+                      </span>
+                      <button onClick={fetchPreflight} className="text-slate-400 hover:text-white">
+                        <RotateCcw className="w-3.5 h-3.5" />
+                      </button>
+                    </h3>
+                    <div className="space-y-2 text-xs">
+                      {preflightChecks.map((chk, i) => (
+                        <div key={i} className="flex items-start justify-between p-2 bg-slate-950 rounded border border-slate-800/80">
+                          <div>
+                            <div className="font-semibold text-slate-200">{chk.name}</div>
+                            <div className="text-[10px] text-slate-400">{chk.details}</div>
+                          </div>
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                              chk.status === "pass"
+                                ? "bg-emerald-950 text-emerald-400 border border-emerald-800"
+                                : chk.status === "warn"
+                                ? "bg-amber-950 text-amber-400 border border-amber-800"
+                                : "bg-rose-950 text-rose-400 border border-rose-800"
+                            }`}
+                          >
+                            {chk.status}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
-              {/* Evaluation & Export Actions */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-sm">Evidence & Evaluation Bundle</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Exports CSV trial record and SHA-256 verifiable package.
-                  </p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <a
-                    href="/api/export/csv"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-xs font-semibold"
-                  >
-                    <Download className="w-3.5 h-3.5 text-sky-400" /> CSV
-                  </a>
-                  <a
-                    href="/api/export/bundle"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-600 hover:bg-sky-500 rounded text-xs font-semibold"
-                  >
-                    <Download className="w-3.5 h-3.5" /> Evidence ZIP
-                  </a>
+                {/* Center & Right Columns: TaskProof State & Live Stream */}
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">State Machine Lifecycle</span>
+                        <h2 className="text-xl font-black text-sky-400 mt-0.5">{telemetry?.taskproof.state || "READY"}</h2>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={handleStartAttempt}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold transition"
+                        >
+                          <Play className="w-3.5 h-3.5" /> Start Attempt
+                        </button>
+                        <button
+                          onClick={handleAbortAttempt}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 rounded-lg text-xs font-bold transition"
+                        >
+                          <StopCircle className="w-3.5 h-3.5" /> Abort (Esc)
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Sensor Strip */}
+                    <div className="grid grid-cols-4 gap-3 text-xs">
+                      {["Thumb Flex", "Index Flex", "Middle Flex", "FSR Contact"].map((name, idx) => {
+                        const rawVal = telemetry?.sensor?.flex?.[idx] ?? (idx === 3 ? telemetry?.sensor?.fsr : 0);
+                        return (
+                          <div key={idx} className="bg-slate-950 p-2.5 rounded border border-slate-800">
+                            <div className="text-slate-400 text-[11px]">{name}</div>
+                            <div className="text-base font-bold mt-0.5 text-slate-200">{rawVal ?? "No data"}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Evaluation & Export Actions */}
+                    <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between">
+                      <div className="text-xs text-slate-400">
+                        Exports ground truth trials and SHA-256 verifiable manifest.
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <a
+                          href="/api/export/csv"
+                          className="flex items-center gap-1 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-xs font-semibold"
+                        >
+                          <Download className="w-3 h-3 text-sky-400" /> CSV
+                        </a>
+                        <a
+                          href="/api/export/bundle"
+                          className="flex items-center gap-1 px-3 py-1.5 bg-sky-600 hover:bg-sky-500 rounded text-xs font-semibold"
+                        >
+                          <Download className="w-3 h-3" /> Evidence ZIP
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </main>
 
       {/* Floating Hotkey Action Toast */}
       {hotkeyToast && (
-        <div className="fixed bottom-12 right-6 bg-sky-600 text-white px-4 py-2 rounded-lg shadow-xl text-xs font-bold animate-bounce flex items-center gap-2">
+        <div className="fixed bottom-12 right-6 bg-sky-600 text-white px-4 py-2 rounded-lg shadow-xl text-xs font-bold animate-bounce flex items-center gap-2 z-50">
           <CheckCircle2 className="w-4 h-4" />
           {hotkeyToast}
         </div>

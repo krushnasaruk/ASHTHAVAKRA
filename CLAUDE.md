@@ -11,7 +11,7 @@ This project uses zone-based ownership for multi-developer AI collaboration.
 
 | Zone | Owner | Paths | Notes |
 |------|-------|-------|-------|
-| frontend | @Bot | mobile/lib/screens/, mobile/lib/widgets/, mobile/packages/h10_core/lib/theme/, docs/vaishnavi_jare/ | Mobile & Web Patient UI screens, widgets, design tokens, and designer docs |
+| frontend | @vaishnavijare60-hash | mobile/lib/screens/, mobile/lib/widgets/, mobile/packages/h10_core/lib/theme/, docs/vaishnavi_jare/ | Mobile & Web Patient UI screens, widgets, design tokens, and designer docs |
 | backend | _unclaimed_ | backend/, simulator/ | FastAPI backend server, SQLite database, and ESP32 device simulator |
 | shared | _unclaimed_ | shared/, mobile/packages/h10_core/ | Signal processing, protocols, and shared JSON schemas |
 | ml | _unclaimed_ | ml/ | ML pipeline, Colab notebooks, and feature extraction |

@@ -14,7 +14,7 @@ Each directory/area of the codebase is assigned to a **zone**. Each zone can be
 **claimed** by one developer at a time. You must only modify files within zones
 that your developer has claimed.
 
-### frontend — 🔴 Claimed by **@Bot**
+### frontend — 🔴 Claimed by **@vaishnavijare60-hash**
 - Paths: `mobile/lib/screens/`, `mobile/lib/widgets/`, `mobile/packages/h10_core/lib/theme/`, `docs/vaishnavi_jare/`
 - Mobile & Web Patient UI screens, widgets, design tokens, and designer docs
 
