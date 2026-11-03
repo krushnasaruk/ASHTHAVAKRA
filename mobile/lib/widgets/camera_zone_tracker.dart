@@ -328,3 +328,4 @@ class CameraZoneTrackerWidget extends StatelessWidget {
     );
   }
 }
+
