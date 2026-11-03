@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import SciFiHudView from "./components/SciFiHudView";
 import {
   Activity,
   AlertTriangle,
@@ -16,6 +17,7 @@ import {
   HeartPulse,
   HelpCircle,
   Play,
+  Radio,
   RefreshCw,
   RotateCcw,
   ShieldCheck,
@@ -70,7 +72,7 @@ interface TelemetryPayload {
 }
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<"operator" | "judge" | "mobile_preview">("operator");
+  const [viewMode, setViewMode] = useState<"scifi_hud" | "operator" | "judge" | "mobile_preview">("scifi_hud");
   const [dataSource, setDataSource] = useState<"live" | "replay" | "simulated">("live");
 
   // Mobile App Preview Navigation State
@@ -261,6 +263,16 @@ export default function App() {
     { name: "Pinky", hex: "#0072B2", val: 55 },
   ];
 
+  if (viewMode === "scifi_hud") {
+    return (
+      <SciFiHudView
+        onSwitchView={setViewMode}
+        telemetry={telemetry}
+        isConnected={connected}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans">
       {/* Top Header & Mode Toggle */}
@@ -286,6 +298,14 @@ export default function App() {
 
         {/* View Mode Navigation Switcher */}
         <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setViewMode("scifi_hud")}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-amber-600/70 bg-amber-950/40 text-amber-300 hover:bg-amber-900/60 shadow-[0_0_10px_rgba(251,191,36,0.25)]"
+          >
+            <Radio className="w-4 h-4 text-amber-400" />
+            <span>Sci-Fi Holographic HUD</span>
+          </button>
+
           <button
             onClick={() => setViewMode("mobile_preview")}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
