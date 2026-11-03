@@ -34,7 +34,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   final String _sessionId = 'session_${DateTime.now().millisecondsSinceEpoch}';
 
   bool _isPaused = false;
-  bool _showAnatomicalSkeleton = false;
+  bool _showAnatomicalSkeleton = true;
   int _sessionSeconds = 0;
   Timer? _sessionTimer;
   Timer? _presentationTimer;

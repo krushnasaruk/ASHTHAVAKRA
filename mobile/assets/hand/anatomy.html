@@ -28,9 +28,9 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 16px 12px 16px;
+      padding: 14px 14px 10px 14px;
       position: relative;
-      background: radial-gradient(circle at 50% 45%, #0e1012 0%, #040505 85%, #000000 100%);
+      background: radial-gradient(circle at 50% 45%, #0e1214 0%, #050708 75%, #000000 100%);
     }
 
     /* 4:5 Portrait Anatomical Viewport */
@@ -39,11 +39,13 @@
       max-width: 440px;
       aspect-ratio: 4 / 5;
       position: relative;
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: #000000;
     }
     #canvas-container {
       width: 100%;
@@ -60,7 +62,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
       z-index: 10;
     }
     .header-title {
@@ -100,7 +102,7 @@
       border: 1px solid #ffd54a;
       padding: 5px 9px;
       border-radius: 4px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
       font-size: 9.5px;
       line-height: 1.35;
       color: #e8efef;
@@ -145,9 +147,9 @@
       display: none;
       align-items: center;
       gap: 10px;
-      margin-top: 8px;
+      margin-top: 6px;
       padding: 6px 12px;
-      background: rgba(16, 20, 22, 0.7);
+      background: rgba(16, 20, 22, 0.75);
       border-radius: 6px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       z-index: 10;
@@ -182,18 +184,18 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      margin-top: 8px;
+      margin-top: 6px;
       z-index: 10;
     }
     .action-btn {
       flex: 1;
-      padding: 9px 4px;
+      padding: 8px 4px;
       background: rgba(18, 22, 24, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 5px;
       color: #c9d0d4;
       font-family: inherit;
-      font-size: 9px;
+      font-size: 8.5px;
       font-weight: 700;
       letter-spacing: 1.2px;
       text-transform: uppercase;
@@ -233,7 +235,7 @@
       letter-spacing: 1.6px;
       color: #555e62;
       text-transform: uppercase;
-      margin-top: 8px;
+      margin-top: 6px;
       text-align: center;
       z-index: 10;
     }
@@ -247,7 +249,7 @@
     <!-- Header Bar -->
     <div class="header-bar">
       <div class="header-title">HAND / ANATOMY</div>
-      <div id="mode-indicator" class="mode-indicator">NO DATA</div>
+      <div id="mode-indicator" class="mode-indicator">READY</div>
     </div>
 
     <!-- 4:5 Portrait Framing Viewport -->
@@ -258,7 +260,7 @@
       <div id="bone-callout">
         <div class="callout-box">
           <div id="callout-title" class="callout-bone-name">PROXIMAL PHALANX</div>
-          <div id="callout-detail" class="callout-sub">INDEX FINGER • MCP, PIP</div>
+          <div id="callout-detail" class="callout-sub">INDEX FINGER &bull; MCP, PIP</div>
         </div>
         <div class="callout-pointer"></div>
         <div class="callout-dot"></div>
@@ -296,8 +298,9 @@
 
     // --- State Management ---
     let scene, camera, renderer, raycaster;
-    let handRoot, skeletonGroup;
+    let handRoot;
     let allBoneMeshes = [];
+    let boneNodes = {}; // Named joint Object3D nodes for hierarchical rotation
     let carpalCount = 0, metacarpalCount = 0, phalanxCount = 0;
 
     let selectedFinger = null; // 'thumb' | 'index' | 'middle' | 'ring' | 'pinky' | null
@@ -307,19 +310,19 @@
     // Camera interaction state
     let isDragging = false;
     let prevMouseX = 0, prevMouseY = 0;
-    let targetRotY = 0.44; // Default ~25 degrees from palm side
-    let targetRotX = 0.05;
-    let currentRotY = 0.44;
-    let currentRotX = 0.05;
+    let targetRotY = 0.22; // Slight natural 3/4 palm tilt
+    let targetRotX = 0.04;
+    let currentRotY = 0.22;
+    let currentRotX = 0.04;
 
     let initialPinchDist = null;
     let targetZoom = 1.0;
     let currentZoom = 1.0;
-    const MIN_ZOOM = 0.8;
-    const MAX_ZOOM = 2.5;
+    const MIN_ZOOM = 0.75;
+    const MAX_ZOOM = 2.4;
 
-    // Joint Rings
-    const jointRings = [];
+    // Joint Rings map: finger -> array of Mesh
+    const jointRings = {};
 
     // Articulation targets (0.0 to 1.0)
     const targetFlex = { thumb: 0.0, index: 0.0, middle: 0.0, ring: 0.0, pinky: 0.0 };
@@ -331,45 +334,45 @@
     let matShaftDefault, matShaftHighlight, matEpiphysisDefault, matDimmed, matSkin;
 
     function initMaterials() {
-      // Mid-grey to off-white (#c9d0d4 to #e8efef) with subtle shading
+      // Metacarpals shaft: mid-grey to off-white (#c9d0d4)
       matShaftDefault = new THREE.MeshStandardMaterial({
         color: 0xc9d0d4,
-        roughness: 0.42,
+        roughness: 0.45,
         metalness: 0.08,
       });
 
-      // Highlighted bone shaft: saturated yellow (#ffd54a)
+      // Highlighted Phalanx bone shafts: Saturated vivid golden yellow (#ffd54a) matching reference
       matShaftHighlight = new THREE.MeshStandardMaterial({
         color: 0xffd54a,
-        roughness: 0.35,
+        roughness: 0.32,
         metalness: 0.05,
         emissive: 0xffd54a,
-        emissiveIntensity: 0.28,
+        emissiveIntensity: 0.32,
       });
 
-      // Joint ends: pale / mid grey
+      // Joint ends (epiphyses) & Carpal bones: soft neutral pale grey (#b5bec4)
       matEpiphysisDefault = new THREE.MeshStandardMaterial({
         color: 0xb5bec4,
         roughness: 0.55,
         metalness: 0.04,
       });
 
-      // Dimmed non-selected bones (40% opacity)
+      // Dimmed non-selected bones (when a single finger is isolated)
       matDimmed = new THREE.MeshStandardMaterial({
-        color: 0x6e787d,
+        color: 0x5a6368,
         roughness: 0.65,
         metalness: 0.02,
         transparent: true,
-        opacity: 0.40,
+        opacity: 0.35,
       });
 
-      // Faint semi-transparent skin silhouette outline (opacity 0.14, fine light-grey edge)
+      // Faint semi-transparent skin silhouette outline (opacity 0.14, fine off-white rim)
       matSkin = new THREE.MeshPhysicalMaterial({
-        color: 0xe8efef,
+        color: 0xd8e4ea,
         transparent: true,
-        opacity: 0.14,
-        roughness: 0.45,
-        metalness: 0.0,
+        opacity: 0.13,
+        roughness: 0.40,
+        metalness: 0.02,
         depthWrite: false,
         side: THREE.FrontSide,
       });
@@ -381,12 +384,12 @@
       const h = container.clientHeight || 450;
 
       scene = new THREE.Scene();
-      scene.background = null; // Transparent, root element has dark gradient
+      scene.background = null;
 
-      // Camera: angled so hand fills ~80% of 4:5 frame height
+      // Camera: perfectly framed so the hand fills ~80% of 4:5 portrait frame
       camera = new THREE.PerspectiveCamera(36, w / h, 0.01, 100);
-      camera.position.set(0.0, 0.045, 0.34);
-      camera.lookAt(0.0, 0.045, 0.0);
+      camera.position.set(0.0, 0.065, 0.35);
+      camera.lookAt(0.0, 0.065, 0.0);
 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
       renderer.setSize(w, h);
@@ -396,16 +399,16 @@
 
       raycaster = new THREE.Raycaster();
 
-      // Lighting: Soft ambient + Upper-Left Directional Key Light (no hard cast shadows)
-      const ambLight = new THREE.AmbientLight(0xfff5ea, 0.75);
+      // Lighting: Soft ambient + upper-left key light + soft rim light per spec
+      const ambLight = new THREE.AmbientLight(0xfff6ea, 0.82);
       scene.add(ambLight);
 
-      const keyLight = new THREE.DirectionalLight(0xffeedd, 0.95);
-      keyLight.position.set(-0.35, 0.55, 0.4);
+      const keyLight = new THREE.DirectionalLight(0xffeedd, 1.05);
+      keyLight.position.set(-0.35, 0.60, 0.45);
       scene.add(keyLight);
 
-      const rimLight = new THREE.DirectionalLight(0xa0b5c0, 0.35);
-      rimLight.position.set(0.3, -0.2, -0.3);
+      const rimLight = new THREE.DirectionalLight(0x90a8b4, 0.40);
+      rimLight.position.set(0.35, -0.20, -0.35);
       scene.add(rimLight);
 
       initMaterials();
@@ -423,88 +426,120 @@
         handRoot = gltf.scene;
         scene.add(handRoot);
 
-        handRoot.position.set(0, -0.015, 0);
+        handRoot.position.set(0, 0.0, 0);
         handRoot.rotation.y = targetRotY;
         handRoot.rotation.x = targetRotX;
 
-        // Traverse & Catalog Bones
         carpalCount = 0;
         metacarpalCount = 0;
         phalanxCount = 0;
         allBoneMeshes = [];
+        boneNodes = {};
 
         handRoot.traverse((obj) => {
-          if (obj.isMesh) {
-            allBoneMeshes.push(obj);
+          if (obj.name) {
+            boneNodes[obj.name] = obj;
+          }
 
-            const nodeName = obj.name || (obj.parent ? obj.parent.name : '');
+          if (obj.isMesh) {
+            const nodeName = (obj.name || (obj.parent ? obj.parent.name : '')).toLowerCase();
             const extras = obj.userData || (obj.parent ? obj.parent.userData : {}) || {};
 
             if (nodeName.includes('skin')) {
               obj.material = matSkin;
-            } else if (extras.boneType === 'carpal' || nodeName.includes('scaphoid') || nodeName.includes('lunate') ||
-                       nodeName.includes('triquetrum') || nodeName.includes('pisiform') || nodeName.includes('trapezium') ||
-                       nodeName.includes('trapezoid') || nodeName.includes('capitate') || nodeName.includes('hamate')) {
-              carpalCount++;
-              obj.material = matEpiphysisDefault;
-            } else if (extras.boneType === 'metacarpal' || nodeName.includes('metacarpal')) {
-              metacarpalCount++;
-              applyBoneMaterials(obj);
-            } else if (extras.boneType === 'phalanx' || nodeName.includes('phalanx')) {
-              phalanxCount++;
-              applyBoneMaterials(obj);
+              obj.renderOrder = 10;
+            } else {
+              allBoneMeshes.push(obj);
+
+              if (extras.boneType === 'carpal' || nodeName.includes('scaphoid') || nodeName.includes('lunate') ||
+                  nodeName.includes('triquetrum') || nodeName.includes('pisiform') || nodeName.includes('trapezium') ||
+                  nodeName.includes('trapezoid') || nodeName.includes('capitate') || nodeName.includes('hamate')) {
+                carpalCount++;
+                obj.material = matEpiphysisDefault;
+              } else if (extras.boneType === 'metacarpal' || nodeName.includes('metacarpal')) {
+                metacarpalCount++;
+                applyBoneMaterials(obj, false);
+              } else if (extras.boneType === 'phalanx' || nodeName.includes('phalanx')) {
+                phalanxCount++;
+                // Saturated Golden-Yellow Phalanx Shafts matching reference image!
+                applyBoneMaterials(obj, true);
+              }
             }
           }
         });
 
-        // Create Small Amber Joint Rings (#f5a623, 2-3px)
+        // Create Small Amber Joint Rings (#f5a623) at finger joints
         createJointRings();
+        updateJointRingsPositions();
 
-        // Debug Log per acceptance criteria:
         console.log(`[ANATOMY] Bones count verified: ${carpalCount} carpal, ${metacarpalCount} metacarpal, ${phalanxCount} phalanx. Total bones: ${carpalCount + metacarpalCount + phalanxCount}.`);
       }
 
       // Try local Base64 zero-latency bridge first, then file load
-      if (window.SKELETON_GLB_B64) {
-        const binStr = atob(window.SKELETON_GLB_B64);
-        const len = binStr.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-          bytes[i] = binStr.charCodeAt(i);
+      if (window.SKELETON_GLB_B64 && window.SKELETON_GLB_B64.length > 100) {
+        try {
+          const binStr = atob(window.SKELETON_GLB_B64);
+          const len = binStr.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binStr.charCodeAt(i);
+          }
+          loader.parse(bytes.buffer, '', onLoaded, (err) => {
+            console.warn("Base64 parse fallback:", err);
+            loader.load('skeleton.glb', onLoaded);
+          });
+          return;
+        } catch(e) {
+          console.warn("Base64 decode error:", e);
         }
-        loader.parse(bytes.buffer, '', onLoaded, (err) => console.error("Parse error:", err));
-      } else {
-        loader.load('skeleton.glb', onLoaded, undefined, (err) => {
-          loader.load('assets/hand/skeleton.glb', onLoaded);
-        });
       }
+
+      loader.load('skeleton.glb', onLoaded, undefined, () => {
+        loader.load('assets/hand/skeleton.glb', onLoaded);
+      });
     }
 
-    function applyBoneMaterials(mesh) {
-      if (Array.isArray(mesh.material)) {
-        mesh.material[0] = matShaftDefault; // Shaft
-        if (mesh.material.length > 1) {
-          mesh.material[1] = matEpiphysisDefault; // Epiphysis
+    function applyBoneMaterials(mesh, isPhalanx = true) {
+      if (isPhalanx) {
+        // Phalanx: Shaft is vivid saturated golden yellow (#ffd54a), ends are pale grey
+        if (Array.isArray(mesh.material)) {
+          mesh.material[0] = matShaftHighlight;
+          if (mesh.material.length > 1) {
+            mesh.material[1] = matEpiphysisDefault;
+          }
+        } else {
+          mesh.material = matShaftHighlight;
         }
       } else {
-        mesh.material = matShaftDefault;
+        // Metacarpal: Mid-grey shaft
+        if (Array.isArray(mesh.material)) {
+          mesh.material[0] = matShaftDefault;
+          if (mesh.material.length > 1) {
+            mesh.material[1] = matEpiphysisDefault;
+          }
+        } else {
+          mesh.material = matShaftDefault;
+        }
       }
     }
 
     function createJointRings() {
-      // Torus rings for MCP, PIP, DIP joints in amber (#f5a623)
-      const ringGeo = new THREE.TorusGeometry(0.0048, 0.00065, 8, 24);
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0xf5a623, transparent: true, opacity: 0.95 });
+      // Small Amber joint rings (#f5a623, 2-3px screen size)
+      const ringGeo = new THREE.TorusGeometry(0.0052, 0.00065, 8, 24);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xf5a623,
+        transparent: true,
+        opacity: 0.95
+      });
 
       const fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky'];
       fingerNames.forEach((f) => {
         const ringsForFinger = [];
-        // Add 2 rings for thumb, 3 for fingers
         const count = (f === 'thumb') ? 2 : 3;
         for (let i = 0; i < count; i++) {
           const ringMesh = new THREE.Mesh(ringGeo, ringMat);
           ringMesh.rotation.x = Math.PI * 0.5;
-          ringMesh.visible = false;
+          ringMesh.visible = true; // Visible by default as in reference image
           scene.add(ringMesh);
           ringsForFinger.push(ringMesh);
         }
@@ -513,18 +548,27 @@
     }
 
     function updateJointRingsPositions() {
-      if (!selectedFinger || !jointRings[selectedFinger]) return;
-      const rings = jointRings[selectedFinger];
+      if (!handRoot) return;
+      const fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky'];
+      fingerNames.forEach((f) => {
+        const rings = jointRings[f];
+        if (!rings) return;
 
-      const fingerBones = getBonesForFinger(selectedFinger);
-      fingerBones.forEach((mesh, idx) => {
-        if (idx > 0 && idx <= rings.length) {
-          const ring = rings[idx - 1];
-          const worldPos = new THREE.Vector3();
-          mesh.getWorldPosition(worldPos);
-          ring.position.copy(worldPos);
-          ring.visible = true;
-        }
+        // Find phalanx nodes for this finger
+        const fingerNodes = Object.keys(boneNodes)
+          .filter(k => k.includes(f) && k.includes('phalanx'))
+          .map(k => boneNodes[k]);
+
+        fingerNodes.forEach((node, idx) => {
+          if (idx < rings.length) {
+            const ring = rings[idx];
+            const worldPos = new THREE.Vector3();
+            node.getWorldPosition(worldPos);
+            ring.position.copy(worldPos);
+            // If a specific finger is selected, make its rings slightly brighter; otherwise show all
+            ring.visible = (selectedFinger === null || selectedFinger === f);
+          }
+        });
       });
     }
 
@@ -532,7 +576,6 @@
     function setupEventListeners(container) {
       let isPointerMoved = false;
 
-      // Pointer / Touch Handlers
       container.addEventListener('pointerdown', (e) => {
         isDragging = true;
         isPointerMoved = false;
@@ -549,7 +592,6 @@
         }
 
         targetRotY += dx * 0.008;
-        // Clamp vertical rotation so hand cannot flip upside down
         targetRotX = Math.max(-0.65, Math.min(0.65, targetRotX + dy * 0.008));
 
         prevMouseX = e.clientX;
@@ -558,14 +600,13 @@
 
       window.addEventListener('pointerup', (e) => {
         if (isDragging && !isPointerMoved) {
-          // Tap on canvas: Raycast selection
           handleTap(e);
         }
         isDragging = false;
         initialPinchDist = null;
       });
 
-      // Pinch-to-zoom (Touch)
+      // Pinch-to-zoom
       container.addEventListener('touchmove', (e) => {
         if (e.touches.length === 2) {
           isDragging = false;
@@ -621,14 +662,12 @@
 
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(allBoneMeshes, true);
-
-      // Filter out skin envelope mesh
-      const hit = intersects.find((h) => !h.object.name.includes('skin'));
+      const hit = intersects.find((h) => !h.object.name.toLowerCase().includes('skin'));
 
       if (hit) {
         const obj = hit.object;
         const extras = obj.userData || (obj.parent ? obj.parent.userData : {}) || {};
-        const fingerId = extras.finger || inferFingerFromName(obj.name || obj.parent.name);
+        const fingerId = extras.finger || inferFingerFromName(obj.name || (obj.parent ? obj.parent.name : ''));
 
         if (fingerId && fingerId !== 'wrist') {
           if (selectedFinger === fingerId) {
@@ -637,7 +676,6 @@
             selectFinger(fingerId, obj, extras);
           }
         } else {
-          // Carpal bone tapped: show info without bending
           showBoneCallout(obj, extras, 'wrist');
         }
       } else {
@@ -656,32 +694,22 @@
       return null;
     }
 
-    function getBonesForFinger(finger) {
-      return allBoneMeshes.filter((m) => {
-        const name = (m.name || (m.parent ? m.parent.name : '')).toLowerCase();
-        return name.includes(finger);
-      });
-    }
-
     function selectFinger(finger, tappedBone, extras) {
       selectedFinger = finger;
       selectedBoneMesh = tappedBone;
 
-      // Highlight selected finger shafts yellow (#ffd54a), dim other bones to 40%
       allBoneMeshes.forEach((mesh) => {
         const name = (mesh.name || (mesh.parent ? mesh.parent.name : '')).toLowerCase();
         if (name.includes('skin')) return;
 
-        const isFingerBone = name.includes(finger);
+        const isTargetFinger = name.includes(finger);
+        const isPhalanx = name.includes('phalanx');
 
-        if (isFingerBone) {
-          if (Array.isArray(mesh.material)) {
-            mesh.material[0] = matShaftHighlight; // Shaft turns saturated yellow
-            if (mesh.material.length > 1) {
-              mesh.material[1] = matEpiphysisDefault; // Joint ends stay pale grey
-            }
+        if (isTargetFinger) {
+          if (isPhalanx) {
+            applyBoneMaterials(mesh, true);
           } else {
-            mesh.material = matShaftHighlight;
+            applyBoneMaterials(mesh, false);
           }
         } else {
           if (Array.isArray(mesh.material)) {
@@ -693,7 +721,7 @@
         }
       });
 
-      // Show amber joint rings for selected finger
+      // Rings visibility
       Object.keys(jointRings).forEach((f) => {
         jointRings[f].forEach((r) => r.visible = (f === finger));
       });
@@ -712,7 +740,6 @@
       badge.style.display = 'flex';
       document.getElementById('finger-badge-text').textContent = finger.toUpperCase();
 
-      // Show Bone Info Callout near tapped bone
       showBoneCallout(tappedBone, extras, finger);
     }
 
@@ -721,14 +748,13 @@
       const title = document.getElementById('callout-title');
       const detail = document.getElementById('callout-detail');
 
-      const boneName = extras.name || (mesh.name || 'BONE').replace('_', ' ');
+      const boneName = extras.name || (mesh.name || 'BONE').replace(/_/g, ' ');
       const jointsList = (extras.joints || ['CMC', 'MCP']).join(', ');
       const estTag = (finger === 'ring' || finger === 'pinky') ? ' [EST.]' : '';
 
       title.textContent = boneName.toUpperCase();
-      detail.textContent = `${finger.toUpperCase()}${estTag} • JOINTS: ${jointsList}`;
+      detail.textContent = `${finger.toUpperCase()}${estTag} \u2022 JOINTS: ${jointsList}`;
 
-      // Project bone world position to 2D screen coordinate
       const worldPos = new THREE.Vector3();
       mesh.getWorldPosition(worldPos);
       worldPos.project(camera);
@@ -747,19 +773,20 @@
       selectedFinger = null;
       selectedBoneMesh = null;
 
-      // Restore all bone materials with crisp transition
+      // Restore all bone materials (Phalanges yellow, Metacarpals grey)
       allBoneMeshes.forEach((mesh) => {
         const name = (mesh.name || (mesh.parent ? mesh.parent.name : '')).toLowerCase();
         if (name.includes('skin')) return;
-        applyBoneMaterials(mesh);
+        const isPhalanx = name.includes('phalanx');
+        applyBoneMaterials(mesh, isPhalanx);
       });
 
-      // Hide Joint Rings
+      // Show all joint rings
       Object.keys(jointRings).forEach((f) => {
-        jointRings[f].forEach((r) => r.visible = false);
+        jointRings[f].forEach((r) => r.visible = true);
       });
+      updateJointRingsPositions();
 
-      // Hide Slider & Callout
       document.getElementById('slider-strip').style.display = 'none';
       document.getElementById('finger-badge').style.display = 'none';
       document.getElementById('bone-callout').style.display = 'none';
@@ -767,15 +794,12 @@
 
     function togglePalmBackView() {
       isPalmView = !isPalmView;
-      // Animate 180 degrees over ~500 ms
-      const startRot = currentRotY;
-      const endRot = isPalmView ? 0.44 : (0.44 + Math.PI);
-      targetRotY = endRot;
+      targetRotY = isPalmView ? 0.22 : (0.22 + Math.PI);
     }
 
     function resetView() {
-      targetRotY = 0.44;
-      targetRotX = 0.05;
+      targetRotY = 0.22;
+      targetRotX = 0.04;
       targetZoom = 1.0;
       isPalmView = true;
       clearSelection();
@@ -802,25 +826,21 @@
         targetFlex.thumb = Math.max(0, Math.min(1, data.curl.thumb ?? 0));
         targetFlex.index = Math.max(0, Math.min(1, data.curl.index ?? 0));
         targetFlex.middle = Math.max(0, Math.min(1, data.curl.middle ?? 0));
-
-        // Ring & Pinky estimated per spec
         targetFlex.ring = data.curl.ring != null ? data.curl.ring : (targetFlex.middle * 0.90);
         targetFlex.pinky = data.curl.pinky != null ? data.curl.pinky : (targetFlex.middle * 0.75);
       }
 
       if (data.imu && handRoot) {
-        // Wrist follows IMU quaternion
         const qw = data.imu.qw ?? 1.0;
         const qx = data.imu.qx ?? 0.0;
         const qy = data.imu.qy ?? 0.0;
         const qz = data.imu.qz ?? 0.0;
-        const q = new THREE.Quaternion(qx, qy, qz, qw).normalize();
-        handRoot.quaternion.slerp(q, LERP_FACTOR);
+        const q = new THREE.Quaternion(qx, qy, qz, qw);
+        handRoot.quaternion.slerp(q, 0.2);
       }
     };
 
     window.addEventListener('message', (event) => {
-      if (!event.data) return;
       try {
         const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
         if (payload.action === 'setFrame' && payload.data) {
@@ -839,17 +859,21 @@
       const pipAngle = t * ANGLE_PIP;
       const dipAngle = t * ANGLE_DIP;
 
-      const bones = getBonesForFinger(finger);
-      bones.forEach((mesh) => {
-        const name = (mesh.name || (mesh.parent ? mesh.parent.name : '')).toLowerCase();
-        if (name.includes('proximal')) {
-          mesh.rotation.x = -mcpAngle;
-        } else if (name.includes('middle')) {
-          mesh.rotation.x = -pipAngle;
-        } else if (name.includes('distal')) {
-          mesh.rotation.x = -dipAngle;
-        }
-      });
+      // Rotate hierarchical joint nodes
+      const proxNode = boneNodes[`proximal_phalanx_${finger}`];
+      if (proxNode) {
+        proxNode.rotation.x = -mcpAngle;
+      }
+
+      const midNode = boneNodes[`middle_phalanx_${finger}`];
+      if (midNode) {
+        midNode.rotation.x = -pipAngle;
+      }
+
+      const distNode = boneNodes[`distal_phalanx_${finger}`];
+      if (distNode) {
+        distNode.rotation.x = -dipAngle;
+      }
     }
 
     // --- Main Render Loop ---
@@ -859,14 +883,12 @@
     function animate(now) {
       requestAnimationFrame(animate);
 
-      // Performance monitoring: target 30 FPS+ (frame time < 33ms)
       if (now) {
         const dt = now - lastFrameTime;
         lastFrameTime = now;
         if (dt > 33) {
           slowFrameCounter++;
           if (slowFrameCounter > 60) {
-            // Low-end device: cap pixel ratio to 1.0
             renderer.setPixelRatio(1.0);
           }
         } else {
@@ -874,7 +896,7 @@
         }
       }
 
-      // Sensor timeout (if no packet for 1.5s, fall back to NO DATA)
+      // Sensor timeout (fallback after 1.5s)
       if (isSensorDriven && performance.now() - lastSensorPacketTime > 1500) {
         isSensorDriven = false;
         updateModeIndicator('NO DATA');
@@ -897,21 +919,21 @@
         applyFingerArticulation(f, currentFlex[f]);
       });
 
-      // Update positions of joint rings if selected
-      if (selectedFinger) {
-        updateJointRingsPositions();
-      }
+      updateJointRingsPositions();
 
       renderer.render(scene, camera);
     }
 
     function onWindowResize() {
       const container = document.getElementById('canvas-container');
-      const w = container.clientWidth || 360;
-      const h = container.clientHeight || 450;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      if (!container || !camera || !renderer) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w > 0 && h > 0) {
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
     }
 
     window.addEventListener('DOMContentLoaded', initScene);

@@ -30,7 +30,7 @@ class TodayScreen extends StatefulWidget {
 }
 
 class _TodayScreenState extends State<TodayScreen> {
-  bool _showAnatomyView = false;
+  bool _showAnatomyView = true;
 
   @override
   Widget build(BuildContext context) {
@@ -532,7 +532,7 @@ class _TodayScreenState extends State<TodayScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    value: (sessions.length / plan.sessionsPerWeek).clamp(0.0, 1.0),
+                    value: (plan.sessionsPerWeek > 0 ? (sessions.length / plan.sessionsPerWeek) : 0.0).clamp(0.0, 1.0),
                     backgroundColor: c.iconContainer,
                     color: const Color(0xFFC8F05F),
                     minHeight: 8,

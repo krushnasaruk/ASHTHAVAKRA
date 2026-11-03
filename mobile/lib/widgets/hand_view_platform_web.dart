@@ -12,19 +12,21 @@ Widget buildPlatformHandView({
 }) {
   if (!_registeredViewTypes.contains(viewType)) {
     _registeredViewTypes.add(viewType);
-    ui_web.platformViewRegistry.registerViewFactory(
-      viewType,
-      (int viewId) {
-        final iframe = html.IFrameElement()
-          ..src = assetUrl
-          ..style.border = 'none'
-          ..style.width = '100%'
-          ..style.height = '100%'
-          ..style.backgroundColor = '#000000';
-        _webIframes[viewType] = iframe;
-        return iframe;
-      },
-    );
+    try {
+      ui_web.platformViewRegistry.registerViewFactory(
+        viewType,
+        (int viewId) {
+          final iframe = html.IFrameElement()
+            ..src = assetUrl
+            ..style.border = 'none'
+            ..style.width = '100%'
+            ..style.height = '100%'
+            ..style.backgroundColor = '#000000';
+          _webIframes[viewType] = iframe;
+          return iframe;
+        },
+      );
+    } catch (_) {}
   }
   return HtmlElementView(viewType: viewType);
 }
@@ -40,4 +42,3 @@ void postPlatformMessage(String message, [String? viewType]) {
     }
   } catch (_) {}
 }
-
