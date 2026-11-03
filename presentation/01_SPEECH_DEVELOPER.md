@@ -22,3 +22,4 @@ I am Krushna, the software and systems architect for RehabBridge NEXUS. I built 
 
 3. **Can your software diagnose motor recovery or predict clinical outcomes?**  
    No, our system only verifies completion of a defined mechanical transfer task; clinical diagnosis is explicitly prohibited in `backend/schemas.py` and requires formal clinical trials.
+

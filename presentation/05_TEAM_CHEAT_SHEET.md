@@ -50,3 +50,4 @@ If the physical glove, ADC, or serial port fails during the live presentation, d
 > *"The live glove is not responding, so I will show a recorded real session, marked REPLAY on screen."*
 
 Toggle the UI data source switch to **Replay Mode** in `frontend/src/App.tsx`, and continue the demonstration using the verified recorded session fixture.
+

@@ -15,7 +15,7 @@ This project uses zone-based ownership for multi-developer AI collaboration.
 | backend | _unclaimed_ | backend/, simulator/ | FastAPI backend server, SQLite database, and ESP32 device simulator |
 | shared | _unclaimed_ | shared/, mobile/packages/h10_core/ | Signal processing, protocols, and shared JSON schemas |
 | ml | _unclaimed_ | ml/ | ML pipeline, Colab notebooks, and feature extraction |
-| docs | _unclaimed_ | docs/ | Project documentation suite |
+| docs | @Bot | docs/ | Project documentation suite |
 
 ### Rules
 

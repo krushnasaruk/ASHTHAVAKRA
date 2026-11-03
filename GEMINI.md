@@ -30,7 +30,7 @@ that your developer has claimed.
 - Paths: `ml/`
 - ML pipeline, Colab notebooks, and feature extraction
 
-### docs — 🟢 Available
+### docs — 🔴 Claimed by **@Bot**
 - Paths: `docs/`
 - Project documentation suite
 

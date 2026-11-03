@@ -19,7 +19,7 @@ This project uses ONEFORALL (ofa) for multi-developer AI collaboration.
   - Signal processing, protocols, and shared JSON schemas
 - **ml** (UNCLAIMED): `ml/`
   - ML pipeline, Colab notebooks, and feature extraction
-- **docs** (UNCLAIMED): `docs/`
+- **docs** (@Bot): `docs/`
   - Project documentation suite
 
 ## Enforcement Rules

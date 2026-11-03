@@ -11,3 +11,4 @@ At 25 Hz, the glove streams flex bend, contact pressure, and IMU motion over USB
 This prototype is an engineering demonstration and is not a certified medical device, does not diagnose clinical pathologies, and does not prescribe rehabilitation regimens.
 
 All foundational objectives and Gates G0 through G6 are complete with 68 passing automated tests, verified SQLite event logging, and an active 10-trial validation baseline.
+

@@ -22,3 +22,4 @@ I am Vaishnavi Jare, the product designer responsible for user experience and in
 
 3. **Is this interface accessible directly on a mobile phone today?**  
    The dashboard is responsive with a dedicated 440-pixel mobile preview mode in `frontend/src/App.tsx`, while our native Flutter patient application in `mobile/` is scheduled for the post-hackathon platform release.
+

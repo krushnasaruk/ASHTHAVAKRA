@@ -22,3 +22,4 @@ I am Rajendra, responsible for the embedded electronics and firmware on RehabBri
 
 3. **What is the hardware cost to build this glove?**  
    The active hardware components total 6,180 Indian rupees, backed by our itemized bill of materials in `docs/BOM.csv`.
+
