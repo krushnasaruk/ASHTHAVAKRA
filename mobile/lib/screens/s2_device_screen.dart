@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:h10_core/h10_core.dart';
 import '../services/device_service.dart';
 import '../theme/app_theme.dart';
 

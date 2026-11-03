@@ -38,10 +38,16 @@ class SensorPacket {
 
   factory SensorPacket.fromJson(Map<String, dynamic> json) {
     final t = json['t'] as int;
-    final flexRaw = (json['flex'] as List).cast<int>();
-    final imuRaw = (json['imu'] as List).cast<int>();
-    final fsr = json['fsr'] as int? ?? 0;
-    final flags = json['flags'] as int? ?? 0;
+    var flexRaw = (json['flex'] as List).cast<int>();
+    if (flexRaw.length == 3) {
+      flexRaw = [...flexRaw, 0, 0];
+    }
+    var imuRaw = (json['imu'] as List).cast<int>();
+    if (imuRaw.length == 4) {
+      imuRaw = [...imuRaw, 0, 0];
+    }
+    final fsr = json['fsr'] as int? ?? json['grip'] as int? ?? 0;
+    final flags = json['flags'] as int? ?? json['button'] as int? ?? 0;
     final battery = json['battery'] as int? ?? 100;
     final sim = json['simulated'] as bool? ?? ((flags & 0x08) != 0);
 
@@ -154,24 +160,26 @@ class PacketDecoder {
     try {
       final map = jsonDecode(jsonStr) as Map<String, dynamic>;
       final t = map['t'] as int;
-      final flexRaw = (map['flex'] as List).cast<int>();
-      final imuRaw = (map['imu'] as List).cast<int>();
-      final fsr = map['fsr'] as int? ?? 0;
-      final flags = map['flags'] as int? ?? 0;
-      final battery = map['battery'] as int? ?? 100;
-      final sim = map['simulated'] as bool? ?? ((flags & 0x08) != 0);
-
-      if (flexRaw.length != 5) {
-        throw FormatException('JSON flex must contain 5 channels');
+      final flexRawList = (map['flex'] as List).cast<int>();
+      if (flexRawList.length != 3 && flexRawList.length != 5) {
+        throw const FormatException('JSON flex must contain 3 or 5 channels');
       }
+      final flexRaw = flexRawList.length == 3 ? [...flexRawList, 0, 0] : flexRawList;
       for (final f in flexRaw) {
         if (f < 0 || f > 4095) {
           throw FormatException('Flex ADC out of range: $f');
         }
       }
-      if (imuRaw.length != 6) {
-        throw FormatException('JSON imu must contain 6 channels');
+      final imuRawList = (map['imu'] as List).cast<int>();
+      if (imuRawList.length != 4 && imuRawList.length != 6) {
+        throw const FormatException('JSON imu must contain 4 or 6 channels');
       }
+      final imuRaw = imuRawList.length == 4 ? [...imuRawList, 0, 0] : imuRawList;
+      final fsr = map['fsr'] as int? ?? map['grip'] as int? ?? 0;
+      final flags = map['flags'] as int? ?? map['button'] as int? ?? 0;
+      final battery = map['battery'] as int? ?? 100;
+      final sim = map['simulated'] as bool? ?? ((flags & 0x08) != 0);
+
       if (battery < 0 || battery > 100) {
         throw FormatException('Battery out of range: $battery');
       }

@@ -35,6 +35,45 @@ class _ProgressScreenState extends State<ProgressScreen> {
       allSessions: allSessions,
     );
 
+    // Dynamic recovery metrics computed from real session records
+    final double romGain;
+    if (filteredSessions.isNotEmpty && baseline != null && baseline.meanRom > 0) {
+      final currentMean = filteredSessions.map((s) => s.meanRom).reduce((a, b) => a + b) / filteredSessions.length;
+      romGain = ((currentMean - baseline.meanRom) / baseline.meanRom) * 100.0;
+    } else {
+      romGain = 0.0;
+    }
+    final romGainStr = romGain >= 0 ? '+${romGain.toStringAsFixed(0)}%' : '${romGain.toStringAsFixed(0)}%';
+
+    final plan = widget.storageService.activePlan;
+    final totalCompletedReps = filteredSessions.fold<int>(0, (sum, s) => sum + s.repsCompleted);
+    final weeklyTargetReps = plan.targetReps * plan.sessionsPerWeek;
+    final repGoalFraction = weeklyTargetReps > 0 ? (totalCompletedReps / weeklyTargetReps).clamp(0.0, 1.0) : 0.0;
+    final filledDots = (repGoalFraction * 10).round();
+
+    final weeklySessionsTarget = plan.sessionsPerWeek;
+    final adherenceFraction = weeklySessionsTarget > 0 ? (filteredSessions.length / weeklySessionsTarget).clamp(0.0, 1.0) : 0.0;
+    final adherencePct = (adherenceFraction * 100).toInt();
+
+    // Daily distribution Mon..Sun
+    final dayReps = List<int>.filled(7, 0);
+    for (final s in filteredSessions) {
+      final wIdx = s.startedAt.weekday - 1;
+      if (wIdx >= 0 && wIdx < 7) {
+        dayReps[wIdx] += s.repsCompleted;
+      }
+    }
+    final maxDayRep = math.max(1, dayReps.reduce(math.max));
+
+    // Radar Kinematics polygon computed from real session ROM
+    final List<double> radarValues;
+    if (filteredSessions.isNotEmpty) {
+      final meanRomFrac = (filteredSessions.map((s) => s.meanRom).reduce((a, b) => a + b) / filteredSessions.length / 100.0).clamp(0.15, 1.0);
+      radarValues = [meanRomFrac, (meanRomFrac * 0.95).clamp(0.15, 1.0), (meanRomFrac * 0.90).clamp(0.15, 1.0), 0.35, 0.30];
+    } else {
+      radarValues = [0.20, 0.20, 0.20, 0.20, 0.20];
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       child: Column(
@@ -145,9 +184,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        '+24%',
-                        style: TextStyle(
+                      Text(
+                        romGainStr,
+                        style: const TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF121715),
@@ -169,10 +208,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Flexible(
+                          Flexible(
                             child: Text(
-                              'Goal: 8/10 Reps',
-                              style: TextStyle(
+                              'Goal: $totalCompletedReps/${plan.targetReps} Reps',
+                              style: const TextStyle(
                                 fontSize: 8.5,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF121715),
@@ -181,7 +220,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             ),
                           ),
                           Text(
-                            '80%',
+                            '${(repGoalFraction * 100).toInt()}%',
                             style: TextStyle(
                               fontSize: 8.5,
                               fontWeight: FontWeight.bold,
@@ -193,7 +232,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       const SizedBox(height: 6),
                       Row(
                         children: List.generate(10, (i) {
-                          final isFilled = i < 8;
+                          final isFilled = i < filledDots;
                           return Expanded(
                             child: Container(
                               margin: const EdgeInsets.symmetric(horizontal: 1.5),
@@ -259,7 +298,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         height: 95,
                         width: double.infinity,
                         child: CustomPaint(
-                          painter: _KinematicsRadarPainter(),
+                          painter: _KinematicsRadarPainter(values: radarValues),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -347,7 +386,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '94% Completed',
+                          '$adherencePct% Completed',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
@@ -386,13 +425,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      _buildStackedBar(context, 'Mon', 0.5, 0.3),
-                      _buildStackedBar(context, 'Tue', 0.7, 0.4),
-                      _buildStackedBar(context, 'Wed', 0.4, 0.2),
-                      _buildStackedBar(context, 'Thu', 0.8, 0.5),
-                      _buildStackedBar(context, 'Fri', 1.0, 0.8, hasTooltip: true, tooltip: '10 Reps • Fri'),
-                      _buildStackedBar(context, 'Sat', 0.6, 0.4),
-                      _buildStackedBar(context, 'Sun', 0.9, 0.7),
+                      _buildStackedBar(context, 'Mon', (dayReps[0] / maxDayRep).clamp(0.08, 1.0), (dayReps[0] / maxDayRep * 0.6).clamp(0.04, 0.8), hasTooltip: dayReps[0] > 0, tooltip: '${dayReps[0]} Reps • Mon'),
+                      _buildStackedBar(context, 'Tue', (dayReps[1] / maxDayRep).clamp(0.08, 1.0), (dayReps[1] / maxDayRep * 0.6).clamp(0.04, 0.8), hasTooltip: dayReps[1] > 0, tooltip: '${dayReps[1]} Reps • Tue'),
+                      _buildStackedBar(context, 'Wed', (dayReps[2] / maxDayRep).clamp(0.08, 1.0), (dayReps[2] / maxDayRep * 0.6).clamp(0.04, 0.8), hasTooltip: dayReps[2] > 0, tooltip: '${dayReps[2]} Reps • Wed'),
+                      _buildStackedBar(context, 'Thu', (dayReps[3] / maxDayRep).clamp(0.08, 1.0), (dayReps[3] / maxDayRep * 0.6).clamp(0.04, 0.8), hasTooltip: dayReps[3] > 0, tooltip: '${dayReps[3]} Reps • Thu'),
+                      _buildStackedBar(context, 'Fri', (dayReps[4] / maxDayRep).clamp(0.08, 1.0), (dayReps[4] / maxDayRep * 0.6).clamp(0.04, 0.8), hasTooltip: dayReps[4] > 0, tooltip: '${dayReps[4]} Reps • Fri'),
+                      _buildStackedBar(context, 'Sat', (dayReps[5] / maxDayRep).clamp(0.08, 1.0), (dayReps[5] / maxDayRep * 0.6).clamp(0.04, 0.8), hasTooltip: dayReps[5] > 0, tooltip: '${dayReps[5]} Reps • Sat'),
+                      _buildStackedBar(context, 'Sun', (dayReps[6] / maxDayRep).clamp(0.08, 1.0), (dayReps[6] / maxDayRep * 0.6).clamp(0.04, 0.8), hasTooltip: dayReps[6] > 0, tooltip: '${dayReps[6]} Reps • Sun'),
                     ],
                   ),
                 ),
@@ -592,6 +631,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
 }
 
 class _KinematicsRadarPainter extends CustomPainter {
+  final List<double> values;
+
+  _KinematicsRadarPainter({this.values = const [0.2, 0.2, 0.2, 0.2, 0.2]});
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
@@ -619,11 +662,11 @@ class _KinematicsRadarPainter extends CustomPainter {
       canvas.drawPath(path, gridPaint);
     }
 
-    final values = [0.82, 0.78, 0.74, 0.4, 0.35];
     final shapePath = Path();
     for (int i = 0; i < 5; i++) {
       final angle = (i * 2 * math.pi / 5) - math.pi / 2;
-      final r = radius * values[i];
+      final val = i < values.length ? values[i] : 0.2;
+      final r = radius * val;
       final x = center.dx + r * math.cos(angle);
       final y = center.dy + r * math.sin(angle);
       if (i == 0) {
@@ -647,5 +690,6 @@ class _KinematicsRadarPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _KinematicsRadarPainter oldDelegate) =>
+      oldDelegate.values != values;
 }

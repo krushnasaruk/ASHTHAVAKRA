@@ -8,11 +8,9 @@ import 'screens/s3_calibration_screen.dart';
 import 'screens/s4_exercises_screen.dart';
 import 'screens/s5_live_session_screen.dart';
 import 'screens/s7_progress_screen.dart';
-import 'screens/s8_history_screen.dart';
 import 'screens/s9_settings_screen.dart';
 import 'screens/minigame_screen.dart';
 import 'screens/s10_taskproof_screen.dart';
-import 'widgets/preflight_dialog.dart';
 import 'widgets/vector_icons.dart';
 import 'theme/app_theme.dart';
 
@@ -234,13 +232,13 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         shape: BoxShape.circle,
                         border: Border.all(color: const Color(0xFFC8F05F), width: 1.5),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          'KS',
-                          style: TextStyle(
+                          _storageService.patientId.replaceAll('-', '').toUpperCase(),
+                          style: const TextStyle(
                             color: Color(0xFFC8F05F),
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 12.5,
                           ),
                         ),
                       ),

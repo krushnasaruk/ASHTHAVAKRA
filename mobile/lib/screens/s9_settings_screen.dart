@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:h10_core/h10_core.dart';
 import '../services/device_service.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
@@ -225,7 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                     if (confirm == true) {
                       widget.storageService.clearAllData();
-                      if (mounted) {
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Local storage cleared.')));
                       }
                     }

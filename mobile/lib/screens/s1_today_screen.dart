@@ -3,10 +3,12 @@ import 'package:h10_core/h10_core.dart';
 import '../services/device_service.dart';
 import '../services/storage_service.dart';
 import 's10_taskproof_screen.dart';
+import 's8_history_screen.dart';
 import '../widgets/preflight_dialog.dart';
 import '../widgets/holographic_hand_scan.dart';
 import '../widgets/vector_icons.dart';
 import '../theme/app_theme.dart';
+import '../dev/mock_data.dart';
 
 class TodayScreen extends StatelessWidget {
   final DeviceService deviceService;
@@ -269,7 +271,7 @@ class TodayScreen extends StatelessWidget {
             children: [
               Flexible(
                 child: Text(
-                  'Care Team & Investigators',
+                  'Care Team & Prescriber',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -296,17 +298,20 @@ class TodayScreen extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: [
-                _buildCareAvatar(context, 'VJ', 'Vaishnavi', const Color(0xFF56B4E9)),
-                const SizedBox(width: 16),
-                _buildCareAvatar(context, 'RP', 'Rajendra', const Color(0xFFE69F00)),
-                const SizedBox(width: 16),
-                _buildCareAvatar(context, 'GS', 'Gautam', const Color(0xFF009E73)),
-                const SizedBox(width: 16),
-                _buildCareAvatar(context, 'KS', 'Krushna', const Color(0xFFC8F05F)),
-                const SizedBox(width: 16),
-                _buildCareAvatar(context, 'DJ', 'Dr. Joshi', const Color(0xFFE4C41B)),
-              ],
+              children: kUseMockData
+                  ? DevMockData.mockCareTeam
+                      .map((m) => Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: _buildCareAvatar(context, m.initials, m.name, m.color),
+                          ))
+                      .toList()
+                  : [
+                      _buildCareAvatar(context, 'DR', plan.setBy.split(' ').first, const Color(0xFFC8F05F)),
+                      const SizedBox(width: 16),
+                      _buildCareAvatar(context, 'AI', 'Kinematics', const Color(0xFF56B4E9)),
+                      const SizedBox(width: 16),
+                      _buildCareAvatar(context, 'PT', 'Lead Physio', const Color(0xFF009E73)),
+                    ],
             ),
           ),
           const SizedBox(height: 24),
@@ -553,48 +558,94 @@ class TodayScreen extends StatelessWidget {
                   color: c.textPrimary,
                 ),
               ),
-              Text(
-                'See all >',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: c.textSecondary,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => HistoryScreen(storageService: storageService),
+                    ),
+                  );
+                },
+                child: Text(
+                  'See all >',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: c.textSecondary,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
 
-          _buildActivityCard(
-            context,
-            title: 'Fist Clench Routine',
-            subtitle: 'Today, 10:30 AM',
-            badge: 'VERIFIED 4.2s',
-            badgeColor: const Color(0xFFC8F05F),
-            badgeTextColor: const Color(0xFF121715),
-            iconWidget: VectorIcon.routines(size: 18, color: c.iconTint),
-          ),
-          const SizedBox(height: 10),
+          Builder(
+            builder: (context) {
+              final activeSessions = sessions.isNotEmpty
+                  ? sessions
+                  : (kUseMockData ? DevMockData.createMockSessions() : <SessionRecord>[]);
 
-          _buildActivityCard(
-            context,
-            title: 'ArUco Marker Transfer',
-            subtitle: 'Object Handover Task #42',
-            badge: 'JUDGE VERIFIED',
-            badgeColor: c.isDark ? const Color(0xFF1E2822) : const Color(0xFF121715),
-            badgeTextColor: const Color(0xFFC8F05F),
-            iconWidget: VectorIcon.qrCode(size: 18, color: c.iconTint),
-          ),
-          const SizedBox(height: 10),
+              if (activeSessions.isEmpty) {
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
+                  decoration: BoxDecoration(
+                    color: c.card,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: c.cardBorder, width: 1.2),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(Icons.history, color: c.textSecondary, size: 28),
+                      const SizedBox(height: 8),
+                      Text(
+                        'No exercise sessions recorded yet',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: c.textPrimary,
+                          fontSize: 13.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Start an exercise session above to begin your rehabilitation program.',
+                        style: TextStyle(color: c.textSecondary, fontSize: 11),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-          _buildActivityCard(
-            context,
-            title: 'Thumb-Index Pinch',
-            subtitle: 'Ch1 Thumb + Ch2 Index • 12 Reps',
-            badge: '+84% ROM',
-            badgeColor: c.isDark ? const Color(0xFF1E2822) : const Color(0xFFE2E7DE),
-            badgeTextColor: c.isDark ? const Color(0xFFC8F05F) : const Color(0xFF161C19),
-            iconWidget: VectorIcon.pinch(size: 18, color: c.iconTint),
+              return Column(
+                children: activeSessions.take(3).map((s) {
+                  final isClench = s.exerciseCode.contains('clench');
+                  final isPinch = s.exerciseCode.contains('pinch');
+                  final icon = isClench
+                      ? VectorIcon.routines(size: 18, color: c.iconTint)
+                      : (isPinch
+                          ? VectorIcon.pinch(size: 18, color: c.iconTint)
+                          : VectorIcon.taskProof(size: 18, color: c.iconTint));
+
+                  final durationMin = (s.durationS / 60).toStringAsFixed(1);
+                  final badgeText = '${s.repsCompleted} Reps • ${s.meanRom.toStringAsFixed(0)}% ROM';
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _buildActivityCard(
+                      context,
+                      title: s.exerciseCode.replaceAll('_', ' ').toUpperCase(),
+                      subtitle: '${durationMin}m duration • ${s.dataQuality.toUpperCase()}',
+                      badge: badgeText,
+                      badgeColor: c.isDark ? const Color(0xFF1E2822) : const Color(0xFFC8F05F),
+                      badgeTextColor: c.isDark ? const Color(0xFFC8F05F) : const Color(0xFF121715),
+                      iconWidget: icon,
+                    ),
+                  );
+                }).toList(),
+              );
+            },
           ),
 
           // Ample bottom breathing room so content scrolls completely above floating dock

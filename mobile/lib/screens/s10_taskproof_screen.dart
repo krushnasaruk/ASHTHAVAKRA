@@ -8,7 +8,6 @@ import '../services/device_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/preflight_dialog.dart';
 import '../widgets/camera_zone_tracker.dart';
-import '../widgets/holographic_hand_scan.dart';
 
 class TaskProofScreen extends StatefulWidget {
   final DeviceService deviceService;
@@ -499,11 +498,11 @@ class _TaskProofScreenState extends State<TaskProofScreen> {
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
-                  Row(
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Transfer Target:', style: TextStyle(fontSize: 13, color: Color(0xFF475569))),
-                      const Text('Zone A  ➔  Zone B', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                      Text('Transfer Target:', style: TextStyle(fontSize: 13, color: Color(0xFF475569))),
+                      Text('Zone A  ➔  Zone B', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 6),

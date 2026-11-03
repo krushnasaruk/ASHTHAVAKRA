@@ -22,7 +22,7 @@ void main() {
       // 2.0s duration (100 samples at 50 Hz, 20ms steps)
       // Signal rises from 0% -> 85% -> holds for 0.6s -> returns to 10%
       Repetition? completed;
-      final startMs = 1000;
+      const startMs = 1000;
 
       for (var i = 0; i <= 100; i++) {
         final t = startMs + (i * 20);

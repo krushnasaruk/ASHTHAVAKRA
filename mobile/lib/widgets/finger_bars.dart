@@ -109,6 +109,15 @@ class FingerBarsWidget extends StatelessWidget {
                       color: color,
                     ),
                   ),
+                  if (index >= 3)
+                    const Text(
+                      'Estimated',
+                      style: TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF8E958E),
+                      ),
+                    ),
                 ],
               );
             }),

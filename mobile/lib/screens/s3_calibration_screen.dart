@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
 import '../services/device_service.dart';
 import '../services/storage_service.dart';
+import '../dev/mock_data.dart';
 
 class CalibrationScreen extends StatefulWidget {
   final DeviceService deviceService;
@@ -68,6 +69,14 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
         return;
       }
       final latest = widget.deviceService.latestPacket;
+      if (latest == null && !kUseMockData) {
+        timer.cancel();
+        setState(() {
+          _isCapturing = false;
+          _statusError = 'Device disconnected. Connect glove hardware or simulator to calibrate.';
+        });
+        return;
+      }
       final flex = latest != null
           ? List<int>.from(latest.flex)
           : (stage == 1 ? [1200, 1150, 1180, 1220, 1190] : [2800, 2950, 3100, 2750, 2600]);
@@ -278,9 +287,9 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
         4: FlexColumnWidth(3),
       },
       children: [
-        TableRow(
-          decoration: const BoxDecoration(color: Color(0xFFEFEFEA)),
-          children: const [
+        const TableRow(
+          decoration: BoxDecoration(color: Color(0xFFEFEFEA)),
+          children: [
             Padding(padding: EdgeInsets.all(8), child: Text('Finger', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
             Padding(padding: EdgeInsets.all(8), child: Text('Open', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
             Padding(padding: EdgeInsets.all(8), child: Text('Fist', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),

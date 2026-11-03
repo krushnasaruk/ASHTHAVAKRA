@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:h10_core/h10_core.dart';
 import 'package:mobile/main.dart';
+import 'package:mobile/widgets/vector_icons.dart';
 
 void main() {
   testWidgets('H10 Patient App navigation smoke test', (WidgetTester tester) async {
@@ -69,5 +71,44 @@ void main() {
 
     expect(H10PatientApp.themeNotifier.value, ThemeMode.dark);
     expect(find.byTooltip('Switch to Light Theme'), findsOneWidget);
+  });
+
+  testWidgets('VectorIcon renders all types sharply without missing glyphs', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              VectorIcon.taskProof(),
+              VectorIcon.judge(),
+              VectorIcon.routines(),
+              VectorIcon.preflight(),
+              VectorIcon.scanner(),
+              VectorIcon.qrCode(),
+              VectorIcon.pinch(),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(VectorIcon), findsNWidgets(7));
+  });
+
+  test('PacketDecoder decodes 3-channel flex and quaternion IMU schema', () {
+    final decoder = PacketDecoder();
+    const jsonStr = '{"v":1,"t":5000,"flex":[1200,1800,2100],"imu":[1000,0,0,0],"grip":850,"button":1,"battery":95}';
+    final packet = decoder.decodeJson(jsonStr);
+
+    expect(packet.timestampMs, 5000);
+    expect(packet.flex.length, 5);
+    expect(packet.flex[0], 1200);
+    expect(packet.flex[1], 1800);
+    expect(packet.flex[2], 2100);
+    expect(packet.flex[3], 0); // Ring estimated/padded
+    expect(packet.flex[4], 0); // Pinky estimated/padded
+    expect(packet.fsr, 850);
+    expect(packet.batteryPct, 95);
+    expect(packet.isCalibrated, true);
   });
 }

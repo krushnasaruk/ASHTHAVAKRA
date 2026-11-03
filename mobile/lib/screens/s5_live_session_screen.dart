@@ -9,6 +9,7 @@ import '../widgets/finger_bars.dart';
 import '../widgets/repetition_ring.dart';
 import '../widgets/quality_strip.dart';
 import '../widgets/holographic_hand_scan.dart';
+import '../dev/mock_data.dart';
 import 's6_summary_screen.dart';
 
 class LiveSessionScreen extends StatefulWidget {
@@ -92,12 +93,17 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
       normFlex = dev.latestNormalizedFlex;
       imu = packet.imu;
       timestampMs = packet.timestampMs;
-    } else {
+    } else if (kUseMockData) {
       _simPhase += 0.04;
       final wave = (math.sin(_simPhase) * 0.5 + 0.5) * 88.0;
       normFlex = [wave, wave, wave, wave, wave];
       imu = [0, -980, 0, 0, 0, 0];
       timestampMs = _sessionSeconds * 1000 + ((_simPhase * 100).toInt() % 1000);
+    } else {
+      // Hardware / real mode: use actual device readings without fabricating synthetic waves
+      normFlex = dev.latestNormalizedFlex;
+      imu = packet?.imu ?? [0, 0, 0, 0, 0, 0];
+      timestampMs = packet?.timestampMs ?? (_sessionSeconds * 1000);
     }
 
     _displayFlex = List<double>.from(normFlex);

@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:h10_core/h10_core.dart';
 
 /// Holographic / 3D Kinematic Hand Scanner for ASHTHAVAKRA.
 /// Computes joint angles, palmar contact pressure, and renders
@@ -350,7 +349,7 @@ class _HolographicHandPainter extends CustomPainter {
       final labelSpan = TextSpan(
         text: isChannelActive
             ? '${fingerLabels[i]}\n${flexPct.toStringAsFixed(0)}%'
-            : '${fingerLabels[i]}\nRESERVED',
+            : '${fingerLabels[i]}\nESTIMATED',
         style: TextStyle(
           color: isChannelActive ? fingerColors[i] : const Color(0xFF64748B),
           fontSize: 8.5,

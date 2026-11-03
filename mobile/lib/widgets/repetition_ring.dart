@@ -63,10 +63,10 @@ class RepetitionRingWidget extends StatelessWidget {
           SizedBox(
             width: size,
             height: size,
-            child: CircularProgressIndicator(
+            child: const CircularProgressIndicator(
               value: 1.0,
               strokeWidth: 10,
-              valueColor: const AlwaysStoppedAnimation(Color(0xFFE4E9E6)),
+              valueColor: AlwaysStoppedAnimation(Color(0xFFE4E9E6)),
             ),
           ),
           // Active Progress

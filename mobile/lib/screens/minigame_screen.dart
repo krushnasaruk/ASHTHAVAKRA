@@ -109,6 +109,13 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
 
   void _finishGame() {
     _gameLoopTimer?.cancel();
+    final meanRom = _gameReps.isEmpty
+        ? 0.0
+        : _gameReps.map((r) => r.rom).reduce((a, b) => a + b) / _gameReps.length;
+    final maxRom = _gameReps.isEmpty
+        ? 0.0
+        : _gameReps.map((r) => r.rom).reduce(math.max);
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -117,8 +124,8 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
           exercise: ExerciseCode.handControlGame,
           durationS: _elapsedSeconds.toDouble(),
           completedReps: _gameReps,
-          meanRom: _score > 0 ? 75.0 : 0.0,
-          maxRom: 85.0,
+          meanRom: meanRom,
+          maxRom: maxRom,
           consistency: const ConsistencyResult(isAvailable: false, missingReason: 'Mini-game uses catch accuracy instead of rep consistency'),
           fatigue: const FatigueResult(isAvailable: false, isFatigueDetected: false),
           storageService: widget.storageService,
