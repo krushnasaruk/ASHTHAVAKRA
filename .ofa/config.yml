@@ -7,7 +7,7 @@ zones:
       - mobile/lib/widgets/
       - mobile/packages/h10_core/lib/theme/
       - docs/vaishnavi_jare/
-    owner: vaishnavijare60-hash
+    owner: krushnasaruk
     description: Mobile & Web Patient UI screens, widgets, design tokens, and designer docs
   backend:
     paths:

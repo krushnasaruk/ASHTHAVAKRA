@@ -151,7 +151,7 @@ export default function SciFiHudView({
             <div className="text-xs font-hud tracking-[0.2em] text-amber-200 font-bold uppercase flex items-center gap-2">
               <span>OBJECT IDENTIFICATION .. 01</span>
               <span className="text-[10px] text-amber-500 font-tech font-normal">
-                [ ASHTAVAKRA H10 PROTOCOL ]
+                [ ASHTHAVAKRA H10 PROTOCOL ]
               </span>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function SciFiHudView({
         {/* Left: UNKNOWN OBJECT / REC: 249/13 - 63 */}
         <div>
           <div className="font-hud font-bold text-sm text-amber-300 tracking-widest flex items-center gap-2">
-            <span>ASHTAVAKRA H10 BIO-KINETIC HAND</span>
+            <span>ASHTHAVAKRA H10 BIO-KINETIC HAND</span>
             {isConnected && (
               <span className="text-[10px] text-emerald-400 font-tech flex items-center gap-1 font-bold">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
@@ -421,7 +421,7 @@ export default function SciFiHudView({
                 <span className="text-amber-400 font-bold">SO. 939</span>
               </div>
               <h2 className="text-xl font-hud font-black text-amber-300 tracking-wider">
-                {warningMode ? "MOTOR FATIGUE" : "ASHTAVAKRA H10"}
+                {warningMode ? "MOTOR FATIGUE" : "ASHTHAVAKRA H10"}
               </h2>
               <p className="text-[9px] font-tech text-amber-600 uppercase tracking-widest">
                 AI-ASSISTED REHABILITATION KINEMATICS
@@ -625,7 +625,7 @@ export default function SciFiHudView({
 
         {/* Mandatory Non-Medical Disclaimer Banner */}
         <div className="mt-2 pt-1 border-t border-amber-950/40 text-center text-[9px] font-tech text-amber-600/80">
-          PROTOTYPE MONITORING TOOL — NOT A MEDICAL DEVICE. Ashtavakra H10 is an experimental research telemetry interface for physical therapy monitoring. Not for medical diagnosis or clinical treatment.
+          PROTOTYPE MONITORING TOOL — NOT A MEDICAL DEVICE. Ashthavakra H10 is an experimental research telemetry interface for physical therapy monitoring. Not for medical diagnosis or clinical treatment.
         </div>
       </footer>
     </div>

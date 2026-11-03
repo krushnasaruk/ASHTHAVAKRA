@@ -33,7 +33,7 @@ export default function FirmwareTerminal({
         </div>
         <div>
           <span className="text-amber-600">using </span>
-          <span className="text-amber-200">Ashtavakra.Kinematics.Hand;</span>
+          <span className="text-amber-200">Ashthavakra.Kinematics.Hand;</span>
         </div>
         <div>
           <span className="text-amber-600">using </span>

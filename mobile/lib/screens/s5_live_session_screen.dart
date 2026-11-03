@@ -8,6 +8,7 @@ import '../widgets/hand_visualization.dart';
 import '../widgets/finger_bars.dart';
 import '../widgets/repetition_ring.dart';
 import '../widgets/quality_strip.dart';
+import '../widgets/holographic_hand_scan.dart';
 import 's6_summary_screen.dart';
 
 class LiveSessionScreen extends StatefulWidget {
@@ -32,6 +33,7 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
   final String _sessionId = 'session_${DateTime.now().millisecondsSinceEpoch}';
 
   bool _isPaused = false;
+  bool _showHolographic3D = true;
   int _sessionSeconds = 0;
   Timer? _sessionTimer;
   Timer? _presentationTimer;
@@ -345,21 +347,67 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                       ),
                     ),
 
-                    // Right: Animated 2D Hand Visualization (30 fps)
+                    // Right: Animated 3D Holographic or 2D Hand Visualization
                     Expanded(
                       flex: 6,
-                      child: Center(
-                        child: HandVisualizationWidget(
-                          movement: HandMovement(
-                            thumb: _displayFlex[0],
-                            index: _displayFlex[1],
-                            middle: _displayFlex[2],
-                            ring: _displayFlex[3],
-                            pinky: _displayFlex[4],
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _showHolographic3D = !_showHolographic3D;
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: _showHolographic3D ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(
+                                      color: _showHolographic3D ? const Color(0xFF00E5FF) : const Color(0xFFCBD5E1),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    _showHolographic3D ? '3D HUD' : '2D VIEW',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: _showHolographic3D ? const Color(0xFF00E5FF) : const Color(0xFF475569),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          width: 180,
-                          height: 220,
-                        ),
+                          const SizedBox(height: 4),
+                          Center(
+                            child: _showHolographic3D
+                                ? SizedBox(
+                                    width: 195,
+                                    height: 215,
+                                    child: HolographicHandScanWidget(
+                                      flexValues: _displayFlex,
+                                      fsrContact: (widget.deviceService.latestPacket?.fsr ?? 0) / 32767.0 * 100.0,
+                                      isDemo3: widget.deviceService.hardwareProfile == 'demo3',
+                                    ),
+                                  )
+                                : HandVisualizationWidget(
+                                    movement: HandMovement(
+                                      thumb: _displayFlex[0],
+                                      index: _displayFlex[1],
+                                      middle: _displayFlex[2],
+                                      ring: _displayFlex[3],
+                                      pinky: _displayFlex[4],
+                                    ),
+                                    width: 180,
+                                    height: 215,
+                                  ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

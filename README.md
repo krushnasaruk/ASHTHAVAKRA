@@ -9,7 +9,7 @@
 
 ## Overview
 
-**H10 (Ashtavakra)** is a modular, AI-assisted telemetry and rehabilitation monitoring system designed for stroke survivors and individuals recovering fine motor control in their hands and fingers.
+**H10 (ASHTHAVAKRA)** is a modular, AI-assisted telemetry and rehabilitation monitoring system designed for stroke survivors and individuals recovering fine motor control in their hands and fingers.
 
 The system decodes 5-finger flex sensor curvature and 6-DOF wrist orientation into per-finger Range of Motion (ROM), provides real-time biofeedback during exercises, detects compensatory or fatigued movement patterns, and provides physical therapists with reviewable telemetry records, plan versioning tools, and clinical summary reports.
 

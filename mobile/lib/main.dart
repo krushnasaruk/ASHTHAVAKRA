@@ -25,7 +25,7 @@ class H10PatientApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'H10 Patient App',
+      title: 'ASHTHAVAKRA Patient App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -176,50 +176,52 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: const Color(H10Tokens.colorPrimary).withOpacity(0.15),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                'H10',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Color(H10Tokens.colorPrimary),
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(H10Tokens.colorPrimary),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'ASHTHAVAKRA',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 10.5,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 8),
-            const Flexible(
-              child: Text(
+              const SizedBox(width: 6),
+              const Text(
                 'Hand Rehab',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(width: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-              decoration: BoxDecoration(
-                color: const Color(H10Tokens.colorPrimary),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                'v1',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E293B),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.4)),
+                ),
+                child: const Text(
+                  '3-CH',
+                  style: TextStyle(
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF00E5FF),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           ListenableBuilder(

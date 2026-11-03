@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SciFiHudView from "./components/SciFiHudView";
+import HolographicHandScan from "./components/HolographicHandScan";
 import {
   Activity,
   AlertTriangle,
@@ -80,6 +81,9 @@ export default function App() {
   const [painRating, setPainRating] = useState(2);
   const [fatigueRating, setFatigueRating] = useState(3);
   const [activeExercise, setActiveExercise] = useState("Fist Clench & Release");
+  const [isDemo3, setIsDemo3] = useState(true); // Competition active profile (Thumb, Index, Middle + FSR + IMU)
+  const [selectedScanFinger, setSelectedScanFinger] = useState<number | null>(null);
+  const [liveScanMode, setLiveScanMode] = useState<"3d" | "ring">("3d");
 
   // Telemetry state
   const [telemetry, setTelemetry] = useState<TelemetryPayload | null>(null);
@@ -263,6 +267,15 @@ export default function App() {
     { name: "Pinky", hex: "#0072B2", val: 55 },
   ];
 
+  const fingerAngles = {
+    thumb: telemetry?.sensor?.flex?.[0] ?? 82,
+    index: telemetry?.sensor?.flex?.[1] ?? 94,
+    middle: telemetry?.sensor?.flex?.[2] ?? 78,
+    ring: isDemo3 ? 0 : (telemetry?.sensor?.flex?.[3] ?? 35),
+    pinky: isDemo3 ? 0 : (telemetry?.sensor?.flex?.[4] ?? 20),
+  };
+  const fsrVal = telemetry?.sensor?.fsr ?? 55;
+
   if (viewMode === "scifi_hud") {
     return (
       <SciFiHudView
@@ -281,17 +294,30 @@ export default function App() {
           <Activity className="h-6 w-6 text-emerald-400" />
           <div>
             <div className="flex items-center space-x-2">
+              <span className="bg-[#173C35] text-white font-black text-xs px-2 py-0.5 rounded tracking-wider border border-emerald-500/50">
+                ASHTHAVAKRA
+              </span>
               <h1 className="text-base font-bold tracking-tight">RehabBridge NEXUS / H10</h1>
               <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">v3.0.0</span>
             </div>
             <p className="text-[11px] text-slate-400">Hand Rehabilitation Platform • Innovation 2K26</p>
           </div>
 
+          <div className="hidden lg:flex items-center space-x-2 ml-4">
+            <span className="text-xs bg-sky-950/80 text-cyan-400 border border-cyan-700/60 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              ESP32-S3 N16R8 ({isDemo3 ? "3-CH ACTIVE" : "5-CH PLATFORM"})
+            </span>
+            <span className="text-xs bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 px-2.5 py-0.5 rounded-full font-semibold">
+              USB Powered (5V VBUS)
+            </span>
+          </div>
+
           {/* Data Source Badge */}
           {dataSource === "live" && (
-            <span className="text-xs bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5 ml-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              25 Hz SERIAL
+            <span className="text-xs bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5 ml-2 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              921600 BAUD
             </span>
           )}
         </div>
@@ -343,17 +369,19 @@ export default function App() {
               <div className="bg-[#173C35] text-white px-6 py-2 flex items-center justify-between text-xs">
                 <span className="font-bold">9:41 AM</span>
                 <div className="flex items-center space-x-2">
+                  <span className="text-[10px] bg-[#0E2822] text-emerald-300 font-mono font-bold px-1.5 py-0.5 rounded">USB 5V</span>
                   <Wifi className="w-3.5 h-3.5" />
-                  <span>100%</span>
                 </div>
               </div>
 
               {/* App Bar */}
               <div className="bg-white border-b border-[#E0E5E2] px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <span className="bg-[#173C35]/15 text-[#173C35] text-xs font-black px-1.5 py-0.5 rounded">H10</span>
+                  <span className="bg-[#173C35] text-white text-[10px] font-black px-1.5 py-0.5 rounded tracking-wider">ASHTHAVAKRA</span>
                   <span className="font-bold text-sm text-[#173C35]">Hand Rehab</span>
-                  <span className="bg-[#173C35] text-white text-[10px] font-bold px-1.5 py-0.5 rounded">v1</span>
+                  <span className="bg-slate-900 text-cyan-400 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border border-cyan-800">
+                    {isDemo3 ? "3-CH" : "5-CH"}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <span className="flex items-center gap-1 text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-bold">
@@ -388,10 +416,12 @@ export default function App() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-1.5">
-                          <h4 className="font-bold text-xs text-[#252A28]">Device Connected</h4>
-                          <span className="text-[9px] bg-blue-50 text-blue-700 font-bold px-1.5 py-0.2 rounded">SIMULATED</span>
+                          <h4 className="font-bold text-xs text-[#252A28]">ESP32-S3 N16R8 Connected</h4>
+                          <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded border border-emerald-300">
+                            {isDemo3 ? "3-CH ACTIVE" : "5-CH PLATFORM"}
+                          </span>
                         </div>
-                        <p className="text-[11px] text-[#747B76]">Battery: 90% • 50 Hz stream rate</p>
+                        <p className="text-[11px] text-[#747B76]">Power: USB Powered (5V VBUS) • 921,600 baud</p>
                       </div>
                       <button
                         onClick={() => setMobileTab("device")}
@@ -399,6 +429,56 @@ export default function App() {
                       >
                         Manage
                       </button>
+                    </div>
+
+                    {/* 3D Holographic Hand Scanner Card */}
+                    <div className="bg-[#0B1520] p-3 rounded-xl border border-cyan-800/60 shadow-lg text-slate-100 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                          <span className="text-[10px] font-bold tracking-wider text-cyan-300 uppercase">
+                            3D Holographic Hand Scanner
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setIsDemo3(!isDemo3)}
+                          className="text-[9px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700 hover:bg-cyan-900 transition font-mono font-bold"
+                        >
+                          {isDemo3 ? "3-CH (ACTIVE)" : "5-CH (FULL)"}
+                        </button>
+                      </div>
+
+                      {/* Interactive Holographic Kinematics */}
+                      <div className="h-52 w-full rounded-lg bg-black/60 border border-cyan-950 flex items-center justify-center overflow-hidden relative">
+                        <HolographicHandScan
+                          fingerAngles={fingerAngles}
+                          fsrContact={fsrVal}
+                          colorCoded={true}
+                          onFingerClick={(idx) => setSelectedScanFinger(idx === selectedScanFinger ? null : idx)}
+                          selectedFinger={selectedScanFinger}
+                        />
+                      </div>
+
+                      {/* Channel Values & FSR Palmar Pressure */}
+                      <div className="grid grid-cols-3 gap-1 pt-1 text-[9px] font-mono">
+                        <div className="p-1 rounded bg-black/50 border border-amber-600/40 text-center">
+                          <span className="text-amber-400 font-bold block">THUMB</span>
+                          <span className="text-white font-bold">{fingerAngles.thumb}%</span>
+                        </div>
+                        <div className="p-1 rounded bg-black/50 border border-sky-600/40 text-center">
+                          <span className="text-sky-400 font-bold block">INDEX</span>
+                          <span className="text-white font-bold">{fingerAngles.index}%</span>
+                        </div>
+                        <div className="p-1 rounded bg-black/50 border border-emerald-600/40 text-center">
+                          <span className="text-emerald-400 font-bold block">MIDDLE</span>
+                          <span className="text-white font-bold">{fingerAngles.middle}%</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[9px] font-mono pt-0.5 px-1 border-t border-slate-800">
+                        <span className="text-slate-400">PALMAR FSR PRESSURE:</span>
+                        <span className="text-cyan-400 font-bold">{fsrVal}% (EVA BUFFER RING)</span>
+                      </div>
                     </div>
 
                     {/* Featured Event Card: TaskProof */}
@@ -504,28 +584,61 @@ export default function App() {
                 {mobileTab === "live_session" && (
                   <div className="space-y-3">
                     <div className="bg-white p-4 rounded-xl border border-[#E0E5E2] text-center shadow-sm">
-                      <span className="text-[11px] font-bold text-[#747B76]">{activeExercise.toUpperCase()}</span>
-                      {/* Repetition Ring */}
-                      <div className="relative w-36 h-36 mx-auto my-3 flex items-center justify-center">
-                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                          <circle cx="50" cy="50" r="42" stroke="#E0E5E2" strokeWidth="10" fill="transparent" />
-                          <circle
-                            cx="50"
-                            cy="50"
-                            r="42"
-                            stroke="#173C35"
-                            strokeWidth="10"
-                            strokeDasharray="264"
-                            strokeDashoffset="79"
-                            strokeLinecap="round"
-                            fill="transparent"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span className="text-3xl font-black text-[#173C35]">7</span>
-                          <span className="text-[10px] font-bold text-[#747B76]">/ 10 REPS</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-bold text-[#747B76] uppercase">{activeExercise}</span>
+                        <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[10px] font-bold">
+                          <button
+                            onClick={() => setLiveScanMode("3d")}
+                            className={`px-2 py-0.5 rounded ${
+                              liveScanMode === "3d" ? "bg-[#173C35] text-white" : "text-slate-600 hover:text-slate-900"
+                            }`}
+                          >
+                            3D Scan
+                          </button>
+                          <button
+                            onClick={() => setLiveScanMode("ring")}
+                            className={`px-2 py-0.5 rounded ${
+                              liveScanMode === "ring" ? "bg-[#173C35] text-white" : "text-slate-600 hover:text-slate-900"
+                            }`}
+                          >
+                            Ring Gauge
+                          </button>
                         </div>
                       </div>
+
+                      {liveScanMode === "3d" ? (
+                        <div className="my-2 h-52 w-full rounded-xl bg-[#070D14] border border-cyan-800/40 relative overflow-hidden flex items-center justify-center shadow-inner">
+                          <HolographicHandScan
+                            fingerAngles={fingerAngles}
+                            fsrContact={fsrVal}
+                            colorCoded={true}
+                            onFingerClick={(idx) => setSelectedScanFinger(idx === selectedScanFinger ? null : idx)}
+                            selectedFinger={selectedScanFinger}
+                          />
+                        </div>
+                      ) : (
+                        /* Repetition Ring */
+                        <div className="relative w-36 h-36 mx-auto my-3 flex items-center justify-center">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="42" stroke="#E0E5E2" strokeWidth="10" fill="transparent" />
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="42"
+                              stroke="#173C35"
+                              strokeWidth="10"
+                              strokeDasharray="264"
+                              strokeDashoffset="79"
+                              strokeLinecap="round"
+                              fill="transparent"
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-3xl font-black text-[#173C35]">7</span>
+                            <span className="text-[10px] font-bold text-[#747B76]">/ 10 REPS</span>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="flex justify-around text-xs border-t border-[#E0E5E2] pt-2 mt-2">
                         <div>
@@ -543,19 +656,44 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Okabe-Ito 5 Finger Channels */}
+                    {/* Okabe-Ito Finger Channels (Honoring 3-CH Active Design) */}
                     <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
-                      <div className="text-[11px] font-bold text-[#747B76] mb-2">OKABE-ITO FINGER CHANNELS</div>
+                      <div className="flex items-center justify-between text-[11px] font-bold text-[#747B76] mb-2">
+                        <span>OKABE-ITO FINGER CHANNELS</span>
+                        <span className="text-[9px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-mono">
+                          {isDemo3 ? "demo3: 3 Active" : "full5: 5 Active"}
+                        </span>
+                      </div>
                       <div className="space-y-1.5">
-                        {okabeItoColors.map((f, i) => (
-                          <div key={i} className="flex items-center space-x-2 text-[11px]">
-                            <span className="w-12 font-bold">{f.name}</span>
-                            <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                              <div className="h-full rounded-full transition-all" style={{ width: `${f.val}%`, backgroundColor: f.hex }} />
+                        {okabeItoColors.map((f, i) => {
+                          const isReserved = isDemo3 && i >= 3;
+                          return (
+                            <div key={i} className="flex items-center space-x-2 text-[11px]">
+                              <span className="w-12 font-bold">{f.name}</span>
+                              <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all"
+                                  style={{
+                                    width: isReserved ? "0%" : `${f.val}%`,
+                                    backgroundColor: isReserved ? "#94A3B8" : f.hex,
+                                  }}
+                                />
+                              </div>
+                              <span className="w-16 text-right font-mono text-[10px]">
+                                {isReserved ? (
+                                  <span className="text-slate-400 text-[9px]">RESERVED</span>
+                                ) : (
+                                  `${f.val}%`
+                                )}
+                              </span>
                             </div>
-                            <span className="w-8 text-right font-mono text-[10px]">{f.val}%</span>
-                          </div>
-                        ))}
+                          );
+                        })}
+                      </div>
+
+                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                        <span className="text-[#747B76] font-bold">PALMAR FSR CONTACT:</span>
+                        <span className="font-mono font-bold text-emerald-800">{fsrVal}% (Active Grip)</span>
                       </div>
                     </div>
 
@@ -595,12 +733,91 @@ export default function App() {
                 {mobileTab === "taskproof" && (
                   <div className="space-y-3">
                     {/* Live Verdict Banner */}
-                    <div className="bg-emerald-100 border-2 border-emerald-600 p-4 rounded-xl text-center shadow-sm">
+                    <div className="bg-emerald-100 border-2 border-emerald-600 p-3.5 rounded-xl text-center shadow-sm">
                       <div className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">TASKPROOF VERDICT</div>
-                      <div className="text-3xl font-black text-emerald-900 mt-1">
+                      <div className="text-2xl font-black text-emerald-900 mt-0.5">
                         {telemetry?.taskproof.verdict === "NOT_STARTED" ? "VERIFIED" : telemetry?.taskproof.verdict || "READY"}
                       </div>
-                      <div className="text-xs font-mono font-bold text-emerald-800 mt-1">4.2 s • ALL GUARDS MET</div>
+                      <div className="text-[11px] font-mono font-bold text-emerald-800 mt-0.5">4.2 s • ALL GUARDS MET</div>
+                    </div>
+
+                    {/* OpenCV ArUco Camera Zone Tracker (Live Tabletop Field) */}
+                    <div className="bg-[#0B1520] p-3 rounded-xl border border-emerald-800/50 shadow text-slate-100 space-y-2">
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="font-bold text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
+                          <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                          OpenCV ArUco Zone Field
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 font-mono font-bold border border-emerald-700">
+                          Marker #0 (Cup)
+                        </span>
+                      </div>
+
+                      {/* Visual Tabletop Workspace */}
+                      <div className="h-28 w-full rounded-lg bg-black/70 border border-slate-800 relative p-2 overflow-hidden flex items-center justify-between text-center font-mono text-[9px]">
+                        {/* Zone A (Pick-up) */}
+                        <div className="w-1/3 h-full border-2 border-dashed border-emerald-500/60 rounded bg-emerald-950/30 flex flex-col items-center justify-center p-1">
+                          <span className="text-emerald-300 font-bold">ZONE A</span>
+                          <span className="text-[8px] text-emerald-500">Pick-up Area</span>
+                          <span className="text-[8px] text-slate-400 mt-0.5">X: 120–220</span>
+                        </div>
+
+                        {/* Transit Arrow & Boundary */}
+                        <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
+                          <ArrowRight className="w-4 h-4 text-amber-400 animate-pulse" />
+                          <span className="text-[8px] text-amber-300/80">Transit</span>
+                        </div>
+
+                        {/* Zone B (Target) */}
+                        <div className="w-1/3 h-full border-2 border-emerald-400 rounded bg-cyan-950/40 flex flex-col items-center justify-center p-1 relative shadow-[0_0_12px_rgba(0,229,255,0.2)]">
+                          <span className="text-cyan-300 font-bold">ZONE B</span>
+                          <span className="text-[8px] text-cyan-500">Target Zone</span>
+                          {/* ArUco Marker #0 placed inside Zone B */}
+                          <div className="mt-1 px-1.5 py-0.5 bg-emerald-500 text-black font-black rounded text-[8px] flex items-center gap-0.5 shadow">
+                            <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
+                            #0 VERIFIED
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Vision Diagnostics: Detection Rate, Frame Age, Occlusion */}
+                      <div className="grid grid-cols-3 gap-1.5 text-[9px] font-mono">
+                        <div className="bg-black/50 p-1.5 rounded border border-slate-800 text-center">
+                          <span className="text-slate-400 block text-[8px]">DETECTION (1S)</span>
+                          <span className="text-emerald-400 font-bold">96% (≥80%)</span>
+                        </div>
+                        <div className="bg-black/50 p-1.5 rounded border border-slate-800 text-center">
+                          <span className="text-slate-400 block text-[8px]">FRAME AGE</span>
+                          <span className="text-cyan-400 font-bold">28 ms (&lt;120ms)</span>
+                        </div>
+                        <div className="bg-black/50 p-1.5 rounded border border-slate-800 text-center">
+                          <span className="text-slate-400 block text-[8px]">OCCLUSION</span>
+                          <span className="text-emerald-400 font-bold">0 ms (NONE)</span>
+                        </div>
+                      </div>
+
+                      {/* 4-Phase Deterministic Checklist */}
+                      <div className="pt-1 space-y-1">
+                        <div className="text-[9px] font-bold text-slate-400 uppercase">4-Phase Verification Guards</div>
+                        <div className="grid grid-cols-2 gap-1 text-[9px]">
+                          <div className="bg-emerald-950/50 border border-emerald-600/50 text-emerald-300 p-1 rounded flex items-center gap-1 font-bold">
+                            <Check className="w-3 h-3 text-emerald-400 shrink-0" />
+                            <span>1. Contact (FSR &gt; 200)</span>
+                          </div>
+                          <div className="bg-emerald-950/50 border border-emerald-600/50 text-emerald-300 p-1 rounded flex items-center gap-1 font-bold">
+                            <Check className="w-3 h-3 text-emerald-400 shrink-0" />
+                            <span>2. Lifted (&gt;20mm)</span>
+                          </div>
+                          <div className="bg-emerald-950/50 border border-emerald-600/50 text-emerald-300 p-1 rounded flex items-center gap-1 font-bold">
+                            <Check className="w-3 h-3 text-emerald-400 shrink-0" />
+                            <span>3. Transit Boundary</span>
+                          </div>
+                          <div className="bg-emerald-950/50 border border-emerald-600/50 text-emerald-300 p-1 rounded flex items-center gap-1 font-bold">
+                            <Check className="w-3 h-3 text-emerald-400 shrink-0" />
+                            <span>4. Release in Zone B</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {/* 7-State Stepper */}
@@ -667,25 +884,67 @@ export default function App() {
                 {/* 5. DEVICE & CALIBRATION TAB */}
                 {mobileTab === "device" && (
                   <div className="space-y-3">
+                    {/* Hardware Specifications */}
                     <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm">
-                      <div className="text-[10px] font-bold text-[#747B76] mb-2">HARDWARE LINK & PROFILE</div>
-                      <div className="text-xs space-y-1">
+                      <div className="text-[10px] font-bold text-[#747B76] mb-2">HARDWARE SPECIFICATIONS (ESP32-S3)</div>
+                      <div className="text-xs space-y-1.5">
                         <div className="flex justify-between">
-                          <span className="text-[#747B76]">Device:</span>
-                          <span className="font-bold">ESP32-S3 DevKit</span>
+                          <span className="text-[#747B76]">Microcontroller:</span>
+                          <span className="font-bold">ESP32-S3 N16R8 (240MHz LX7)</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-[#747B76]">Transport:</span>
-                          <span className="font-bold">USB Serial (921,600 baud)</span>
+                          <span className="text-[#747B76]">Precision ADC:</span>
+                          <span className="font-bold">ADS1115 (16-bit I2C @ 0x48)</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-[#747B76]">Active Profile:</span>
-                          <span className="font-bold text-[#173C35]">demo3 (3 Flex + FSR + IMU)</span>
+                          <span className="text-[#747B76]">6-DOF IMU:</span>
+                          <span className="font-bold">MPU6050 (Accel + Gyro @ 0x68)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#747B76]">Power Source:</span>
+                          <span className="font-bold text-emerald-800">USB Powered (5V VBUS) — Isolated</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#747B76]">Serial Baud:</span>
+                          <span className="font-mono font-bold">921,600 baud (50 Hz)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#747B76]">Active Channels:</span>
+                          <span className="font-bold text-[#173C35]">
+                            {isDemo3 ? "demo3 (Thumb, Index, Middle + FSR + IMU)" : "full5 (5 Flex + FSR + IMU)"}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-[#747B76]">Calibration:</span>
-                          <span className="font-bold text-emerald-700">Valid (Age: 1 day, Span &gt; 300)</span>
+                          <span className="font-bold text-emerald-700">Valid (Span &gt; 300, Age: 1 day)</span>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Glove Connection Management */}
+                    <div className="bg-white p-3.5 rounded-xl border border-[#E0E5E2] shadow-sm space-y-2">
+                      <div className="text-[10px] font-bold text-[#747B76]">GLOVE CONNECTION CONTROLS</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => {
+                            setConnected(true);
+                            setDataSource("live");
+                            showToast("Connected to ESP32-S3 Glove (921,600 baud)");
+                          }}
+                          className="py-2 bg-[#173C35] text-white rounded-lg text-xs font-bold hover:bg-emerald-950 transition flex items-center justify-center gap-1.5"
+                        >
+                          <Wifi className="w-3.5 h-3.5" />
+                          Connect Glove
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsDemo3(!isDemo3);
+                            showToast(isDemo3 ? "Switched to full5 Profile (5 Channels)" : "Switched to demo3 Profile (3 Channels)");
+                          }}
+                          className="py-2 bg-slate-100 text-slate-800 border border-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 transition"
+                        >
+                          {isDemo3 ? "Profile: demo3 (3-CH)" : "Profile: full5 (5-CH)"}
+                        </button>
                       </div>
                     </div>
 

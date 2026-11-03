@@ -4,6 +4,7 @@ import '../services/device_service.dart';
 import '../services/storage_service.dart';
 import 's10_taskproof_screen.dart';
 import '../widgets/preflight_dialog.dart';
+import '../widgets/holographic_hand_scan.dart';
 
 class TodayScreen extends StatelessWidget {
   final DeviceService deviceService;
@@ -90,8 +91,8 @@ class TodayScreen extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           isConnected
-                              ? 'Battery: ${deviceService.batteryPct}% • ${deviceService.currentPacketRateHz}Hz stream'
-                              : 'Connect to ESP32 glove or start Simulator',
+                              ? '${deviceService.batteryStatus} • ${deviceService.hardwareProfile.toUpperCase()} (${deviceService.currentPacketRateHz}Hz)'
+                              : 'Connect to ${deviceService.controllerModel} glove or start Simulator',
                           style: const TextStyle(fontSize: 12, color: Color(H10Tokens.colorSecondaryText)),
                         ),
                       ],
@@ -218,7 +219,87 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: H10Tokens.space16),
 
-          // 3. Pending Sync Badge (if any)
+          // 3. 3D Holographic Hand Kinematic Scanner Card
+          Card(
+            color: const Color(0xFF0F172A), // Slate 900
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(H10Tokens.radiusCard),
+              side: const BorderSide(color: Color(0xFF00E5FF), width: 1.2),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(H10Tokens.space16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Expanded(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.view_in_ar, size: 16, color: Color(0xFF00E5FF)),
+                            SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                '3D HOLOGRAPHIC SCAN',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () {
+                          deviceService.toggleHardwareProfile();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E293B),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.4)),
+                          ),
+                          child: Text(
+                            deviceService.hardwareProfile == 'demo3' ? '3-CH (ACTIVE)' : '5-CH (FULL)',
+                            style: const TextStyle(
+                              color: Color(0xFF00E5FF),
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Real-time kinematic joint curl with Okabe-Ito finger channels & palmar EVA contact buffer.',
+                    style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 240,
+                    child: HolographicHandScanWidget(
+                      flexValues: deviceService.latestNormalizedFlex,
+                      fsrContact: (deviceService.latestPacket?.fsr ?? 0) / 32767.0 * 100.0,
+                      isDemo3: deviceService.hardwareProfile == 'demo3',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: H10Tokens.space16),
+
+          // 4. Pending Sync Badge (if any)
           if (pendingCount > 0)
             Container(
               margin: const EdgeInsets.only(bottom: H10Tokens.space16),

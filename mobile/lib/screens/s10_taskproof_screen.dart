@@ -7,6 +7,8 @@ import 'package:h10_core/h10_core.dart';
 import '../services/device_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/preflight_dialog.dart';
+import '../widgets/camera_zone_tracker.dart';
+import '../widgets/holographic_hand_scan.dart';
 
 class TaskProofScreen extends StatefulWidget {
   final DeviceService deviceService;
@@ -468,6 +470,19 @@ class _TaskProofScreenState extends State<TaskProofScreen> {
           ),
           const SizedBox(height: H10Tokens.space16),
 
+          // Live OpenCV ArUco Tabletop Zone Field
+          CameraZoneTrackerWidget(
+            markerDetected: _markerDetected,
+            currentZone: _currentZone,
+            detectionRate: _detectionRate,
+            frameAgeMs: _frameAgeMs,
+            contactEngaged: _contactOn,
+            objectLifted: _statesFlow.indexOf(_currentState) >= 3,
+            transportVerified: _statesFlow.indexOf(_currentState) >= 4,
+            releaseConfirmed: _statesFlow.indexOf(_currentState) >= 5,
+          ),
+          const SizedBox(height: H10Tokens.space16),
+
           // Attempt Context & Reason Codes
           Card(
             shape: RoundedRectangleBorder(
@@ -657,6 +672,19 @@ class _TaskProofScreenState extends State<TaskProofScreen> {
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: H10Tokens.space12),
+
+          // Live OpenCV ArUco Tabletop Zone Field
+          CameraZoneTrackerWidget(
+            markerDetected: _markerDetected,
+            currentZone: _currentZone,
+            detectionRate: _detectionRate,
+            frameAgeMs: _frameAgeMs,
+            contactEngaged: _contactOn,
+            objectLifted: _statesFlow.indexOf(_currentState) >= 3,
+            transportVerified: _statesFlow.indexOf(_currentState) >= 4,
+            releaseConfirmed: _statesFlow.indexOf(_currentState) >= 5,
           ),
           const SizedBox(height: H10Tokens.space12),
 

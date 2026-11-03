@@ -37,8 +37,25 @@ class DeviceService extends ChangeNotifier {
   int lastPacketTimeMs = 0;
   int lastPacketAgeMs = 0;
   bool isSimulated = true;
-  int batteryPct = 90;
+  int batteryPct = 100;
+  bool isUsbPowered = true;
+  String batteryStatus = 'USB Powered (5V VBUS)';
   bool isCalibrated = true;
+
+  // Hardware Metadata (Competition Profile vs Platform)
+  String hardwareProfile = 'demo3'; // 'demo3' (3 flex + FSR + IMU) or 'full5'
+  String controllerModel = 'ESP32-S3 N16R8';
+  String adcModel = 'ADS1115 16-bit (I2C 0x48)';
+  String imuModel = 'MPU6050 6-DOF (I2C 0x68)';
+  bool adcOk = true;
+  bool fsrOk = true;
+  bool imuOk = true;
+  int baudRate = 921600;
+
+  void toggleHardwareProfile() {
+    hardwareProfile = (hardwareProfile == 'demo3') ? 'full5' : 'demo3';
+    notifyListeners();
+  }
 
   SensorPacket? latestPacket;
   List<double> latestNormalizedFlex = [0, 0, 0, 0, 0];
