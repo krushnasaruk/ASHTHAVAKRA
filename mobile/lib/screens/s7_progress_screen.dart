@@ -47,19 +47,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF161C19),
+                  color: Colors.white,
                 ),
               ),
               Row(
                 children: [
-                  const Text('Simulated', style: TextStyle(fontSize: 11, color: Color(0xFF7A837E))),
+                  const Text('Simulated', style: TextStyle(fontSize: 11, color: Color(0xFF8E958E))),
                   const SizedBox(width: 4),
                   Transform.scale(
                     scale: 0.75,
                     child: Switch(
                       value: _includeSimulated,
-                      activeColor: const Color(0xFF121715),
-                      activeTrackColor: const Color(0xFFC8F05F),
+                      activeColor: const Color(0xFFC8F05F),
+                      activeTrackColor: const Color(0xFF1E2822),
                       onChanged: (v) => setState(() => _includeSimulated = v),
                     ),
                   ),
@@ -284,12 +284,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF141A17),
               borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
+              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withOpacity(0.18),
                   blurRadius: 14,
                   offset: const Offset(0, 4),
                 ),
@@ -307,7 +307,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF161C19),
+                          color: Colors.white,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -316,15 +316,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF4F6F0),
+                        color: const Color(0xFF1E2822),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.tune, size: 12, color: Color(0xFF121715)),
+                          Icon(Icons.tune, size: 12, color: Color(0xFFC8F05F)),
                           SizedBox(width: 4),
-                          Text('Filters', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                          Text('Filters', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
                         ],
                       ),
                     ),
@@ -336,20 +336,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Session Adherence',
-                          style: TextStyle(fontSize: 11, color: Color(0xFF7A837E)),
+                          style: TextStyle(fontSize: 11, color: Color(0xFF8E958E)),
                         ),
-                        const SizedBox(height: 2),
-                        const Text(
+                        SizedBox(height: 2),
+                        Text(
                           '94% Completed',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF161C19),
+                            color: Colors.white,
                           ),
                         ),
                       ],
@@ -360,7 +360,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         children: [
                           const Text(
                             'Baseline Mean ROM',
-                            style: TextStyle(fontSize: 11, color: Color(0xFF7A837E)),
+                            style: TextStyle(fontSize: 11, color: Color(0xFF8E958E)),
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -368,7 +368,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF121715),
+                              color: Color(0xFFC8F05F),
                             ),
                           ),
                         ],
@@ -408,12 +408,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF161C19),
+                  color: Colors.white,
                 ),
               ),
               Text(
                 '${filteredSessions.length} sessions',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF7A837E)),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF8E958E)),
               ),
             ],
           ),
@@ -425,7 +425,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               alignment: Alignment.center,
               child: const Text(
                 'No sessions recorded in this time range.',
-                style: TextStyle(color: Color(0xFF7A837E)),
+                style: TextStyle(color: Color(0xFF8E958E)),
               ),
             )
           else
@@ -434,9 +434,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFF141A17),
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFFE2E7DE)),
+                  border: Border.all(color: const Color(0xFF222B26)),
                 ),
                 child: Row(
                   children: [
@@ -444,7 +444,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF121715),
+                        color: const Color(0xFF1E2822),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.show_chart, color: Color(0xFFC8F05F), size: 18),
@@ -456,11 +456,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         children: [
                           Text(
                             s.exerciseCode.toUpperCase(),
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           Text(
                             '${s.startedAt.month}/${s.startedAt.day} • ${s.startedAt.hour.toString().padLeft(2, '0')}:${s.startedAt.minute.toString().padLeft(2, '0')}',
-                            style: const TextStyle(fontSize: 11, color: Color(0xFF7A837E)),
+                            style: const TextStyle(fontSize: 11, color: Color(0xFF8E958E)),
                           ),
                         ],
                       ),
@@ -470,11 +470,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       children: [
                         Text(
                           '${s.meanRom.toStringAsFixed(1)}%',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF121715)),
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFC8F05F)),
                         ),
                         Text(
                           'Max ${s.maxRom.toStringAsFixed(0)}%',
-                          style: const TextStyle(fontSize: 10.5, color: Color(0xFF7A837E)),
+                          style: const TextStyle(fontSize: 10.5, color: Color(0xFF8E958E)),
                         ),
                       ],
                     ),
@@ -496,10 +496,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFC8F05F) : Colors.white,
+          color: isSelected ? const Color(0xFFC8F05F) : const Color(0xFF141A17),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFFC8F05F) : const Color(0xFFE2E7DE),
+            color: isSelected ? const Color(0xFFC8F05F) : const Color(0xFF222B26),
             width: 1.2,
           ),
           boxShadow: isSelected
@@ -517,7 +517,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           style: TextStyle(
             fontSize: 11.5,
             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-            color: const Color(0xFF121715),
+            color: isSelected ? const Color(0xFF0B0F0E) : Colors.white,
           ),
         ),
       ),

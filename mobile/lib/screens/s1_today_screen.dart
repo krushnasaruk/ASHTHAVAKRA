@@ -5,6 +5,7 @@ import '../services/storage_service.dart';
 import 's10_taskproof_screen.dart';
 import '../widgets/preflight_dialog.dart';
 import '../widgets/holographic_hand_scan.dart';
+import '../widgets/vector_icons.dart';
 
 class TodayScreen extends StatelessWidget {
   final DeviceService deviceService;
@@ -204,12 +205,12 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: 22),
 
-          // 2. Paytin 4 Squircle Quick Action Buttons (Guaranteed Visible Icons)
+          // 2. Paytin 4 Squircle Quick Action Buttons (Guaranteed 100% Canvas Vector Icons)
           Row(
             children: [
               _buildSquircleAction(
                 context,
-                iconWidget: const Icon(Icons.verified, color: Color(0xFF121715), size: 19),
+                iconWidget: VectorIcon.taskProof(size: 20, color: const Color(0xFFC8F05F)),
                 label: 'TaskProof',
                 onTap: () {
                   Navigator.push(
@@ -227,7 +228,7 @@ class TodayScreen extends StatelessWidget {
               const SizedBox(width: 10),
               _buildSquircleAction(
                 context,
-                iconWidget: const Icon(Icons.gavel, color: Color(0xFF121715), size: 19),
+                iconWidget: VectorIcon.judge(size: 20, color: const Color(0xFFC8F05F)),
                 label: 'Judge View',
                 onTap: () {
                   Navigator.push(
@@ -245,14 +246,14 @@ class TodayScreen extends StatelessWidget {
               const SizedBox(width: 10),
               _buildSquircleAction(
                 context,
-                iconWidget: const Icon(Icons.fitness_center, color: Color(0xFF121715), size: 19),
+                iconWidget: VectorIcon.routines(size: 20, color: const Color(0xFFC8F05F)),
                 label: 'Routines',
                 onTap: onStartExercise,
               ),
               const SizedBox(width: 10),
               _buildSquircleAction(
                 context,
-                iconWidget: const Icon(Icons.fact_check, color: Color(0xFF121715), size: 19),
+                iconWidget: VectorIcon.preflight(size: 20, color: const Color(0xFFC8F05F)),
                 label: 'Preflight',
                 onTap: () => PreflightDialog.show(context),
               ),
@@ -260,7 +261,7 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // 3. Care Team & Investigators Horizontal Avatars (Paytin "Quick Send" Style)
+          // 3. Care Team & Investigators Horizontal Avatars (Obsidian Dark Style)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -270,7 +271,7 @@ class TodayScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF161C19),
+                    color: Colors.white,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -283,7 +284,7 @@ class TodayScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF7A837E),
+                    color: Color(0xFF8E958E),
                   ),
                 ),
               ),
@@ -387,17 +388,17 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // 5. Prescribed Plan Card (Spacious & Clean)
+          // 5. Prescribed Plan Card (Spacious & Clean Obsidian Card)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF141A17),
               borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
+              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withOpacity(0.20),
                   blurRadius: 14,
                   offset: const Offset(0, 4),
                 ),
@@ -429,7 +430,7 @@ class TodayScreen extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF161C19),
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -442,10 +443,12 @@ class TodayScreen extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF121715),
+                        color: const Color(0xFF1E2822),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.fitness_center, color: Color(0xFFC8F05F), size: 22),
+                      child: Center(
+                        child: VectorIcon.routines(size: 22, color: const Color(0xFFC8F05F)),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     const Expanded(
@@ -454,7 +457,7 @@ class TodayScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF161C19),
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -470,7 +473,7 @@ class TodayScreen extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF121715),
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -479,7 +482,7 @@ class TodayScreen extends StatelessWidget {
                         'sessions completed this week',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF7A837E),
+                          color: Color(0xFF8E958E),
                           fontWeight: FontWeight.w500,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -492,8 +495,8 @@ class TodayScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: (sessions.length / plan.sessionsPerWeek).clamp(0.0, 1.0),
-                    backgroundColor: const Color(0xFFE2E7DE),
-                    color: const Color(0xFF121715),
+                    backgroundColor: const Color(0xFF1E2822),
+                    color: const Color(0xFFC8F05F),
                     minHeight: 8,
                   ),
                 ),
@@ -537,23 +540,23 @@ class TodayScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // 6. Recent Activity
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Recent Activity',
                 style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF161C19),
+                  color: Colors.white,
                 ),
               ),
-              const Text(
+              Text(
                 'See all >',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF7A837E),
+                  color: Color(0xFF8E958E),
                 ),
               ),
             ],
@@ -566,7 +569,7 @@ class TodayScreen extends StatelessWidget {
             badge: 'VERIFIED 4.2s',
             badgeColor: const Color(0xFFC8F05F),
             badgeTextColor: const Color(0xFF121715),
-            iconWidget: const Icon(Icons.fitness_center, color: Color(0xFFC8F05F), size: 18),
+            iconWidget: VectorIcon.routines(size: 18, color: const Color(0xFFC8F05F)),
           ),
           const SizedBox(height: 10),
 
@@ -574,9 +577,9 @@ class TodayScreen extends StatelessWidget {
             title: 'ArUco Marker Transfer',
             subtitle: 'Object Handover Task #42',
             badge: 'JUDGE VERIFIED',
-            badgeColor: const Color(0xFF121715),
+            badgeColor: const Color(0xFF1E2822),
             badgeTextColor: const Color(0xFFC8F05F),
-            iconWidget: const Icon(Icons.qr_code, color: Color(0xFFC8F05F), size: 18),
+            iconWidget: VectorIcon.qrCode(size: 18, color: const Color(0xFFC8F05F)),
           ),
           const SizedBox(height: 10),
 
@@ -584,9 +587,9 @@ class TodayScreen extends StatelessWidget {
             title: 'Thumb-Index Pinch',
             subtitle: 'Ch1 Thumb + Ch2 Index • 12 Reps',
             badge: '+84% ROM',
-            badgeColor: const Color(0xFFE2E7DE),
-            badgeTextColor: const Color(0xFF161C19),
-            iconWidget: const Icon(Icons.touch_app, color: Color(0xFFC8F05F), size: 18),
+            badgeColor: const Color(0xFF1E2822),
+            badgeTextColor: const Color(0xFFC8F05F),
+            iconWidget: VectorIcon.pinch(size: 18, color: const Color(0xFFC8F05F)),
           ),
 
           // Ample bottom breathing room so content scrolls completely above floating dock
@@ -609,12 +612,12 @@ class TodayScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 2),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color(0xFF141A17),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
+            border: Border.all(color: const Color(0xFF222B26), width: 1.2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withOpacity(0.20),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -627,7 +630,7 @@ class TodayScreen extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF4F6F0),
+                  color: Color(0xFF1E2822),
                   shape: BoxShape.circle,
                 ),
                 child: Center(child: iconWidget),
@@ -638,7 +641,7 @@ class TodayScreen extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF161C19),
+                  color: Colors.white,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -686,7 +689,7 @@ class TodayScreen extends StatelessWidget {
           style: const TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF161C19),
+            color: Colors.white,
           ),
         ),
       ],
@@ -704,9 +707,9 @@ class TodayScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF141A17),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
+        border: Border.all(color: const Color(0xFF222B26), width: 1.2),
       ),
       child: Row(
         children: [
@@ -714,7 +717,7 @@ class TodayScreen extends StatelessWidget {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: const Color(0xFF121715),
+              color: const Color(0xFF1E2822),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(child: iconWidget),
@@ -729,14 +732,14 @@ class TodayScreen extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF161C19),
+                    color: Colors.white,
                   ),
                 ),
                 Text(
                   subtitle,
                   style: const TextStyle(
                     fontSize: 11,
-                    color: Color(0xFF7A837E),
+                    color: Color(0xFF8E958E),
                   ),
                 ),
               ],

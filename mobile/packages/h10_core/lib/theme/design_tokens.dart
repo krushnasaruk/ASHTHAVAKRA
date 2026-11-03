@@ -1,14 +1,14 @@
 /// Design tokens for H10 theme, ensuring color-blind accessibility and consistency.
 class H10Tokens {
-  // Brand Palette - Paytin Neo-Rehabilitation Aesthetic
-  static const int colorBackground = 0xFFF4F6F0;
-  static const int colorPrimary = 0xFF121715;
+  // Brand Palette - True Obsidian Dark Aesthetic
+  static const int colorBackground = 0xFF0B0F0E;
+  static const int colorPrimary = 0xFF0B0F0E;
   static const int colorSecondary = 0xFFC8F05F;
-  static const int colorSurfaceTint = 0xFFE2E7DE;
-  static const int colorText = 0xFF161C19;
-  static const int colorSecondaryText = 0xFF7A837E;
-  static const int colorCard = 0xFFFFFFFF;
-  static const int colorBorder = 0xFFE2E7DE;
+  static const int colorSurfaceTint = 0xFF1E2822;
+  static const int colorText = 0xFFFFFFFF;
+  static const int colorSecondaryText = 0xFF8E958E;
+  static const int colorCard = 0xFF141A17;
+  static const int colorBorder = 0xFF222B26;
   static const int colorLime = 0xFFC8F05F;
 
   // Status Colors (Never rely on color alone)

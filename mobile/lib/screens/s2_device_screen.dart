@@ -100,9 +100,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF141A17),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
+              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,16 +110,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Device Socket Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5, color: Color(0xFF161C19))),
+                    const Text('Device Socket Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5, color: Colors.white)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: dev.state == DeviceConnectionState.streaming ? const Color(0xFFC8F05F) : const Color(0xFFF4F6F0),
+                        color: dev.state == DeviceConnectionState.streaming ? const Color(0xFFC8F05F) : const Color(0xFF1E2822),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         dev.state.name.toUpperCase(),
-                        style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Color(0xFF121715)),
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                          color: dev.state == DeviceConnectionState.streaming ? const Color(0xFF121715) : const Color(0xFF8E958E),
+                        ),
                       ),
                     ),
                   ],
@@ -131,10 +135,18 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       flex: 3,
                       child: TextField(
                         controller: _ipController,
+                        style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           labelText: 'IP / Host',
-                          labelStyle: const TextStyle(fontSize: 12),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF8E958E)),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFF222B26)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFFC8F05F)),
+                          ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         ),
                       ),
@@ -145,10 +157,18 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       child: TextField(
                         controller: _portController,
                         keyboardType: TextInputType.number,
+                        style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           labelText: 'Port',
-                          labelStyle: const TextStyle(fontSize: 12),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF8E958E)),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFF222B26)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Color(0xFFC8F05F)),
+                          ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         ),
                       ),
@@ -161,17 +181,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFEBEE),
+                      color: const Color(0xFF3B1212),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline, color: Color(H10Tokens.colorError), size: 18),
+                        const Icon(Icons.error_outline, color: Color(0xFFFF6B6B), size: 18),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             dev.lastValidationError!,
-                            style: const TextStyle(fontSize: 12, color: Color(H10Tokens.colorError)),
+                            style: const TextStyle(fontSize: 12, color: Color(0xFFFF6B6B)),
                           ),
                         ),
                       ],
@@ -182,8 +202,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   height: 46,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isConnected ? const Color(0xFFDC2626) : const Color(0xFF121715),
-                      foregroundColor: isConnected ? Colors.white : const Color(0xFFC8F05F),
+                      backgroundColor: isConnected ? const Color(0xFFDC2626) : const Color(0xFFC8F05F),
+                      foregroundColor: isConnected ? Colors.white : const Color(0xFF0B0F0E),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
                       elevation: 0,
                     ),
@@ -210,9 +230,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: const Color(0xFF121715),
+              color: const Color(0xFF141A17),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0xFF232D28), width: 1.2),
+              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.18),
@@ -260,14 +280,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF141A17),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
+              border: Border.all(color: const Color(0xFF222B26), width: 1.2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('HARDWARE CONTROLS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(0xFF7A837E))),
+                const Text('HARDWARE CONTROLS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(0xFF8E958E))),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -276,8 +296,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         icon: const Icon(Icons.vibration, size: 18),
                         label: Text(_isTestingHaptic ? 'Pulsing...' : 'Test Haptic', style: const TextStyle(fontWeight: FontWeight.bold)),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF121715),
-                          side: const BorderSide(color: Color(0xFFE2E7DE), width: 1.2),
+                          foregroundColor: Colors.white,
+                          side: const BorderSide(color: Color(0xFF222B26), width: 1.2),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                           minimumSize: const Size(0, 44),
                         ),
@@ -293,11 +313,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: ElevatedButton.icon(
-                        icon: const Icon(Icons.tune, size: 18),
-                        label: const Text('Calibration Wizard', style: TextStyle(fontWeight: FontWeight.w900)),
+                        icon: const Icon(Icons.tune, size: 18, color: Color(0xFF0B0F0E)),
+                        label: const Text('Calibration Wizard', style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF0B0F0E))),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFC8F05F),
-                          foregroundColor: const Color(0xFF121715),
+                          foregroundColor: const Color(0xFF0B0F0E),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                           minimumSize: const Size(0, 44),
                           elevation: 0,
