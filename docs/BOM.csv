@@ -1,0 +1,20 @@
+item_id,category,component,specification,quantity,unit_cost_inr,total_cost_inr,status,purpose
+BOM-01,Compute,ESP32-S3 DevKit-C,Xtensa dual-core 240MHz 16MB Flash 8MB PSRAM,1,850,850,active,Primary controller 25Hz ADC/IMU sampling & 921600 baud serial stream
+BOM-02,Sensor,Flex Sensor 2.2",Spectra Symbol resistive bend sensor (Thumb),1,1200,1200,active,Thumb MCP/IP flexion tracking (ADC A0)
+BOM-03,Sensor,Flex Sensor 2.2",Spectra Symbol resistive bend sensor (Index),1,1200,1200,active,Index MCP/PIP flexion tracking (ADC A1)
+BOM-04,Sensor,Flex Sensor 2.2",Spectra Symbol resistive bend sensor (Middle),1,1200,1200,active,Middle MCP/PIP flexion tracking (ADC A2)
+BOM-05,Sensor,FSR 402 Contact Sensor,Interlink Electronics 0.5" round force sensor,1,450,450,active,Palmar contact Schmitt-trigger detector (ADC A3)
+BOM-06,ADC,ADS1115 Breakout,Texas Instruments 16-bit 4-channel I2C ADC (0x48),1,350,350,active,Differential 16-bit digitization of 3 flex + 1 FSR at 25Hz per channel
+BOM-07,IMU,MPU6050 6-DOF,InvenSense 3-axis accelerometer + 3-axis gyroscope (0x68),1,180,180,active,Hand orientation tilt & dynamic stability tracking
+BOM-08,Apparel,Soft Cotton Glove,Stretchable breathable cotton work glove (Size M/L),2,75,150,active,Sensor substrate worn by volunteer
+BOM-09,Electronics,Precision Resistors,10 kOhm 1% metal film divider resistors,20,2.5,50,active,Voltage divider reference legs for flex & FSR
+BOM-10,Cabling,USB-C to USB-A Cable,1.5m shielded 24AWG power/data high-speed cable,1,200,200,active,Isolated USB 921600 baud serial stream & 5V rail
+BOM-11,Prototyping,Perfboard & Headers,FR4 double-sided prototype board + 2.54mm headers,1,80,80,active,Circuit wiring and strain relief terminal block
+BOM-12,Vision,ArUco Marker Sheet,OpenCV DICT_4X4_50 ID#0 (50mm x 50mm laminated),2,25,50,active,Fiducial target for camera pose & zone verification
+BOM-13,Mechanical,Transfer Object,Lightweight EVA foam block (60mm x 60mm x 60mm, 28g),1,50,50,active,Standardized transfer payload for TaskProof task
+BOM-14,Fasteners,Mounting Hardware,Hook-and-loop velcro, 3M VHB tape, heat-shrink tubing,1,150,150,active,Strain relief and electrical insulation
+BOM-15,Signalling,User Feedback,Piezo buzzer 5V + 3mm Green Status LED + Pushbutton,1,70,70,active,Local audio-visual state cue and hardware abort trigger
+BOM-16,Spare,Flex Sensor 2.2" (Spare),Spectra Symbol resistive bend sensor (Backup),1,1200,1200,spare,Emergency on-site hot-swap spare
+BOM-17,Spare,FSR 402 (Spare),Interlink Electronics 0.5" round force sensor (Backup),1,450,450,spare,Emergency on-site hot-swap spare
+BOM-18,Spare,ADS1115 (Spare),Texas Instruments 16-bit 4-channel I2C ADC (Backup),1,350,350,spare,Emergency on-site hot-swap spare
+BOM-19,Spare,USB-C Data Cable (Spare),1.5m shielded USB-C cable (Backup),1,200,200,spare,Emergency on-site cable replacement

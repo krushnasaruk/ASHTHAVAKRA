@@ -1,0 +1,51 @@
+# RehabBridge NEXUS / H10 — Team Roles and Responsibilities
+# Event: Innovation 2K26, College of Engineering, Phaltan (3–4 November 2026)
+# Status: Proposed, not confirmed (pending on-site sign-off)
+
+team:
+  project_lead:
+    name: "Developer (Project Lead)"
+    handle: "@developer"
+    role: "Software & System Architecture"
+    ownership:
+      - "Host serial ingestion pipeline (backend/serial_ingest.py)"
+      - "Kinematic signal processing & calibration (backend/signal/)"
+      - "TaskProof deterministic state machine & guards (backend/taskproof.py)"
+      - "FastAPI backend, WebSocket streaming, and SQLite WAL database (backend/main.py, backend/models.py)"
+      - "React dual-view event dashboard (frontend/src/App.tsx)"
+      - "Automated test suite (tests/, 68 unit/integration tests)"
+      - "System integration, preflight diagnostics, and evidence packaging"
+
+  designer:
+    name: "Vaishnavi Jare"
+    handle: "@vaishnavijare60-hash"
+    role: "Product Design & Volunteer Experience"
+    ownership:
+      - "Mobile patient application UX and screen flows (mobile/lib/screens/)"
+      - "High-contrast Judge View typography and verdict hierarchy"
+      - "Accessibility standards: 48x48 px touch targets, 440px canvas container"
+      - "Okabe-Ito color-blind safe palette tokens (mobile/packages/h10_core/lib/theme/)"
+      - "Volunteer journey, consent visual flow, and non-medical disclaimer banner"
+      - "Presentation slide visuals and judge-facing UI demonstrations"
+
+  hardware_lead:
+    name: "Rajendra"
+    role: "Hardware Electronics & Firmware (Proposed)"
+    ownership:
+      - "ESP32-S3 circuit pinout and I2C bus wiring (firmware-esp32/include/config.h)"
+      - "ADS1115 16-bit ADC sampling loop & MPU6050 6-DOF IMU integration"
+      - "Firmware line-delimited JSON packet serialization at 921600 baud"
+      - "Voltage divider circuit design (10 kOhm reference resistors)"
+      - "Electrical insulation, ground reference stability, and USB power safety"
+      - "Hardware diagnostics, wire fault isolation, and hot-swap spare readiness"
+
+  mechanics_lead:
+    name: "Gautam"
+    role: "Glove Mechanics & Validation (Proposed)"
+    ownership:
+      - "Sensor mechanical mounting, guide channels, and palm glove fit"
+      - "FSR palmar contact placement and bend strain relief"
+      - "Mechanical durability across repeated flex-extension cycles"
+      - "Physical ArUco transfer cube fabrication (60mm EVA foam, 28g, Marker ID#0)"
+      - "Volunteer physical testing protocol, fit adjustments, and sanitization"
+      - "Ground truth trial execution, labelling coordination, and bench testing"
