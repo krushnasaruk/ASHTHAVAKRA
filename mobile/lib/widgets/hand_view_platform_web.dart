@@ -4,7 +4,7 @@ import 'dart:ui_web' as ui_web;
 import 'package:flutter/widgets.dart';
 
 final Set<String> _registeredViewTypes = <String>{};
-html.IFrameElement? _webIframe;
+final Map<String, html.IFrameElement> _webIframes = {};
 
 Widget buildPlatformHandView({
   required String viewType,
@@ -20,8 +20,8 @@ Widget buildPlatformHandView({
           ..style.border = 'none'
           ..style.width = '100%'
           ..style.height = '100%'
-          ..style.backgroundColor = '#0a0a0a';
-        _webIframe = iframe;
+          ..style.backgroundColor = '#000000';
+        _webIframes[viewType] = iframe;
         return iframe;
       },
     );
@@ -29,10 +29,14 @@ Widget buildPlatformHandView({
   return HtmlElementView(viewType: viewType);
 }
 
-void postPlatformMessage(String message) {
+void postPlatformMessage(String message, [String? viewType]) {
   try {
-    if (_webIframe != null && _webIframe!.contentWindow != null) {
-      _webIframe!.contentWindow!.postMessage(message, '*');
+    if (viewType != null && _webIframes.containsKey(viewType)) {
+      _webIframes[viewType]?.contentWindow?.postMessage(message, '*');
+    } else {
+      for (final iframe in _webIframes.values) {
+        iframe.contentWindow?.postMessage(message, '*');
+      }
     }
   } catch (_) {}
 }

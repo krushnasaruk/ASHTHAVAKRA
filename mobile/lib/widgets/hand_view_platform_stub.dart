@@ -7,5 +7,5 @@ Widget buildPlatformHandView({
   return const SizedBox();
 }
 
-void postPlatformMessage(String message) {}
+void postPlatformMessage(String message, [String? viewType]) {}
 

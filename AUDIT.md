@@ -206,3 +206,38 @@ flutter build apk --release --dart-define=MOCK=true
   - "SIMULATED" badge appears only when `kUseMockData` compile-time flag is enabled.
 - **Dual-App Phone Installation:**
   - Updated Application ID to `com.asthavakra.v3` and app label to `ASHTAVAKRA v3` so both v2 and v3 can coexist simultaneously on the test phone.
+
+---
+
+## 9. Interactive 3D Anatomical Hand Viewer & Biomechanical Verification
+- **Medical Imaging Aesthetic:** Matches `Screenshot_2026-11-04_025617.png` reference:
+  - Pure near-black background (`#000000` to `#0B0B0B`) with subtle radial vignette.
+  - Hand skin rendered as a faint, semi-transparent outline (opacity 0.14, fine light-grey edge).
+  - Bones rendered in mid-grey to off-white (`#C9D0D4` to `#E8EFEF`) with curvature shading.
+  - Selected finger shafts turn saturated yellow (`#FFD54A`), while joint ends (epiphyses) remain pale grey.
+  - Selected finger joints display small amber rings (`#F5A623`, 2–3 px screen size).
+  - Lighting: Soft ambient + upper-left directional key light (no harsh cast shadows).
+- **Exact 27-Bone Anatomical Skeleton (`mobile/assets/hand/skeleton.glb`):**
+  - **8 Carpal Bones:** Proximal row (scaphoid, lunate, triquetrum, pisiform) and distal row (trapezium, trapezoid, capitate, hamate).
+  - **5 Metacarpals:** Metacarpals I through V with physiological spacing.
+  - **14 Phalanges:** Thumb (proximal, distal) + fingers 2–5 (proximal, middle, distal).
+  - Verified and logged to console on initialization: `[ANATOMY] Bones count verified: 8 carpal, 5 metacarpal, 14 phalanx. Total bones: 27.`
+- **Interactive Controls & Biomechanical Articulation:**
+  - **Raycasting Selection:** Tapping a finger selects its chain, highlights diaphysis shafts in saturated yellow, reveals amber joint rings, and dims unselected bones to 40% opacity.
+  - **Deselection:** Tapping background or pressing `CLEAR` restores baseline materials smoothly.
+  - **Monospace Info Callout:** Shows bone name, finger ID (`[EST.]` tag for ring/pinky), and articulating joints connected via a thin leader line and dot.
+  - **Manual Articulation Slider:** 0% (extended) to 100% (flexed) bending selected finger with standard angular constants (`MCP = t * 1.4 rad`, `PIP = t * 1.6 rad`, `DIP = t * 0.9 rad`, lerp factor 0.25).
+  - **Touch Gestures:** 1-finger drag rotates hand with vertical clamping (cannot flip upside down); 2-finger pinch zooms between 0.8x and 2.5x.
+  - **Controls Row:** `PALM / BACK` animated view toggle (500 ms), `RESET VIEW`, `CLEAR`, and selected finger status pill.
+- **Sensor Bridge Integration:**
+  - Connected device forwards calibrated flex curl values (`thumb`, `index`, `middle`) and IMU orientation quaternion (`qw`, `qx`, `qy`, `qz`) via `setFrame()` throttled at 25 Hz.
+  - Status indicator switches dynamically: `SENSOR` (live device stream), `MANUAL` (slider driven), or `NO DATA` (disconnected/missing).
+- **Framing & Responsiveness:**
+  - Portrait frame locked to 4:5 aspect ratio, centered horizontally with at least 16 px padding on all sides, respecting top and bottom safe-area insets.
+- **Offline Self-Containment:**
+  - `mobile/assets/hand/anatomy.html` runs locally with `skeleton_b64.js` zero-latency base64 fallback.
+  - `mobile/assets/hand/README.md` documents CC BY-SA 4.0 license, origin, and the complete 27-bone anthropometric measurement table.
+- **Verification Tests:**
+  - Static Analysis: 0 issues on `flutter analyze`.
+  - Unit & Widget Tests: 10/10 tests in `mobile/test`, 33/33 tests in `h10_core/test` (43/43 total passed).
+

@@ -6,11 +6,12 @@ import 's10_taskproof_screen.dart';
 import 's8_history_screen.dart';
 import '../widgets/preflight_dialog.dart';
 import '../widgets/hand_view.dart';
+import '../widgets/anatomy_hand_view.dart';
 import '../widgets/vector_icons.dart';
 import '../theme/app_theme.dart';
 import '../dev/mock_data.dart';
 
-class TodayScreen extends StatelessWidget {
+class TodayScreen extends StatefulWidget {
   final DeviceService deviceService;
   final StorageService storageService;
   final VoidCallback onStartExercise;
@@ -25,7 +26,19 @@ class TodayScreen extends StatelessWidget {
   });
 
   @override
+  State<TodayScreen> createState() => _TodayScreenState();
+}
+
+class _TodayScreenState extends State<TodayScreen> {
+  bool _showAnatomyView = false;
+
+  @override
   Widget build(BuildContext context) {
+    final deviceService = widget.deviceService;
+    final storageService = widget.storageService;
+    final onStartExercise = widget.onStartExercise;
+    final onNavigateDevice = widget.onNavigateDevice;
+
     final c = AppColors.of(context);
     final isStreaming = deviceService.state == DeviceConnectionState.streaming;
     final plan = storageService.activePlan;
@@ -316,13 +329,101 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // 4. 3D Realistic Human Hand View (WebGL Three.js Local Engine)
-          HandView(
-            normalizedFlex: deviceService.latestNormalizedFlex,
-            imu: deviceService.latestPacket?.imu,
-            isConnected: isStreaming,
-            height: 250,
+          // 4. 3D Interactive Hand & Anatomical Skeleton Views
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(2.5),
+                decoration: BoxDecoration(
+                  color: c.isDark ? const Color(0xFF141816) : const Color(0xFFE8ECE9),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: c.cardBorder, width: 0.8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _build3DViewTab('3D HAND', !_showAnatomyView, () => setState(() => _showAnatomyView = false)),
+                    const SizedBox(width: 3),
+                    _build3DViewTab('3D ANATOMY', _showAnatomyView, () => setState(() => _showAnatomyView = true)),
+                  ],
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (ctx) => Scaffold(
+                        backgroundColor: const Color(0xFF000000),
+                        appBar: AppBar(
+                          backgroundColor: const Color(0xFF000000),
+                          elevation: 0,
+                          iconTheme: const IconThemeData(color: Color(0xFFE8EFEF)),
+                          title: const Text(
+                            'HAND / ANATOMY',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2.0,
+                              color: Color(0xFFE8EFEF),
+                            ),
+                          ),
+                        ),
+                        body: AnatomyHandView(
+                          normalizedFlex: widget.deviceService.latestNormalizedFlex,
+                          imu: widget.deviceService.latestPacket?.imu,
+                          isConnected: isStreaming,
+                          isFullScreen: true,
+                          onClose: () => Navigator.pop(ctx),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4.5),
+                  decoration: BoxDecoration(
+                    color: c.isDark ? const Color(0xFF141816) : const Color(0xFFE8ECE9),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: c.cardBorder, width: 0.8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.fullscreen, color: c.textSecondary, size: 14),
+                      const SizedBox(width: 3),
+                      Text(
+                        'FULLSCREEN',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.6,
+                          color: c.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 10),
+
+          // Render selected 3D View (Realistic Hand or 27-Bone Anatomical Skeleton)
+          _showAnatomyView
+              ? AnatomyHandView(
+                  normalizedFlex: widget.deviceService.latestNormalizedFlex,
+                  imu: widget.deviceService.latestPacket?.imu,
+                  isConnected: isStreaming,
+                )
+              : HandView(
+                  normalizedFlex: widget.deviceService.latestNormalizedFlex,
+                  imu: widget.deviceService.latestPacket?.imu,
+                  isConnected: isStreaming,
+                  height: 250,
+                ),
           const SizedBox(height: 24),
 
           // 5. Prescribed Plan Card (Adaptive Dual-Mode Card)
@@ -751,6 +852,28 @@ class TodayScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _build3DViewTab(String label, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFC8F05F) : Colors.transparent,
+          borderRadius: BorderRadius.circular(7),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 9.5,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0.5,
+            color: isSelected ? const Color(0xFF121715) : const Color(0xFF8E958E),
+          ),
+        ),
       ),
     );
   }
