@@ -74,3 +74,4 @@ flowchart TD
 - **Claimed Zone:** `frontend` claimed by `@vaishnavijare60-hash` (`mobile/lib/screens/`, `mobile/lib/widgets/`, `mobile/packages/h10_core/lib/theme/`, `docs/vaishnavi_jare/`).
 - **Violations:** **0 boundary violations.**
 - The event dual-view React application sits cleanly in `frontend/`, independent of the Flutter mobile codebase.
+

@@ -11,7 +11,7 @@ This project uses ONEFORALL zone-based ownership. Multiple developers and their
 AI agents collaborate by respecting these boundaries:
 
 ### Zone: `frontend`
-- **Owner:** @vaishnavijare60-hash
+- **Owner:** @Bot
 - **Paths:** `mobile/lib/screens/`, `mobile/lib/widgets/`, `mobile/packages/h10_core/lib/theme/`, `docs/vaishnavi_jare/`
 - **Description:** Mobile & Web Patient UI screens, widgets, design tokens, and designer docs
 
@@ -52,7 +52,7 @@ If you are editing files outside your zone, STOP and inform the developer.
 
 | Zone | Owner | Paths |
 |------|-------|-------|
-| frontend | @vaishnavijare60-hash | mobile/lib/screens/, mobile/lib/widgets/, mobile/packages/h10_core/lib/theme/, docs/vaishnavi_jare/ |
+| frontend | @Bot | mobile/lib/screens/, mobile/lib/widgets/, mobile/packages/h10_core/lib/theme/, docs/vaishnavi_jare/ |
 
 **DO NOT modify files in zones owned by other developers.**
 

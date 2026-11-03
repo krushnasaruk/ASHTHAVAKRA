@@ -116,3 +116,4 @@ def test_vi_07_aruco_api_available():
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
     assert aruco_dict is not None
     assert aruco_dict.bytesList is not None
+

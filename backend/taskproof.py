@@ -380,3 +380,4 @@ class TaskProofEngine:
             "event_count": len(self.events),
             "events": [e.to_dict() for e in self.events],
         }
+

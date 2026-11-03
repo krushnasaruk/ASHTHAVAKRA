@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
 import '../services/device_service.dart';
 import '../services/storage_service.dart';
+import 's10_taskproof_screen.dart';
+import '../widgets/preflight_dialog.dart';
 
 class TodayScreen extends StatelessWidget {
   final DeviceService deviceService;
@@ -105,7 +107,118 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: H10Tokens.space16),
 
-          // 2. Pending Sync Badge (if any)
+          // 2. RehabBridge NEXUS TaskProof Event Card
+          Card(
+            color: const Color(0xFFF0FDF4), // Emerald 50
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(H10Tokens.radiusCard),
+              side: const BorderSide(color: Color(0xFFBBF7D0), width: 1.5),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(H10Tokens.space16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(H10Tokens.colorPrimary),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'INNOVATION 2K26 EVENT',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.fact_check_outlined, size: 20, color: Color(H10Tokens.colorPrimary)),
+                        tooltip: 'Preflight Diagnostics',
+                        onPressed: () => PreflightDialog.show(context),
+                        constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Object Transfer Verification (TaskProof)',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF14532D),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Live verification with ArUco marker camera tracking + 3-flex & FSR contact glove kinematics.',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF166534)),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => TaskProofScreen(
+                                  deviceService: deviceService,
+                                  storageService: storageService,
+                                  initialJudgeView: false,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.tune, size: 16),
+                          label: const Text('Operator View'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(H10Tokens.colorPrimary),
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(0, 48),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => TaskProofScreen(
+                                  deviceService: deviceService,
+                                  storageService: storageService,
+                                  initialJudgeView: true,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.gavel, size: 16),
+                          label: const Text('Judge View'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(H10Tokens.colorPrimary),
+                            side: const BorderSide(color: Color(H10Tokens.colorPrimary)),
+                            minimumSize: const Size(0, 48),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: H10Tokens.space16),
+
+          // 3. Pending Sync Badge (if any)
           if (pendingCount > 0)
             Container(
               margin: const EdgeInsets.only(bottom: H10Tokens.space16),
@@ -129,7 +242,7 @@ class TodayScreen extends StatelessWidget {
               ),
             ),
 
-          // 3. Today's Plan Card
+          // 4. Today's Plan Card
           Card(
             color: const Color(H10Tokens.colorCard),
             shape: RoundedRectangleBorder(
@@ -192,7 +305,7 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: H10Tokens.space16),
 
-          // 4. Weekly Adherence Card
+          // 5. Weekly Adherence Card
           Card(
             color: const Color(H10Tokens.colorCard),
             shape: RoundedRectangleBorder(
@@ -239,7 +352,7 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: H10Tokens.space16),
 
-          // 5. Last Session Summary Card
+          // 6. Last Session Summary Card
           if (lastSession != null)
             Card(
               color: const Color(H10Tokens.colorCard),

@@ -46,3 +46,4 @@ class StillnessDetector:
                 return False
 
         return True
+

@@ -245,3 +245,4 @@ def test_tp_20_operator_abort_yields_aborted():
     assert tp.current_state == TaskState.ABORTED
     assert tp.verdict == TaskVerdict.ABORTED
     assert "OPERATOR_ABORT" in tp.reason_codes
+

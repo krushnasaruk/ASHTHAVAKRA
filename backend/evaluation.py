@@ -111,3 +111,4 @@ def compute_evaluation_metrics(attempts: List[Dict[str, Any]], ground_truths: Di
         "recall_wilson_ci": recall_ci,
         "uncertain_rate": round(uncertain_rate, 4),
     }
+

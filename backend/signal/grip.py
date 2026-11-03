@@ -66,3 +66,4 @@ class GripChangeDetector:
             self._candidate_channels = []
 
         return False, []
+

@@ -73,3 +73,4 @@ class IMUProcessor:
             "roll_deg": round(self.roll_deg, 2),
             "motion_energy_rms": round(motion_rms, 2),
         }
+

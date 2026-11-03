@@ -109,3 +109,4 @@ class CalibrationCapture:
         if std_val > self.max_std:
             return False, median_val, std_val, f"STD_TOO_HIGH_{std_val:.1f}_GT_{self.max_std:.1f}"
         return True, median_val, std_val, "OK"
+

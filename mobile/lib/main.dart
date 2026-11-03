@@ -11,6 +11,8 @@ import 'screens/s7_progress_screen.dart';
 import 'screens/s8_history_screen.dart';
 import 'screens/s9_settings_screen.dart';
 import 'screens/minigame_screen.dart';
+import 'screens/s10_taskproof_screen.dart';
+import 'widgets/preflight_dialog.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -136,6 +138,19 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     );
   }
 
+  void _openTaskProof({bool judgeView = false}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TaskProofScreen(
+          deviceService: _deviceService,
+          storageService: _storageService,
+          initialJudgeView: judgeView,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
@@ -148,6 +163,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       ExercisesScreen(
         storageService: _storageService,
         onSelectExercise: _startExercise,
+        onLaunchTaskProof: () => _openTaskProof(),
       ),
       ProgressScreen(
         storageService: _storageService,
@@ -230,6 +246,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 ),
               );
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.fact_check_outlined),
+            tooltip: 'Preflight Diagnostics',
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+            onPressed: () => PreflightDialog.show(context),
           ),
           IconButton(
             icon: const Icon(Icons.history),

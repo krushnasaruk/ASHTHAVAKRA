@@ -28,6 +28,7 @@ void main() {
 
     // Verify Exercises tab content
     expect(find.text('Fist Clench & Release'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Single-Finger Tapping'), 200);
     expect(find.text('Single-Finger Tapping'), findsOneWidget);
 
     // Switch to Progress tab

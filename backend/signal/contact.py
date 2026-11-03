@@ -93,3 +93,4 @@ class FSRContactDetector:
                 self._low_start_ms = None
 
         return self.contact_state, self.is_faulted, event_emitted
+

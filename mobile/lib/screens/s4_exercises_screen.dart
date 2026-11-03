@@ -5,11 +5,13 @@ import '../services/storage_service.dart';
 class ExercisesScreen extends StatelessWidget {
   final StorageService storageService;
   final Function(ExerciseCode) onSelectExercise;
+  final VoidCallback? onLaunchTaskProof;
 
   const ExercisesScreen({
     super.key,
     required this.storageService,
     required this.onSelectExercise,
+    this.onLaunchTaskProof,
   });
 
   @override
@@ -79,18 +81,83 @@ class ExercisesScreen extends StatelessWidget {
       },
     ];
 
-    return ListView.separated(
+    return ListView(
       padding: const EdgeInsets.all(H10Tokens.space16),
-      itemCount: exercises.length,
-      separatorBuilder: (_, __) => const SizedBox(height: H10Tokens.space12),
-      itemBuilder: (context, index) {
-        final ex = exercises[index];
-        final code = ex['code'] as ExerciseCode;
-        final title = ex['title'] as String;
-        final desc = ex['desc'] as String;
-        final channels = ex['channels'] as String;
-        final target = ex['defaultTarget'] as String;
-        final instructions = ex['instructions'] as List<String>;
+      children: [
+        if (onLaunchTaskProof != null) ...[
+          Card(
+            color: const Color(0xFFF0FDF4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(H10Tokens.radiusCard),
+              side: const BorderSide(color: Color(0xFF86EFAC), width: 1.5),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(H10Tokens.space16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(H10Tokens.colorPrimary),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'EVENT TASKPROOF',
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                      const Spacer(),
+                      const Chip(
+                        label: Text('Camera + Glove', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Object Transfer Verification',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF14532D)),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Pick up object in Zone A, transfer across the boundary, and place steadily into Zone B. Real-time deterministic verdict verification.',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF166534)),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(H10Tokens.colorPrimary),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: onLaunchTaskProof,
+                      icon: const Icon(Icons.verified_outlined, size: 18),
+                      label: const Text('Open TaskProof Verification'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: H10Tokens.space16),
+          const Text(
+            'H10 EXERCISE LIBRARY',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
+          ),
+          const SizedBox(height: H10Tokens.space12),
+        ],
+        ...exercises.map((ex) {
+          final code = ex['code'] as ExerciseCode;
+          final title = ex['title'] as String;
+          final desc = ex['desc'] as String;
+          final channels = ex['channels'] as String;
+          final target = ex['defaultTarget'] as String;
+          final instructions = ex['instructions'] as List<String>;
 
         return Card(
           color: const Color(H10Tokens.colorCard),
@@ -173,7 +240,8 @@ class ExercisesScreen extends StatelessWidget {
             ),
           ),
         );
-      },
-    );
-  }
+      }),
+    ],
+  );
+}
 }

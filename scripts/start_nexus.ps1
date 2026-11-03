@@ -24,3 +24,4 @@ for c in res['checks']:
 Write-Host "[3/3] Starting Local Backend Server on http://127.0.0.1:8000..." -ForegroundColor Green
 Write-Host "Press Ctrl+C to terminate." -ForegroundColor DarkGray
 uvicorn backend.main:app --host 127.0.0.1 --port 8000 --log-level info
+

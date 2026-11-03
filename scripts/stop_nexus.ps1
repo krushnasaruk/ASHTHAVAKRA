@@ -9,3 +9,4 @@ if ($proc) {
 } else {
     Write-Host "No active NEXUS server processes found." -ForegroundColor DarkGray
 }
+

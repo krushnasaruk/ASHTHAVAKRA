@@ -266,3 +266,4 @@ class VisionEngine:
         sample["frame_age_ms"] = round(age_ms, 1)
         sample["camera_connected"] = bool(self.cap and self.cap.isOpened())
         return sample
+

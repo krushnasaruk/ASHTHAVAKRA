@@ -55,3 +55,4 @@ class CompoundFilter:
     def reset(self):
         self.median_filter.reset()
         self.ema_filter.reset()
+
