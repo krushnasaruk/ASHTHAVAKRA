@@ -57,3 +57,4 @@ If any sensor wire disconnects mid-exercise:
    *Answer:* The firmware detects open-circuit voltage out of range, sets `adc_ok` or `fsr_ok` to false, and the Python serial ingest terminates the trial with a hardware error, verified in `tests/test_serial_ingest.py::test_si_10_range_bounds`.
 3. **What is the hardware cost to build this glove?**  
    *Answer:* The active hardware components total 6,180 Indian rupees, backed by our itemized bill of materials in `docs/BOM.csv`.
+

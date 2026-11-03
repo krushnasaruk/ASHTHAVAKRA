@@ -52,3 +52,4 @@ You conducted 10 consecutive bench transfer attempts documented in `docs/VALIDAT
    *Answer:* No, our current prototype is built on a Medium-Large cotton glove tested on healthy volunteers; clinical fit testing across diverse hand sizes is our next step, outlined in `docs/gautam/DATA_COLLECTION_PROTOCOL.md`.
 3. **How many physical transfer attempts have been verified with this hardware setup?**  
    *Answer:* We have recorded ten consecutive successful physical trials in our database with zero mechanical failures, documented in `docs/VALIDATION_SHEET.csv` and confirmed by test `tests/test_e2e.py::test_e2e_10`.
+

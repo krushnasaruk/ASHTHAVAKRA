@@ -61,3 +61,4 @@ If the camera marker is occluded for $> 500\text{ ms}$, or if sensor telemetry d
    *Answer:* SQLite runs in write-ahead log mode with WAL checkpoints in `backend/database.py`, verified in `tests/test_e2e.py::test_e2e_10` across ten rapid consecutive trials.
 3. **Can your software diagnose motor recovery or predict clinical outcomes?**  
    *Answer:* No, our system only verifies completion of a defined mechanical transfer task; clinical diagnosis is explicitly prohibited in `backend/schemas.py` and requires formal clinical trials.
+

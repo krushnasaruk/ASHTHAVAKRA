@@ -130,3 +130,4 @@ To maintain scientific integrity during judging:
 - **NO Clinical Diagnoses or Recovery Predictions:** The system does not diagnose motor pathologies or predict functional recovery.
 - **NO Uncalibrated Force or Angles:** We report raw and normalized sensor units, never grip force in newtons or joint flexion in degrees without external load-cell calibration.
 - **Live Failure Fallback:** If hardware fails live, say: *"The live glove is not responding, so I will show a recorded real session, marked REPLAY on screen."*
+
