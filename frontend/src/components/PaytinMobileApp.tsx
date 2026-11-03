@@ -1051,17 +1051,22 @@ export default function PaytinMobileApp({
   /* 7. IPHONE BEZEL & DYNAMIC ISLAND CONTAINER                                */
   /* ========================================================================= */
   const renderPhoneFrame = (content: React.ReactNode, title: string) => (
-    <div className="flex flex-col items-center gap-2">
-      <div className="w-full max-w-[380px] sm:max-w-[420px] aspect-[9/19] max-h-[820px] bg-[#121715] rounded-[48px] p-3 shadow-2xl border-[6px] border-[#252C28] relative flex flex-col overflow-hidden">
+    <div className="flex flex-col items-center gap-3">
+      {/* Precision iPhone 15 Pro Hardware Frame */}
+      <div className="w-[340px] sm:w-[355px] h-[730px] shrink-0 bg-[#0E1311] rounded-[52px] p-2.5 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.25)] border-[5.5px] border-[#242C28] relative flex flex-col overflow-hidden transition-all duration-300 hover:shadow-[0_35px_80px_-12px_rgba(0,0,0,0.35)]">
         {/* Dynamic Island Pill */}
-        <div className="absolute top-4 inset-x-0 mx-auto w-24 h-5 bg-black rounded-full z-40 flex items-center justify-center">
+        <div className="absolute top-3.5 inset-x-0 mx-auto w-24 h-5 bg-black rounded-full z-40 flex items-center justify-between px-2.5 shadow-sm">
           <span className="w-2.5 h-2.5 rounded-full bg-[#18201D] border border-white/20" />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80" />
         </div>
 
+        {/* Gloss Edge Highlight */}
+        <div className="absolute inset-0 rounded-[46px] pointer-events-none border border-white/10" />
+
         {/* Phone Content Screen */}
-        <div className="flex-1 rounded-[38px] overflow-hidden flex flex-col relative bg-[#F4F6F0]">
+        <div className="flex-1 rounded-[42px] overflow-hidden flex flex-col relative bg-[#F4F6F0]">
           {/* Mandatory Non-Medical Disclaimer Header Pill */}
-          <div className="bg-[#FEF3C7] border-b border-[#FDE68A] px-3 py-1 text-[9px] text-[#92400E] font-bold text-center z-30 shrink-0">
+          <div className="bg-[#FEF3C7] border-b border-[#FDE68A] px-3 py-1 text-[8.5px] text-[#92400E] font-bold text-center z-30 shrink-0">
             PROTOTYPE MONITORING TOOL — NOT A MEDICAL DEVICE
           </div>
 
@@ -1071,48 +1076,46 @@ export default function PaytinMobileApp({
         </div>
       </div>
 
-      <span className="text-[11px] font-bold text-slate-400 font-mono tracking-wider">
+      <span className="text-[11px] font-bold text-[#646E68] font-mono tracking-wider">
         {title}
       </span>
     </div>
   );
 
   return (
-    <div className="space-y-6">
-      {/* View Options Toggle Bar */}
-      <div className="flex flex-wrap items-center justify-between bg-slate-900 border border-slate-800 p-3 rounded-2xl gap-3">
-        <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded-full bg-[#C8F05F] text-[#121715] font-black text-xs font-mono">
-            PAYTIN-INSPIRED
-          </span>
-          <span className="text-xs font-bold text-slate-200">
-            ASHTHAVAKRA Neo-Rehabilitation UI
+    <div className="space-y-6 w-full max-w-7xl mx-auto">
+      {/* Elegant Minimal Toggle Bar matching light portfolio presentation */}
+      <div className="flex flex-wrap items-center justify-between bg-white/90 backdrop-blur-md border border-black/[0.08] p-2.5 rounded-full shadow-sm gap-3 max-w-xl mx-auto">
+        <div className="flex items-center gap-2 pl-3">
+          <span className="w-2 h-2 rounded-full bg-[#C8F05F]" />
+          <span className="text-xs font-black text-[#121715] tracking-tight">
+            Paytin Neo-Rehabilitation UI
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => setShowTriptych(!showTriptych)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-              showTriptych ? "bg-[#C8F05F] text-[#121715]" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+            className={`px-3 py-1.5 rounded-full text-xs font-black transition flex items-center gap-1.5 ${
+              showTriptych ? "bg-[#C8F05F] text-[#121715] shadow-sm" : "bg-black/5 text-[#646E68] hover:text-[#121715]"
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>{showTriptych ? "Triptych 3-Phone Showcase" : "Single Phone Interactive"}</span>
+            <span>{showTriptych ? "Triptych 3-Phone" : "Single Interactive"}</span>
           </button>
 
           <button
             onClick={() => setActiveScreen(activeScreen === "onboarding" ? "home" : "onboarding")}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition"
+            className="px-3 py-1.5 rounded-full text-xs font-bold bg-black/5 hover:bg-black/10 text-[#121715] transition"
           >
-            {activeScreen === "onboarding" ? "Back to Dashboard" : "View Onboarding Splash"}
+            {activeScreen === "onboarding" ? "Dashboard" : "Splash Screen"}
           </button>
         </div>
       </div>
 
       {/* Main Display: Triptych 3-Screen View OR Single Focused Interactive View */}
       {showTriptych ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center py-2">
+        <div className="flex flex-wrap items-center justify-center gap-6 xl:gap-10 py-2">
           {/* Phone 1: Onboarding Splash Screen */}
           {renderPhoneFrame(renderOnboardingScreen(), "01 • ONBOARDING SPLASH")}
 
@@ -1141,3 +1144,4 @@ export default function PaytinMobileApp({
     </div>
   );
 }
+

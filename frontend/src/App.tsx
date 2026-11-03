@@ -74,7 +74,7 @@ interface TelemetryPayload {
 }
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<"scifi_hud" | "operator" | "judge" | "mobile_preview">("scifi_hud");
+  const [viewMode, setViewMode] = useState<"scifi_hud" | "operator" | "judge" | "mobile_preview">("mobile_preview");
   const [dataSource, setDataSource] = useState<"live" | "replay" | "simulated">("live");
 
   // Mobile App Preview Navigation State
@@ -287,6 +287,80 @@ export default function App() {
     );
   }
 
+  if (viewMode === "mobile_preview") {
+    return (
+      <div className="min-h-screen bg-[#ECEFE6] text-[#161C19] flex flex-col font-sans select-none relative overflow-x-hidden">
+        {/* Subtle grid pattern background */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-40"
+          style={{
+            backgroundImage: `radial-gradient(#CBD4C0 1.2px, transparent 1.2px)`,
+            backgroundSize: "28px 28px",
+          }}
+        />
+
+        {/* Large watermark outline typography in background like reference image */}
+        <div className="absolute top-24 right-8 text-[120px] font-black text-black/[0.03] tracking-widest pointer-events-none select-none font-sans uppercase">
+          SECURE
+        </div>
+        <div className="absolute bottom-12 left-8 text-[140px] font-black text-black/[0.03] tracking-widest pointer-events-none select-none font-sans uppercase">
+          TRUSTED
+        </div>
+
+        {/* Top Header matching reference image: ✦ ASHTHAVAKRA | Rehabilitation Mobile App | www.ashthavakra.rehab */}
+        <header className="relative z-20 px-8 py-4 flex items-center justify-between border-b border-black/[0.06] backdrop-blur-sm">
+          {/* Left: Brand logo with star/flower icon */}
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 rounded-full bg-[#121715] text-[#C8F05F] flex items-center justify-center font-black text-xs shadow-sm">
+              ✦
+            </div>
+            <span className="font-black text-base tracking-tight text-[#121715]">
+              ASHTHAVAKRA
+            </span>
+          </div>
+
+          {/* Center: "Rehabilitation Mobile App" title */}
+          <div className="hidden md:block text-xs font-semibold tracking-wider text-[#646E68] uppercase">
+            Hand Rehabilitation Mobile App
+          </div>
+
+          {/* Right: URL & View switcher controls */}
+          <div className="flex items-center space-x-3">
+            <span className="hidden sm:inline text-xs font-mono text-[#7A857E]">
+              www.ashthavakra.rehab
+            </span>
+
+            <div className="flex items-center space-x-1.5 pl-2 border-l border-black/10">
+              <button
+                onClick={() => setViewMode("scifi_hud")}
+                className="text-[11px] font-bold px-3 py-1 rounded-full bg-black/5 hover:bg-black/10 text-[#121715] transition"
+              >
+                Sci-Fi HUD
+              </button>
+              <button
+                onClick={() => setViewMode("judge")}
+                className="text-[11px] font-bold px-3 py-1 rounded-full bg-black/5 hover:bg-black/10 text-[#121715] transition"
+              >
+                Judge View
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Body: The Paytin Mobile Experience */}
+        <main className="relative z-10 flex-1 p-4 md:p-8 flex items-center justify-center">
+          <PaytinMobileApp
+            telemetry={telemetry}
+            isConnected={connected}
+            onTriggerTaskProof={handleStartAttempt}
+            onLabelGroundTruth={handleLabelGroundTruth}
+            onAbortAttempt={handleAbortAttempt}
+          />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans">
       {/* Top Header & Mode Toggle */}
@@ -335,21 +409,15 @@ export default function App() {
 
           <button
             onClick={() => setViewMode("mobile_preview")}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-              viewMode === "mobile_preview"
-                ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/40"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"
-            }`}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-[#C8F05F] text-[#121715] hover:bg-[#b8e64c] shadow-sm"
           >
             <Smartphone className="w-4 h-4" />
-            <span>Patient Mobile UI Preview</span>
+            <span>Mobile UI Showcase</span>
           </button>
 
           <button
             onClick={() => setViewMode(viewMode === "operator" ? "judge" : "operator")}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-slate-700 ${
-              viewMode !== "mobile_preview" ? "bg-slate-800 text-sky-400 hover:bg-slate-700" : "bg-slate-900 text-slate-400 hover:text-slate-200"
-            }`}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-slate-700 bg-slate-800 text-sky-400 hover:bg-slate-700"
           >
             <Tv className="w-4 h-4" />
             <span>{viewMode === "judge" ? "Operator View" : "Judge View"}</span>
@@ -359,23 +427,8 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 p-6 overflow-y-auto">
-        {/* ========================================================================= */}
-        {/* 1. PATIENT MOBILE UI PREVIEW (440px Phone Frame for Designer Reference)   */}
-        {/* ========================================================================= */}
-        {viewMode === "mobile_preview" ? (
-          <PaytinMobileApp
-            telemetry={telemetry}
-            isConnected={connected}
-            onTriggerTaskProof={handleStartAttempt}
-            onLabelGroundTruth={handleLabelGroundTruth}
-            onAbortAttempt={handleAbortAttempt}
-          />
-        ) : (
-          /* ========================================================================= */
-          /* 2. OPERATOR & JUDGE VIEWS (NEXUS Hackathon Event TaskProof Engine)        */
-          /* ========================================================================= */
-          <div>
-            {viewMode === "judge" ? (
+        <div>
+          {viewMode === "judge" ? (
               <div className="max-w-5xl mx-auto space-y-6">
                 {/* Giant Verdict Banner */}
                 <div
@@ -530,7 +583,6 @@ export default function App() {
               </div>
             )}
           </div>
-        )}
       </main>
 
       {/* Floating Hotkey Action Toast */}
