@@ -20,7 +20,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _remindersEnabled = true;
-  bool _tremorBandEnabled = false; // Phase 2 off by default
+  bool _tremorBandEnabled = false;
   bool _colorBlindSafe = true;
 
   @override
@@ -32,27 +32,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: const Color(0xFFF4F6F0),
       appBar: AppBar(
         title: const Text(
-          'Settings & Configuration',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+          'Settings',
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
         ),
         backgroundColor: const Color(0xFFF4F6F0),
         foregroundColor: const Color(0xFF161C19),
         elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         children: [
-          // 1. Therapist Prescribed Plan (Obsidian Hero Card)
+          // 1. Therapist Prescribed Plan (Hero Obsidian Card)
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: const Color(0xFF121715),
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(26),
               border: Border.all(color: const Color(0xFF232D28), width: 1.2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.18),
-                  blurRadius: 16,
+                  blurRadius: 18,
                   offset: const Offset(0, 6),
                 ),
               ],
@@ -67,72 +67,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: const Color(0xFFC8F05F),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
-                        'PRESCRIBED PLAN (READ-ONLY)',
+                        'PRESCRIBED PLAN',
                         style: TextStyle(
-                          fontSize: 9.5,
+                          fontSize: 9,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF121715),
                         ),
                       ),
                     ),
-                    const Icon(Icons.lock_outline, size: 16, color: Color(0xFFC8F05F)),
+                    Text(
+                      'v${plan.version}',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFC8F05F)),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'Set by: ${plan.setBy} (Plan v${plan.version})',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: Colors.white),
-                ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 _darkRow('Target Repetitions', '${plan.targetReps} reps'),
                 _darkRow('Target ROM Band', '${plan.targetRomMin.toStringAsFixed(0)}–${plan.targetRomMax.toStringAsFixed(0)}%'),
-                _darkRow('Hold Duration', '${plan.holdS} seconds'),
-                _darkRow('Prescribed Cadence', '${plan.sessionsPerWeek} sessions / week'),
-                _darkRow('Fatigue Drop Threshold', '${plan.fatigueDropThreshold.toStringAsFixed(0)}%'),
-                const SizedBox(height: 10),
-                const Text(
-                  'Note: Parameters can only be modified by your physiotherapist in the clinician dashboard.',
-                  style: TextStyle(fontSize: 10.5, fontStyle: FontStyle.italic, color: Color(0xFFA0AAB0)),
-                ),
+                _darkRow('Hold Duration', '${plan.holdS}s'),
+                _darkRow('Weekly Cadence', '${plan.sessionsPerWeek} sessions'),
+                _darkRow('Fatigue Drop', '${plan.fatigueDropThreshold.toStringAsFixed(0)}%'),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          // 2. Reminders & Accessibility (White Card with Neon Lime Switches)
+          // 2. Preferences (White Card - Minimal & Spacious)
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 6),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(26),
               border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
             ),
             child: Column(
               children: [
                 SwitchListTile(
-                  title: const Text('Daily Rehabilitation Reminders', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
-                  subtitle: const Text('Local reminder at 10:00 AM & 5:00 PM', style: TextStyle(fontSize: 11, color: Color(0xFF7A837E))),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
+                  title: const Text('Daily Rehabilitation Reminders', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   value: _remindersEnabled,
                   activeColor: const Color(0xFF121715),
                   activeTrackColor: const Color(0xFFC8F05F),
                   onChanged: (v) => setState(() => _remindersEnabled = v),
                 ),
-                const Divider(height: 1, color: Color(0xFFF0F4EC)),
+                const Divider(height: 1, indent: 18, endIndent: 18, color: Color(0xFFF0F4EC)),
                 SwitchListTile(
-                  title: const Text('Okabe-Ito Color-Blind Palette', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
-                  subtitle: const Text('High-contrast distinguishable finger indicators', style: TextStyle(fontSize: 11, color: Color(0xFF7A837E))),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
+                  title: const Text('Okabe-Ito Color-Blind Palette', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   value: _colorBlindSafe,
                   activeColor: const Color(0xFF121715),
                   activeTrackColor: const Color(0xFFC8F05F),
                   onChanged: (v) => setState(() => _colorBlindSafe = v),
                 ),
-                const Divider(height: 1, color: Color(0xFFF0F4EC)),
+                const Divider(height: 1, indent: 18, endIndent: 18, color: Color(0xFFF0F4EC)),
                 SwitchListTile(
-                  title: const Text('Experimental Tremor Band (Phase 2)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
-                  subtitle: const Text('3–12 Hz bandpass oscillation energy (research only)', style: TextStyle(fontSize: 11, color: Color(0xFF7A837E))),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
+                  title: const Text('Tremor Band Filtering', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   value: _tremorBandEnabled,
                   activeColor: const Color(0xFF121715),
                   activeTrackColor: const Color(0xFFC8F05F),
@@ -141,18 +134,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          // 3. Diagnostics & Exports
+          // 3. Diagnostics & Data
           Container(
+            padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(26),
               border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
             ),
             child: Column(
               children: [
                 ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
                   leading: Container(
                     width: 38,
                     height: 38,
@@ -160,10 +155,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       color: const Color(0xFF121715),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.file_copy, color: Color(0xFFC8F05F), size: 18),
+                    child: const Icon(Icons.file_copy_outlined, color: Color(0xFFC8F05F), size: 18),
                   ),
-                  title: const Text('Copy Diagnostics Bundle', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
-                  subtitle: const Text('Version, protocol, and decoder counters (no PII)', style: TextStyle(fontSize: 11, color: Color(0xFF7A837E))),
+                  title: const Text('Copy Diagnostics Bundle', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   onTap: () {
                     final bundle = {
                       'app_version': '1.0.0',
@@ -176,11 +170,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       'timestamp': DateTime.now().toIso8601String(),
                     };
                     Clipboard.setData(ClipboardData(text: bundle.toString()));
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Diagnostics bundle copied to clipboard!')));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Diagnostics copied!')));
                   },
                 ),
-                const Divider(height: 1, color: Color(0xFFF0F4EC)),
+                const Divider(height: 1, indent: 18, endIndent: 18, color: Color(0xFFF0F4EC)),
                 ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
                   leading: Container(
                     width: 38,
                     height: 38,
@@ -188,10 +183,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       color: const Color(0xFFFEE2E2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.delete_forever, color: Color(0xFFDC2626), size: 18),
+                    child: const Icon(Icons.delete_outline, color: Color(0xFFDC2626), size: 18),
                   ),
-                  title: const Text('Clear Local App Storage', style: TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.w600, fontSize: 13.5)),
-                  subtitle: const Text('Deletes all local session recordings and calibration', style: TextStyle(fontSize: 11, color: Color(0xFF7A837E))),
+                  title: const Text('Clear Local App Storage', style: TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.w600, fontSize: 14)),
                   onTap: () async {
                     final confirm = await showDialog<bool>(
                       context: context,
@@ -223,7 +217,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
         ],
       ),
     );
@@ -231,12 +225,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _darkRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 4.5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12.5, color: Color(0xFFA0AAB0))),
-          Text(value, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(label, style: const TextStyle(fontSize: 13, color: Color(0xFFA0AAB0))),
+          Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)),
         ],
       ),
     );

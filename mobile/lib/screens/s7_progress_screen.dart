@@ -34,7 +34,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -67,7 +67,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
           // Horizontal Segmented Pills (Paytin Style)
           SingleChildScrollView(
@@ -84,7 +84,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 22),
 
           // 2. Paytin Dual Split Cards Row (Lime ROM Gain Card + Obsidian Kinematics Spider Card)
           Row(
@@ -96,7 +96,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: const Color(0xFFC8F05F),
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFFC8F05F).withOpacity(0.35),
@@ -146,22 +146,22 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       const Text(
                         '+24%',
                         style: TextStyle(
-                          fontSize: 32,
+                          fontSize: 34,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF121715),
                           letterSpacing: -1,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       const Text(
-                        'Prescribed ROM increased vs baseline across 3 active channels.',
+                        'vs baseline target',
                         style: TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 11,
                           color: Color(0xFF223028),
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
 
                       // Goal Dots (Paytin 10-dot sequence)
                       Row(
@@ -213,10 +213,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
               // Right Card: Obsidian Black #121715 Kinematics Radar Card
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: const Color(0xFF121715),
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: const Color(0xFF232D28), width: 1.2),
                     boxShadow: [
                       BoxShadow(
@@ -250,15 +250,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Finger Flex Distribution',
-                        style: TextStyle(
-                          fontSize: 9.5,
-                          color: Color(0xFFA0AAB0),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
 
                       // Radar / Spider Chart
                       SizedBox(
@@ -268,7 +260,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           painter: _KinematicsRadarPainter(),
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 10),
 
                       // Channel Legend Row
                       Row(
@@ -285,15 +277,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 24),
 
           // 3. Paytin Overview & Stacked Adherence Bar Chart
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(26),
               border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
               boxShadow: [
                 BoxShadow(
@@ -313,7 +305,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       child: Text(
                         'Overview & Adherence',
                         style: TextStyle(
-                          fontSize: 13.5,
+                          fontSize: 14.5,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF161C19),
                         ),
@@ -338,7 +330,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 14),
 
                 // Main Metric Row
                 Row(
@@ -349,13 +341,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       children: [
                         const Text(
                           'Session Adherence',
-                          style: TextStyle(fontSize: 10.5, color: Color(0xFF7A837E)),
+                          style: TextStyle(fontSize: 11, color: Color(0xFF7A837E)),
                         ),
                         const SizedBox(height: 2),
                         const Text(
                           '94% Completed',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 22,
                             fontWeight: FontWeight.w900,
                             color: Color(0xFF161C19),
                           ),
@@ -368,7 +360,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         children: [
                           const Text(
                             'Baseline Mean ROM',
-                            style: TextStyle(fontSize: 10.5, color: Color(0xFF7A837E)),
+                            style: TextStyle(fontSize: 11, color: Color(0xFF7A837E)),
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -383,7 +375,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                   ],
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 22),
 
                 // Paytin Dual-Tone Stacked Bar Chart (Mon - Sun with Tooltip)
                 SizedBox(
@@ -405,16 +397,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 24),
 
           // 4. Session History List (ROM over time)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Recent Session Logs',
+                'Recent Sessions',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 14.5,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF161C19),
                 ),
@@ -425,7 +417,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
           if (filteredSessions.isEmpty)
             Container(
@@ -437,23 +429,23 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ),
             )
           else
-            ...filteredSessions.take(5).map((s) {
+            ...filteredSessions.take(4).map((s) {
               return Container(
-                margin: const EdgeInsets.only(bottom: 8),
+                margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: const Color(0xFFE2E7DE)),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: 38,
+                      height: 38,
                       decoration: BoxDecoration(
                         color: const Color(0xFF121715),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.show_chart, color: Color(0xFFC8F05F), size: 18),
                     ),
@@ -464,7 +456,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         children: [
                           Text(
                             s.exerciseCode.toUpperCase(),
-                            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                           ),
                           Text(
                             '${s.startedAt.month}/${s.startedAt.day} • ${s.startedAt.hour.toString().padLeft(2, '0')}:${s.startedAt.minute.toString().padLeft(2, '0')}',
@@ -477,34 +469,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'Mean: ${s.meanRom.toStringAsFixed(1)}%',
-                          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFF121715)),
+                          '${s.meanRom.toStringAsFixed(1)}%',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF121715)),
                         ),
                         Text(
-                          'Max: ${s.maxRom.toStringAsFixed(1)}%',
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF7A837E)),
+                          'Max ${s.maxRom.toStringAsFixed(0)}%',
+                          style: const TextStyle(fontSize: 10.5, color: Color(0xFF7A837E)),
                         ),
                       ],
                     ),
-                    if (s.dataSource == 'simulated') ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8F0FE),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Text(
-                          'SIM',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF1967D2)),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               );
             }),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
         ],
       ),
     );
@@ -609,7 +587,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 }
 
-/// Custom Painter for Kinematics Radar / Spider Chart in Obsidian Card
 class _KinematicsRadarPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -621,7 +598,6 @@ class _KinematicsRadarPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
-    // Concentric web polygons
     for (int ring = 1; ring <= 3; ring++) {
       final r = radius * (ring / 3.0);
       final path = Path();
@@ -639,7 +615,6 @@ class _KinematicsRadarPainter extends CustomPainter {
       canvas.drawPath(path, gridPaint);
     }
 
-    // Kinematic Values: Thumb 0.82, Index 0.78, Middle 0.74, Ring 0.4, Pinky 0.35
     final values = [0.82, 0.78, 0.74, 0.4, 0.35];
     final shapePath = Path();
     for (int i = 0; i < 5; i++) {
