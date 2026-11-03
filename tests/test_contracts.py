@@ -90,3 +90,4 @@ def test_config_taskproof_yaml_structure():
             assert "unit" in details, f"Param {param} missing 'unit'"
             assert "status" in details, f"Param {param} missing 'status'"
             assert details["status"] in ["provisional", "measured"]
+

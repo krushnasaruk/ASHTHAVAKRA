@@ -77,3 +77,4 @@ def test_fw_07_boot_line_format():
     assert boot_data.get("boot") is True
     assert boot_data.get("fw") == "1.0.0"
     assert boot_data.get("profile") == "demo3"
+

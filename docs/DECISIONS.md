@@ -46,3 +46,23 @@ Key architectural decisions, trade-offs, and design rationales made during the d
 - **Decision:** Compute a deterministic SHA-256 hash of session telemetry. If an identical session ID is submitted with an identical hash, return `200 OK` (idempotent success). If submitted with differing telemetry, return `409 Conflict`.
 - **Consequences:** Guarantees zero duplicate database rows while preventing silent data overwrites.
 
+---
+
+## ADR 06: Unified Hackathon Decisions (D-01 through D-11)
+- **Status:** Accepted & Implemented in Build Spec v3.
+
+| ID | Topic | Decision | Reason |
+|---|---|---|---|
+| **D-01** | Hardware profile | Two profiles: `demo3` (thumb, index, middle flex + FSR + IMU) and `full5` (all five flex + FSR + IMU). The software supports any subset of five flex channels. | Keeps H10 five-finger requirement while matching event budget. |
+| **D-02** | Event transport | USB serial, newline-delimited JSON at 921600 baud. | Reliable, works completely offline, zero Wi-Fi dependency at the venue. |
+| **D-03** | Later transport | Wi-Fi WebSocket adapter with the same logical packet (H10 §5.3 binary packet). | Preserves long-term H10 requirement. |
+| **D-04** | Processing engine | Python for event; Dart port in T3 verified by parity fixture. | One authoritative source of truth for the event engine. |
+| **D-05** | Frontend | React + Vite + TypeScript for event; Flutter apps consume the same HTTP and WebSocket API. | Fastest reliable demo UI with dual operator/judge view. |
+| **D-06** | Backend | FastAPI, SQLite with WAL mode, single local process. | One simple process to start during live demo. |
+| **D-07** | Object tracking | ArUco fiducial markers (OpenCV `DICT_4X4_50`). No ML training for object recognition. | Deterministic, testable, robust under event lighting. |
+| **D-08** | Verdict set | `VERIFIED`, `FAILED`, `UNCERTAIN`, `ABORTED`, `NOT_STARTED`. | Adds `ABORTED` for operator stops and `UNCERTAIN` for missing/stale telemetry. |
+| **D-09** | Repetition exercises | H10 repetition engine kept; used in T2 for exercise modes. The event task uses TaskProof. Both share the same signal layer. | Keeps both feature sets seamlessly integrated. |
+| **D-10** | Sample rate | Flex and FSR at 25 readings/s per channel from one ADS1115 scan loop; IMU at 25 Hz; stream packet at 25 Hz. | ADS1115 multiplexing limits per-channel rate reliably. |
+| **D-11** | Clinical claims | Output is task-level only. No health score in the event build. H10 metrics appear with explicit non-medical disclaimers. | Matches honest-claims mandate. |
+
+

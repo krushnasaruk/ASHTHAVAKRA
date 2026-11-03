@@ -60,3 +60,4 @@ inline void emitBootLine(Print& output, const char* fw, const char* profile) {
 }
 
 #endif // NEXUS_PROTOCOL_V1_H
+

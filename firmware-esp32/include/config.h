@@ -38,3 +38,4 @@
 #define GYRO_CONFIG_RANGE  0x01 // ±500 deg/s
 
 #endif // NEXUS_CONFIG_H
+

@@ -28,6 +28,7 @@ class IngestStats:
         self.seq_gaps: int = 0
         self.seq_duplicates: int = 0
         self.reboots_detected: int = 0
+        self.range_errors: int = 0
         self.last_seq: Optional[int] = None
         self.last_t_ms: Optional[int] = None
         self.last_arrival_ns: Optional[int] = None
@@ -52,6 +53,7 @@ class IngestStats:
             "seq_gaps": self.seq_gaps,
             "seq_duplicates": self.seq_duplicates,
             "reboots_detected": self.reboots_detected,
+            "range_errors": self.range_errors,
             "estimated_rate_hz": round(self.estimated_rate_hz, 2),
             "last_seq": self.last_seq,
         }
@@ -101,7 +103,6 @@ class SerialIngest:
         """Send ping command to a candidate port and wait for ACK."""
         try:
             with serial.Serial(port, self.baud_rate, timeout=timeout) as ser:
-                # Flush initial garbage
                 ser.reset_input_buffer()
                 ping_id = str(uuid.uuid4())[:8]
                 cmd = json.dumps({"cmd": "ping", "id": ping_id}) + "\n"
@@ -151,7 +152,6 @@ class SerialIngest:
             self.is_connected = True
             self.is_running = True
 
-            # Reset stats for new connection
             self.stats = IngestStats()
             self.device_epoch += 1
 
@@ -198,13 +198,20 @@ class SerialIngest:
         if data.get("boot") is True:
             self.stats.reboots_detected += 1
             self.firmware_version = data.get("fw")
-            self.device_profile = data.get("profile")
+            new_profile = data.get("profile")
+            if self.device_profile and new_profile != self.device_profile:
+                if self.event_callback:
+                    self.event_callback("CALIBRATION_PROFILE_MISMATCH", {
+                        "expected": self.device_profile,
+                        "reconnected": new_profile
+                    })
+            self.device_profile = new_profile
             self.device_epoch += 1
             if self.event_callback:
                 self.event_callback("DEVICE_REBOOT", {"boot": data, "epoch": self.device_epoch})
             return None, "BOOT_LINE"
 
-        # Protocol version verification
+        # Protocol version verification (SI-02)
         if data.get("v") != 1:
             self.stats.invalid_lines += 1
             return None, "UNKNOWN_PROTOCOL_VERSION"
@@ -216,10 +223,24 @@ class SerialIngest:
                 self.stats.invalid_lines += 1
                 return None, f"MISSING_FIELD_{f.upper()}"
 
+        flex = data["flex"]
+        fsr = data["fsr"]
+        imu = data["imu"]
+
+        # Range checks (SI-09)
+        adc_ok = bool(data["adc_ok"])
+        for val in flex:
+            if not isinstance(val, (int, float)) or val < 0 or val > 32767:
+                self.stats.range_errors += 1
+                adc_ok = False
+        if fsr is not None and (not isinstance(fsr, (int, float)) or fsr < 0 or fsr > 32767):
+            self.stats.range_errors += 1
+            adc_ok = False
+
         seq = data["seq"]
         t_ms = data["t_ms"]
 
-        # Detect reboot by sequence regression or t_ms drop
+        # Detect reboot by sequence regression or t_ms drop (SI-04)
         if self.stats.last_seq is not None:
             if seq < self.stats.last_seq or (self.stats.last_t_ms is not None and t_ms < self.stats.last_t_ms):
                 self.stats.reboots_detected += 1
@@ -240,26 +261,25 @@ class SerialIngest:
         self.stats.valid_packets += 1
         self.stats.update_rate(arrival_ns)
 
-        # Enriched packet with host metadata
         packet = {
             "v": data["v"],
             "seq": seq,
             "t_ms": t_ms,
             "host_monotonic_ns": arrival_ns,
             "device_epoch": self.device_epoch,
-            "flex": data["flex"],
-            "fsr": data["fsr"],
-            "imu": data["imu"],
+            "flex": flex,
+            "fsr": fsr,
+            "imu": imu,
             "fsr_ok": bool(data["fsr_ok"]),
             "imu_ok": bool(data["imu_ok"]),
-            "adc_ok": bool(data["adc_ok"]),
+            "adc_ok": adc_ok,
             "flags": int(data["flags"]),
             "data_source": "live",
         }
         return packet, None
 
     def _enqueue_packet(self, packet: Dict[str, Any]):
-        """Enqueue packet, dropping oldest if buffer is full."""
+        """Enqueue packet, dropping oldest if buffer is full (SI-05)."""
         if self.packet_queue.full():
             try:
                 self.packet_queue.get_nowait()

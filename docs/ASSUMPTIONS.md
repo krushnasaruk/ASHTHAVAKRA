@@ -30,7 +30,15 @@ This document records all baseline assumptions, design defaults, and operational
 | Pain & Fatigue scale | 0–10 numeric | Integer rating required post-session. |
 | Stop instruction | "Stop if you feel sharp pain. Rest as needed." | Displayed on live session screen. |
 | Patient pseudonym format | `P-XXX` (e.g. `P-014`) | Refuses personally identifiable information (PII). |
+| Volunteer pseudonym format | `V-XXX` (e.g. `V-101`) | Format for hackathon testing and demo volunteers. |
 | Model Training Execution | Google Colab scripts | Per user directive, Colab training pipeline scripts & notebooks generated to avoid long local training delays; on-device mock/fixture models supplied for integration tests. |
-| Report format | PDF from backend-provided JSON | Generated via PDF package in clinician dashboard. |
+| Report format | PDF / CSV / Evidence ZIP from backend | Generated via backend export endpoints. |
 | Real data consent | Strictly mandatory | Tooling blocks recording if consent flag is false. |
+| Stale packet timeout | 200 ms | Disconnect or telemetry silence > 200 ms during lift yields UNCERTAIN. |
+| Marker occlusion timeout | 150 ms | Marker loss > 150 ms during lift yields UNCERTAIN. |
+| Zone membership hysteresis | 10 pixels | Prevents boundary jitter when marker rests on edge of Zone A / Zone B. |
+| FSR contact threshold | $k_{on}=4$ SD, $k_{off}=2$ SD | Dual-threshold Schmitt trigger prevents chatter on touch/release. |
+| Grip delta threshold | $\ge 15\%$ flexion | Distinguishes intentional grip closure from passive contact. |
+| Object stillness threshold | $< 6$ pixels over $500\text{ ms}$ | Confirms object has settled after release before awarding VERIFIED. |
+
 

@@ -52,4 +52,9 @@ yarn-error.log*
 *.apk
 *.aab
 
+# Node / Web
+node_modules/
+!frontend/dist/
+
+
 

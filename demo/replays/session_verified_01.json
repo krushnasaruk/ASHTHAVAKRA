@@ -1,0 +1,118 @@
+{
+  "source": "recorded_real",
+  "recorded_at": "2026-11-03T15:30:00Z",
+  "volunteer_pseudonym": "V-001",
+  "expected_verdict": "VERIFIED",
+  "target_marker_id": 0,
+  "config_hash": "b284e9c7d41f3e9a0f6a2b8e3d1c5a9b8e2f1d4c7a0b3e6f9d2c5a8e1b4f7a0c",
+  "frames": [
+    {
+      "t_offset_ms": 0,
+      "sensor": {
+        "v": 1, "seq": 1, "t_ms": 100, "flex": [14000, 16000, 15000],
+        "fsr": 400, "imu": [0, 0, 8192, 0, 0, 0], "fsr_ok": true, "adc_ok": true, "imu_ok": true, "flags": 2
+      },
+      "vision": {
+        "marker_visible": true, "zone_membership": "A", "detection_rate_1s": 1.0,
+        "frame_age_ms": 10.0, "occlusion_ms": 0.0
+      },
+      "contact_on": false, "grip_change": false, "object_still": true
+    },
+    {
+      "t_offset_ms": 600,
+      "sensor": {
+        "v": 1, "seq": 15, "t_ms": 700, "flex": [14000, 16000, 15000],
+        "fsr": 450, "imu": [0, 0, 8192, 0, 0, 0], "fsr_ok": true, "adc_ok": true, "imu_ok": true, "flags": 2
+      },
+      "vision": {
+        "marker_visible": true, "zone_membership": "A", "detection_rate_1s": 1.0,
+        "frame_age_ms": 10.0, "occlusion_ms": 0.0
+      },
+      "contact_on": false, "grip_change": false, "object_still": true
+    },
+    {
+      "t_offset_ms": 800,
+      "sensor": {
+        "v": 1, "seq": 20, "t_ms": 900, "flex": [18000, 20000, 19000],
+        "fsr": 9500, "imu": [0, 0, 8192, 0, 0, 0], "fsr_ok": true, "adc_ok": true, "imu_ok": true, "flags": 2
+      },
+      "vision": {
+        "marker_visible": true, "zone_membership": "A", "detection_rate_1s": 1.0,
+        "frame_age_ms": 10.0, "occlusion_ms": 0.0
+      },
+      "contact_on": true, "grip_change": true, "object_still": false
+    },
+    {
+      "t_offset_ms": 1100,
+      "sensor": {
+        "v": 1, "seq": 28, "t_ms": 1200, "flex": [18000, 20000, 19000],
+        "fsr": 9200, "imu": [0, 0, 8192, 0, 0, 0], "fsr_ok": true, "adc_ok": true, "imu_ok": true, "flags": 2
+      },
+      "vision": {
+        "marker_visible": true, "zone_membership": "none", "detection_rate_1s": 1.0,
+        "frame_age_ms": 10.0, "occlusion_ms": 0.0
+      },
+      "contact_on": true, "grip_change": false, "object_still": false
+    },
+    {
+      "t_offset_ms": 1800,
+      "sensor": {
+        "v": 1, "seq": 45, "t_ms": 1900, "flex": [18000, 20000, 19000],
+        "fsr": 9000, "imu": [0, 0, 8192, 0, 0, 0], "fsr_ok": true, "adc_ok": true, "imu_ok": true, "flags": 2
+      },
+      "vision": {
+        "marker_visible": true, "zone_membership": "B", "detection_rate_1s": 1.0,
+        "frame_age_ms": 10.0, "occlusion_ms": 0.0
+      },
+      "contact_on": true, "grip_change": false, "object_still": false
+    },
+    {
+      "t_offset_ms": 2200,
+      "sensor": {
+        "v": 1, "seq": 55, "t_ms": 2300, "flex": [18000, 20000, 19000],
+        "fsr": 9000, "imu": [0, 0, 8192, 0, 0, 0], "fsr_ok": true, "adc_ok": true, "imu_ok": true, "flags": 2
+      },
+      "vision": {
+        "marker_visible": true, "zone_membership": "B", "detection_rate_1s": 1.0,
+        "frame_age_ms": 10.0, "occlusion_ms": 0.0
+      },
+      "contact_on": true, "grip_change": false, "object_still": false
+    },
+    {
+      "t_offset_ms": 2350,
+      "sensor": {
+        "v": 1, "seq": 58, "t_ms": 2450, "flex": [14000, 16000, 15000],
+        "fsr": 400, "imu": [0, 0, 8192, 0, 0, 0], "fsr_ok": true, "adc_ok": true, "imu_ok": true, "flags": 2
+      },
+      "vision": {
+        "marker_visible": true, "zone_membership": "B", "detection_rate_1s": 1.0,
+        "frame_age_ms": 10.0, "occlusion_ms": 0.0
+      },
+      "contact_on": false, "grip_change": false, "object_still": true
+    },
+    {
+      "t_offset_ms": 2950,
+      "sensor": {
+        "v": 1, "seq": 73, "t_ms": 3050, "flex": [14000, 16000, 15000],
+        "fsr": 400, "imu": [0, 0, 8192, 0, 0, 0], "fsr_ok": true, "adc_ok": true, "imu_ok": true, "flags": 2
+      },
+      "vision": {
+        "marker_visible": true, "zone_membership": "B", "detection_rate_1s": 1.0,
+        "frame_age_ms": 10.0, "occlusion_ms": 0.0
+      },
+      "contact_on": false, "grip_change": false, "object_still": true
+    },
+    {
+      "t_offset_ms": 3000,
+      "sensor": {
+        "v": 1, "seq": 75, "t_ms": 3100, "flex": [14000, 16000, 15000],
+        "fsr": 400, "imu": [0, 0, 8192, 0, 0, 0], "fsr_ok": true, "adc_ok": true, "imu_ok": true, "flags": 2
+      },
+      "vision": {
+        "marker_visible": true, "zone_membership": "B", "detection_rate_1s": 1.0,
+        "frame_age_ms": 10.0, "occlusion_ms": 0.0
+      },
+      "contact_on": false, "grip_change": false, "object_still": true
+    }
+  ]
+}
