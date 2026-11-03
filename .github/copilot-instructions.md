@@ -31,7 +31,7 @@ AI agents collaborate by respecting these boundaries:
 - **Description:** ML pipeline, Colab notebooks, and feature extraction
 
 ### Zone: `docs`
-- **Owner:** @Bot
+- **Owner:** _unclaimed_
 - **Paths:** `docs/`
 - **Description:** Project documentation suite
 
@@ -53,7 +53,6 @@ If you are editing files outside your zone, STOP and inform the developer.
 | Zone | Owner | Paths |
 |------|-------|-------|
 | frontend | @vaishnavijare60-hash | mobile/lib/screens/, mobile/lib/widgets/, mobile/packages/h10_core/lib/theme/, docs/vaishnavi_jare/ |
-| docs | @Bot | docs/ |
 
 **DO NOT modify files in zones owned by other developers.**
 

@@ -29,18 +29,12 @@ zones:
   docs:
     paths:
       - docs/
-    owner: Bot
+    owner: null
     description: Project documentation suite
-    claimed_at: '2026-11-03T12:50:51.078Z'
 rules:
   - Never modify files outside your claimed zone without prior approval
   - Preserve mandatory non-medical disclaimer banner across all screens
   - Use Okabe-Ito color-blind safe palette for all 5 finger channels
   - Maintain minimum 48x48 px touch targets for patient accessibility
   - Ensure responsive layout within 440px mobile canvas container
-locks:
-  - zone: docs
-    owner: Bot
-    claimed_at: '2026-11-03T12:50:51.078Z'
-    expires_at: '2026-11-04T12:50:51.078Z'
-    ttl_hours: 24
+locks: []
