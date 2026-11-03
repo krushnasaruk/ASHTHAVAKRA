@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'hand_view_platform_stub.dart'
+    if (dart.library.html) 'hand_view_platform_web.dart';
 import '../dev/mock_data.dart';
 
 enum HandRenderMode { skin, mesh, xray }
 
 /// Realistic 3D Human Hand View powered by local Three.js & GLTF runtime
-/// inside an isolated, hardware-accelerated WebView.
+/// inside an isolated, hardware-accelerated WebView on mobile or native iframe on web.
 class HandView extends StatefulWidget {
   final List<double> normalizedFlex; // [thumb, index, middle, ring, pinky] in 0-100%
   final List<int>? imu;              // ax, ay, az, gx, gy, gz or quaternion
@@ -46,26 +49,36 @@ class _HandViewState extends State<HandView> {
   }
 
   void _initWebViewController() {
+    if (kIsWeb) {
+      // On web, we use native iframe with Three.js WebGL via platformViewRegistry
+      _isPageReady = true;
+      return;
+    }
+
     if (WebViewPlatform.instance == null) {
       _controller = null;
       return;
     }
 
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0xFF0A0A0A))
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageFinished: (_) {
-            if (mounted) {
-              setState(() => _isPageReady = true);
-              _pushCurrentFrame();
-            }
-          },
-        ),
-      );
+    try {
+      _controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setBackgroundColor(const Color(0xFF0A0A0A))
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageFinished: (_) {
+              if (mounted) {
+                setState(() => _isPageReady = true);
+                _pushCurrentFrame();
+              }
+            },
+          ),
+        );
 
-    _loadLocalHandAsset();
+      _loadLocalHandAsset();
+    } catch (_) {
+      _controller = null;
+    }
   }
 
   Future<void> _loadLocalHandAsset() async {
@@ -73,7 +86,6 @@ class _HandViewState extends State<HandView> {
     try {
       await _controller!.loadFlutterAsset('assets/hand/hand_view.html');
     } catch (_) {
-      // Fallback for Web/desktop test environments
       try {
         await _controller!.loadRequest(Uri.parse('assets/assets/hand/hand_view.html'));
       } catch (_) {}
@@ -126,14 +138,12 @@ class _HandViewState extends State<HandView> {
     // IMU orientation quaternion calculation
     double qw = 1.0, qx = 0.0, qy = 0.0, qz = 0.0;
     if (widget.imu != null && widget.imu!.length >= 4) {
-      // If direct quaternion format is sent (qw, qx, qy, qz)
       if (widget.imu!.length == 4) {
         qw = widget.imu![0] / 1000.0;
         qx = widget.imu![1] / 1000.0;
         qy = widget.imu![2] / 1000.0;
         qz = widget.imu![3] / 1000.0;
       } else if (widget.imu!.length >= 6) {
-        // Compute orientation from accelerometer vector (ax, ay, az in mg)
         final ax = widget.imu![0].toDouble();
         final ay = widget.imu![1].toDouble();
         final az = widget.imu![2].toDouble();
@@ -150,6 +160,22 @@ class _HandViewState extends State<HandView> {
     }
 
     final framePayload = jsonEncode({
+      'action': 'setFrame',
+      'data': {
+        'curl': {
+          'thumb': thumbCurl,
+          'index': indexCurl,
+          'middle': middleCurl,
+          'ring': ringCurl,
+          'pinky': pinkyCurl,
+        },
+        'imu': {
+          'qw': qw,
+          'qx': qx,
+          'qy': qy,
+          'qz': qz,
+        },
+      },
       'curl': {
         'thumb': thumbCurl,
         'index': indexCurl,
@@ -165,6 +191,11 @@ class _HandViewState extends State<HandView> {
       },
     });
 
+    if (kIsWeb) {
+      postPlatformMessage(framePayload);
+      return;
+    }
+
     if (_controller == null) return;
     try {
       _controller!.runJavaScript('if(window.setFrame){window.setFrame($framePayload);}');
@@ -173,8 +204,12 @@ class _HandViewState extends State<HandView> {
 
   void _switchRenderMode(HandRenderMode mode) {
     setState(() => _currentMode = mode);
-    if (_controller == null) return;
     final modeStr = mode.name;
+    if (kIsWeb) {
+      postPlatformMessage(jsonEncode({'action': 'setRenderMode', 'mode': modeStr}));
+      return;
+    }
+    if (_controller == null) return;
     try {
       _controller!.runJavaScript('if(window.setRenderMode){window.setRenderMode("$modeStr");}');
     } catch (_) {}
@@ -212,24 +247,29 @@ class _HandViewState extends State<HandView> {
       ),
       child: Stack(
         children: [
-          // 3D Three.js Human Hand WebView or Test Fallback
+          // 3D Three.js Human Hand: Web iframe, Native Mobile WebView, or Test Fallback
           ClipRRect(
             borderRadius: BorderRadius.circular(21),
-            child: _controller != null
-                ? WebViewWidget(controller: _controller!)
-                : Container(
-                    color: const Color(0xFF0A0A0A),
-                    child: const Center(
-                      child: Text(
-                        '3D HUMAN HAND (WEBGL)',
-                        style: TextStyle(
-                          color: Color(0xFFFFD38A),
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+            child: kIsWeb
+                ? buildPlatformHandView(
+                    viewType: 'hand-view-3d',
+                    assetUrl: 'assets/assets/hand/hand_view.html',
+                  )
+                : (_controller != null
+                    ? WebViewWidget(controller: _controller!)
+                    : Container(
+                        color: const Color(0xFF0A0A0A),
+                        child: const Center(
+                          child: Text(
+                            '3D HUMAN HAND (WEBGL)',
+                            style: TextStyle(
+                              color: Color(0xFFFFD38A),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
+                      )),
           ),
 
           // Top Header: Segmented Control (SKIN / MESH / XRAY) & Channel Mode Tag

@@ -465,6 +465,21 @@
 
     // Initialize scene upon document load
     window.addEventListener('DOMContentLoaded', initScene);
+
+    // Cross-platform Message Listener for Web iframe postMessage
+    window.addEventListener('message', function(event) {
+      if (!event.data) return;
+      try {
+        const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (payload.action === 'setFrame' && payload.data) {
+          window.setFrame(payload.data);
+        } else if (payload.action === 'setRenderMode' && payload.mode) {
+          window.setRenderMode(payload.mode);
+        } else if (payload.curl) {
+          window.setFrame(payload);
+        }
+      } catch (err) {}
+    });
   </script>
 </body>
 </html>
