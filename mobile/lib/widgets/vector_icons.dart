@@ -7,8 +7,6 @@ class VectorIcon extends StatelessWidget {
   final double size;
   final Color color;
 
-  const VectorIcon._(this.type, {super.key, this.size = 20, this.color = const Color(0xFFC8F05F)});
-
   const VectorIcon.taskProof({super.key, this.size = 20, this.color = const Color(0xFFC8F05F)})
       : type = VectorIconType.taskProof;
 

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ASHTAVAKRA 3D Human Hand View</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0a0a0a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #hud-overlay {
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .xray-badge {
+      display: none;
+      background: rgba(18, 14, 10, 0.88);
+      border: 1px solid #ffb347;
+      color: #ffd38a;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      box-shadow: 0 0 10px rgba(245, 166, 35, 0.35);
+    }
+    .status-pill {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      color: #ffd38a;
+      font-size: 8px;
+      font-weight: 800;
+      background: rgba(20, 18, 15, 0.8);
+      padding: 3px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(245, 166, 35, 0.3);
+      letter-spacing: 0.5px;
+      pointer-events: none;
+    }
+  </style>
+  <script src="three.min.js"></script>
+  <script src="GLTFLoader.js"></script>
+  <script src="hand_b64.js"></script>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div class="status-pill" id="mode-pill">SKIN MODE</div>
+  <div id="hud-overlay">
+    <div id="xray-label" class="xray-badge">X-RAY STYLE RENDERING, NOT MEDICAL IMAGING.</div>
+  </div>
+
+  <script>
+    // --- Named Kinematic Angle Constants ---
+    const ANGLE_MCP = -1.4; // MCP joint max curl in radians
+    const ANGLE_PIP = -1.6; // PIP joint max curl in radians
+    const ANGLE_DIP = -0.9; // DIP joint max curl in radians
+
+    // Lerp smoothing factor per frame
+    const LERP_FACTOR = 0.25;
+
+    // Target vs Current interpolated state
+    const targetCurl = { thumb: 0, index: 0, middle: 0, ring: 0, pinky: 0 };
+    const currentCurl = { thumb: 0, index: 0, middle: 0, ring: 0, pinky: 0 };
+    const targetImu = { qw: 1.0, qx: 0.0, qy: 0.0, qz: 0.0 };
+    const currentImu = { qw: 1.0, qx: 0.0, qy: 0.0, qz: 0.0 };
+
+    let currentRenderMode = 'skin'; // 'skin' | 'mesh' | 'xray'
+    let scene, camera, renderer, handMesh, skeletonBones = {}, restRotations = {};
+    let skinMaterial, meshMaterial, xrayMaterial;
+    let skeletonGroup, boneLines = [];
+    let isModelLoaded = false;
+
+    function initScene() {
+      const container = document.getElementById('canvas-container');
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+
+      // 1. Scene with Deep Obsidian Black Background
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0a0a);
+
+      // 2. Camera Setup (Positioned for natural anatomical perspective)
+      camera = new THREE.PerspectiveCamera(38, w / h, 0.01, 100);
+      camera.position.set(0.0, 0.05, 0.38);
+      camera.lookAt(0.0, 0.0, 0.0);
+
+      // 3. Renderer with antialiasing and shadow support
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      // 4. Lighting System: Key + Fill + Warm Amber Rim Light
+      const ambientLight = new THREE.AmbientLight(0xffeedd, 0.65);
+      scene.add(ambientLight);
+
+      // Soft Key Light (Front-Top)
+      const keyLight = new THREE.DirectionalLight(0xfff5ea, 1.1);
+      keyLight.position.set(0.2, 0.4, 0.35);
+      keyLight.castShadow = true;
+      scene.add(keyLight);
+
+      // Dim Fill Light (Opposite side)
+      const fillLight = new THREE.DirectionalLight(0x403328, 0.45);
+      fillLight.position.set(-0.3, -0.2, 0.2);
+      scene.add(fillLight);
+
+      // Soft Warm Golden/Amber Rim Light (Back-Side highlight)
+      const rimLight = new THREE.DirectionalLight(0xf5a623, 1.2);
+      rimLight.position.set(0.0, 0.3, -0.3);
+      scene.add(rimLight);
+
+      // 5. Build Reusable Materials for 3 Render Modes
+      createMaterials();
+
+      // 6. Load 3D Hand Model
+      loadHandModel();
+
+      // 7. Window resize handler
+      window.addEventListener('resize', onWindowResize);
+
+      // 8. Start Animation Loop
+      animate();
+    }
+
+    function createMaterials() {
+      // SKIN: Realistic warm neutral skin tone (#d9a88a), roughness ~0.55
+      skinMaterial = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(0xd9a88a),
+        roughness: 0.55,
+        metalness: 0.05,
+        skinning: true
+      });
+
+      // MESH: Off-white (#e8efef) wireframe with dynamic amber shift
+      meshMaterial = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(0xe8efef),
+        wireframe: true,
+        transparent: true,
+        opacity: 0.65,
+        skinning: true
+      });
+
+      // XRAY: Translucent skin (opacity ~0.2) with additive amber glow (#ffb347)
+      xrayMaterial = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(0xffb347),
+        transparent: true,
+        opacity: 0.22,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        skinning: true
+      });
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binaryString = window.atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    function loadHandModel() {
+      const loader = new THREE.GLTFLoader();
+
+      const onGltfLoaded = function(gltf) {
+        const root = gltf.scene;
+
+        // Traverse to find skinned mesh and bone nodes
+        root.traverse(function(child) {
+          if (child.isSkinnedMesh) {
+            handMesh = child;
+            handMesh.castShadow = true;
+            handMesh.receiveShadow = true;
+            handMesh.material = skinMaterial;
+          }
+          if (child.name) {
+            skeletonBones[child.name] = child;
+            restRotations[child.name] = child.quaternion.clone();
+          }
+        });
+
+        // Center and orient model for optimal viewing
+        root.position.set(0.0, -0.06, 0.0);
+        root.rotation.set(-0.2, 3.14159, 0.0); // Facing camera palm forward
+        scene.add(root);
+
+        // Build internal skeleton visualization for X-Ray mode
+        buildSkeletonVisualizer(root);
+
+        isModelLoaded = true;
+        updateMaterials();
+
+        // Notify Flutter WebView controller that hand is ready
+        if (window.FlutterChannel) {
+          try { window.FlutterChannel.postMessage('READY'); } catch(e) {}
+        }
+      };
+
+      // Priority 1: Instant local in-memory base64 arraybuffer (zero CORS, zero file URI restrictions)
+      if (window.HAND_GLB_BASE64 && window.HAND_GLB_BASE64.length > 100) {
+        try {
+          const buffer = base64ToArrayBuffer(window.HAND_GLB_BASE64);
+          loader.parse(buffer, '', onGltfLoaded, function(err) {
+            console.warn('Base64 parse failed, falling back to fetch', err);
+            loader.load('hand.glb', onGltfLoaded);
+          });
+          return;
+        } catch(e) {
+          console.warn('Buffer decode error', e);
+        }
+      }
+
+      // Priority 2: Direct file load
+      loader.load('hand.glb', onGltfLoaded, undefined, function(err) {
+        console.error('Error loading hand.glb', err);
+      });
+    }
+
+    function buildSkeletonVisualizer(root) {
+      skeletonGroup = new THREE.Group();
+      // Helper bones in amber color #ffb347 for XRAY mode
+      const boneMat = new THREE.LineBasicMaterial({
+        color: 0xffb347,
+        linewidth: 2,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending
+      });
+
+      // Chain definitions
+      const fingerChains = [
+        ['wrist', 'thumb-metacarpal', 'thumb-phalanx-proximal', 'thumb-phalanx-distal', 'thumb-tip'],
+        ['wrist', 'index-finger-metacarpal', 'index-finger-phalanx-proximal', 'index-finger-phalanx-intermediate', 'index-finger-phalanx-distal', 'index-finger-tip'],
+        ['wrist', 'middle-finger-metacarpal', 'middle-finger-phalanx-proximal', 'middle-finger-phalanx-intermediate', 'middle-finger-phalanx-distal', 'middle-finger-tip'],
+        ['wrist', 'ring-finger-metacarpal', 'ring-finger-phalanx-proximal', 'ring-finger-phalanx-intermediate', 'ring-finger-phalanx-distal', 'ring-finger-tip'],
+        ['wrist', 'pinky-finger-metacarpal', 'pinky-finger-phalanx-proximal', 'pinky-finger-phalanx-intermediate', 'pinky-finger-phalanx-distal', 'pinky-finger-tip']
+      ];
+
+      fingerChains.forEach(chain => {
+        for (let i = 0; i < chain.length - 1; i++) {
+          const geom = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 0.01, 0)
+          ]);
+          const line = new THREE.Line(geom, boneMat);
+          line.visible = false;
+          skeletonGroup.add(line);
+          boneLines.push({ line, from: chain[i], to: chain[i+1] });
+        }
+      });
+
+      scene.add(skeletonGroup);
+    }
+
+    function updateSkeletonVisualizer() {
+      if (!skeletonGroup || currentRenderMode !== 'xray') return;
+
+      const pA = new THREE.Vector3();
+      const pB = new THREE.Vector3();
+
+      boneLines.forEach(item => {
+        const bA = skeletonBones[item.from];
+        const bB = skeletonBones[item.to];
+        if (bA && bB) {
+          bA.getWorldPosition(pA);
+          bB.getWorldPosition(pB);
+          const positions = item.line.geometry.attributes.position.array;
+          positions[0] = pA.x; positions[1] = pA.y; positions[2] = pA.z;
+          positions[3] = pB.x; positions[4] = pB.y; positions[5] = pB.z;
+          item.line.geometry.attributes.position.needsUpdate = true;
+          item.line.visible = true;
+        }
+      });
+    }
+
+    // --- Mode Switching API (Zero Page Reload) ---
+    window.setRenderMode = function(mode) {
+      currentRenderMode = mode.toLowerCase();
+      updateMaterials();
+    };
+
+    function updateMaterials() {
+      if (!handMesh) return;
+
+      const xrayBadge = document.getElementById('xray-label');
+      const modePill = document.getElementById('mode-pill');
+
+      if (currentRenderMode === 'skin') {
+        handMesh.material = skinMaterial;
+        if (xrayBadge) xrayBadge.style.display = 'none';
+        if (modePill) modePill.textContent = 'SKIN MODE';
+        if (skeletonGroup) skeletonGroup.visible = false;
+      } else if (currentRenderMode === 'mesh') {
+        handMesh.material = meshMaterial;
+        if (xrayBadge) xrayBadge.style.display = 'none';
+        if (modePill) modePill.textContent = 'MESH MODE';
+        if (skeletonGroup) skeletonGroup.visible = false;
+      } else if (currentRenderMode === 'xray') {
+        handMesh.material = xrayMaterial;
+        if (xrayBadge) xrayBadge.style.display = 'block';
+        if (modePill) modePill.textContent = 'X-RAY MODE';
+        if (skeletonGroup) skeletonGroup.visible = true;
+      }
+    }
+
+    // --- High-Performance setFrame Bridge API ---
+    window.setFrame = function(frameData) {
+      const data = typeof frameData === 'string' ? JSON.parse(frameData) : frameData;
+
+      if (data.curl) {
+        // Measured channels: Thumb, Index, Middle
+        targetCurl.thumb = Math.max(0, Math.min(1, data.curl.thumb ?? 0));
+        targetCurl.index = Math.max(0, Math.min(1, data.curl.index ?? 0));
+        targetCurl.middle = Math.max(0, Math.min(1, data.curl.middle ?? 0));
+
+        // Estimated channels per spec:
+        // ring = 0.9 * middle, pinky = 0.75 * middle
+        targetCurl.ring = data.curl.ring != null ? data.curl.ring : (targetCurl.middle * 0.90);
+        targetCurl.pinky = data.curl.pinky != null ? data.curl.pinky : (targetCurl.middle * 0.75);
+      }
+
+      if (data.imu) {
+        targetImu.qw = data.imu.qw ?? 1.0;
+        targetImu.qx = data.imu.qx ?? 0.0;
+        targetImu.qy = data.imu.qy ?? 0.0;
+        targetImu.qz = data.imu.qz ?? 0.0;
+      }
+    };
+
+    function applyFingerCurl(fingerPrefix, curl, flexAxis = 'x') {
+      const bMcp = skeletonBones[fingerPrefix + '-phalanx-proximal'];
+      const bPip = skeletonBones[fingerPrefix + '-phalanx-intermediate'];
+      const bDip = skeletonBones[fingerPrefix + '-phalanx-distal'];
+
+      const mcpAngle = curl * ANGLE_MCP;
+      const pipAngle = curl * ANGLE_PIP;
+      const dipAngle = curl * ANGLE_DIP;
+
+      if (bMcp && restRotations[fingerPrefix + '-phalanx-proximal']) {
+        const q = restRotations[fingerPrefix + '-phalanx-proximal'].clone();
+        const delta = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), mcpAngle);
+        bMcp.quaternion.copy(q.multiply(delta));
+      }
+      if (bPip && restRotations[fingerPrefix + '-phalanx-intermediate']) {
+        const q = restRotations[fingerPrefix + '-phalanx-intermediate'].clone();
+        const delta = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), pipAngle);
+        bPip.quaternion.copy(q.multiply(delta));
+      }
+      if (bDip && restRotations[fingerPrefix + '-phalanx-distal']) {
+        const q = restRotations[fingerPrefix + '-phalanx-distal'].clone();
+        const delta = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), dipAngle);
+        bDip.quaternion.copy(q.multiply(delta));
+      }
+    }
+
+    function applyThumbCurl(curl) {
+      const bMcp = skeletonBones['thumb-phalanx-proximal'];
+      const bDip = skeletonBones['thumb-phalanx-distal'];
+
+      if (bMcp && restRotations['thumb-phalanx-proximal']) {
+        const q = restRotations['thumb-phalanx-proximal'].clone();
+        const delta = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0.5, 0.8, -0.2).normalize(), curl * -1.2);
+        bMcp.quaternion.copy(q.multiply(delta));
+      }
+      if (bDip && restRotations['thumb-phalanx-distal']) {
+        const q = restRotations['thumb-phalanx-distal'].clone();
+        const delta = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), curl * -0.9);
+        bDip.quaternion.copy(q.multiply(delta));
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Lerp current values toward targets
+      currentCurl.thumb += (targetCurl.thumb - currentCurl.thumb) * LERP_FACTOR;
+      currentCurl.index += (targetCurl.index - currentCurl.index) * LERP_FACTOR;
+      currentCurl.middle += (targetCurl.middle - currentCurl.middle) * LERP_FACTOR;
+      currentCurl.ring += (targetCurl.ring - currentCurl.ring) * LERP_FACTOR;
+      currentCurl.pinky += (targetCurl.pinky - currentCurl.pinky) * LERP_FACTOR;
+
+      // Slerp IMU quaternion
+      currentImu.qw += (targetImu.qw - currentImu.qw) * LERP_FACTOR;
+      currentImu.qx += (targetImu.qx - currentImu.qx) * LERP_FACTOR;
+      currentImu.qy += (targetImu.qy - currentImu.qy) * LERP_FACTOR;
+      currentImu.qz += (targetImu.qz - currentImu.qz) * LERP_FACTOR;
+
+      if (isModelLoaded) {
+        // Apply curl to Measured fingers
+        applyThumbCurl(currentCurl.thumb);
+        applyFingerCurl('index-finger', currentCurl.index);
+        applyFingerCurl('middle-finger', currentCurl.middle);
+
+        // Apply curl to Estimated fingers (Ring & Pinky)
+        applyFingerCurl('ring-finger', currentCurl.ring);
+        applyFingerCurl('pinky-finger', currentCurl.pinky);
+
+        // Apply IMU orientation to wrist root bone
+        const wrist = skeletonBones['wrist'];
+        if (wrist && restRotations['wrist']) {
+          const imuQuat = new THREE.Quaternion(currentImu.qx, currentImu.qy, currentImu.qz, currentImu.qw).normalize();
+          wrist.quaternion.copy(restRotations['wrist']).multiply(imuQuat);
+        }
+
+        // If in MESH mode: shift line color toward amber as fingers curl
+        if (currentRenderMode === 'mesh' && meshMaterial) {
+          const avgCurl = (currentCurl.thumb + currentCurl.index + currentCurl.middle + currentCurl.ring + currentCurl.pinky) / 5.0;
+          // Interpolate from off-white (#e8efef) to amber (#f5a623)
+          meshMaterial.color.setRGB(
+            THREE.MathUtils.lerp(0.91, 0.96, avgCurl),
+            THREE.MathUtils.lerp(0.94, 0.65, avgCurl),
+            THREE.MathUtils.lerp(0.94, 0.14, avgCurl)
+          );
+        }
+
+        // If in XRAY mode: update internal skeleton visualizer lines
+        if (currentRenderMode === 'xray') {
+          updateSkeletonVisualizer();
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('canvas-container');
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    // Initialize scene upon document load
+    window.addEventListener('DOMContentLoaded', initScene);
+  </script>
+</body>
+</html>
+

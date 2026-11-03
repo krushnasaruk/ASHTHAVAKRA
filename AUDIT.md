@@ -181,5 +181,28 @@ flutter build apk --release --dart-define=MOCK=true
 ---
 
 ## 7. Build Artifacts
-- **Standalone Android APK:** Located at `ASHTAVAKRA_v2.apk` in project root (Application ID: `com.asthavakra.v2`, Name: `ASHTAVAKRA v2`).
+- **Standalone Android APK v2:** Located at `ASHTAVAKRA_v2.apk` in project root (Application ID: `com.asthavakra.v2`, Name: `ASHTAVAKRA v2`).
+- **Standalone Android APK v3:** Located at `ASHTAVAKRA_v3.apk` in project root (Application ID: `com.asthavakra.v3`, Name: `ASHTAVAKRA v3`).
 - **Web App:** Built and live at `http://127.0.0.1:5050`.
+
+---
+
+## 8. Version 3 Rebuild: Realistic 3D Human Hand & Telemetry Fixes
+- **Rebuilt 3D Hand View:** Replaced stick skeleton entirely with a realistic rigged human hand model (`mobile/assets/hand/hand.glb`, MIT licensed, WebXR generic hand profile).
+- **Offline Three.js Engine:** Local Three.js r128 (`three.min.js`), `GLTFLoader.js`, and `hand_b64.js` bundled directly in assets for 100% offline operation without CDN dependencies.
+- **Three Dynamic Render Modes:**
+  - `SKIN`: Warm human skin tone (`#d9a88a`), soft key/fill lighting, and soft warm amber rim light (`#f5a623`).
+  - `MESH`: Wireframe overlay (`#e8efef`, 0.55 opacity) that dynamically shifts toward amber as each finger curls.
+  - `XRAY`: Translucent skin (0.2 opacity) with an internal amber skeleton (`#ffb347`) and prominent nonclinical notice (`X-RAY STYLE RENDERING, NOT MEDICAL IMAGING.`).
+  - Modes switch instantly via top segmented control without page reloads.
+- **Anatomical Sensor Mapping & Angles:**
+  - Thumb, index, and middle: measured from calibrated curl channels (0.0 to 1.0).
+  - Ring and pinky: anatomically estimated from middle channel (`ring = 0.90 * middle`, `pinky = 0.75 * middle`) with clear `EST.` badges (never labeled "RESERVED").
+  - Wrist orientation: driven by live IMU quaternion (`qw`, `qx`, `qy`, `qz`).
+  - Joint angle constants: MCP = -1.4 rad, PIP = -1.6 rad, DIP = -0.9 rad with 0.25 lerp factor at ~25 Hz throttle.
+- **Finger Flexion & FSR Dummy Remediation:**
+  - Completely removed hardcoded 38% and 0% default numbers.
+  - When disconnected, explicitly displays "NO DATA" or "CONNECT DEVICE" instead of fabricated percentages.
+  - "SIMULATED" badge appears only when `kUseMockData` compile-time flag is enabled.
+- **Dual-App Phone Installation:**
+  - Updated Application ID to `com.asthavakra.v3` and app label to `ASHTAVAKRA v3` so both v2 and v3 can coexist simultaneously on the test phone.

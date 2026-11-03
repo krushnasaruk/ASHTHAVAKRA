@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
+import '../dev/mock_data.dart';
 
 class QualityStripWidget extends StatelessWidget {
   final bool isConnected;
@@ -57,7 +58,7 @@ class QualityStripWidget extends StatelessWidget {
                 isConnected ? 'Connected' : 'Disconnected',
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
               ),
-              if (isSimulated) ...[
+              if (isSimulated && kUseMockData) ...[
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),

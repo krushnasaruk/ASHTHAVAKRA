@@ -5,7 +5,7 @@ import '../services/storage_service.dart';
 import 's10_taskproof_screen.dart';
 import 's8_history_screen.dart';
 import '../widgets/preflight_dialog.dart';
-import '../widgets/holographic_hand_scan.dart';
+import '../widgets/hand_view.dart';
 import '../widgets/vector_icons.dart';
 import '../theme/app_theme.dart';
 import '../dev/mock_data.dart';
@@ -316,82 +316,12 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // 4. 3D Holographic Hand Scanner (Obsidian Container - Clean & Visual)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF121715),
-              borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: const Color(0xFF232D28), width: 1.2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.18),
-                  blurRadius: 18,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.view_in_ar, size: 15, color: Color(0xFFC8F05F)),
-                          SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              '3D HOLOGRAPHIC SCAN',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.8,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    InkWell(
-                      onTap: () => deviceService.toggleHardwareProfile(),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E2822),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFC8F05F).withOpacity(0.4)),
-                        ),
-                        child: Text(
-                          deviceService.hardwareProfile == 'demo3' ? '3-CH ACTIVE' : '5-CH FULL',
-                          style: const TextStyle(
-                            color: Color(0xFFC8F05F),
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 220,
-                  child: HolographicHandScanWidget(
-                    flexValues: deviceService.latestNormalizedFlex,
-                    fsrContact: (deviceService.latestPacket?.fsr ?? 0) / 32767.0 * 100.0,
-                    isDemo3: deviceService.hardwareProfile == 'demo3',
-                  ),
-                ),
-              ],
-            ),
+          // 4. 3D Realistic Human Hand View (WebGL Three.js Local Engine)
+          HandView(
+            normalizedFlex: deviceService.latestNormalizedFlex,
+            imu: deviceService.latestPacket?.imu,
+            isConnected: isStreaming,
+            height: 250,
           ),
           const SizedBox(height: 24),
 

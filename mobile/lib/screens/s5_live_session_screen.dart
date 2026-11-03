@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:h10_core/h10_core.dart';
 import '../services/device_service.dart';
 import '../services/storage_service.dart';
-import '../widgets/hand_visualization.dart';
+import '../widgets/hand_view.dart';
 import '../widgets/finger_bars.dart';
 import '../widgets/repetition_ring.dart';
 import '../widgets/quality_strip.dart';
-import '../widgets/holographic_hand_scan.dart';
 import '../dev/mock_data.dart';
 import 's6_summary_screen.dart';
 
@@ -353,69 +352,83 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
                       ),
                     ),
 
-                    // Right: Animated 3D Holographic or 2D Hand Visualization
-                    Expanded(
-                      flex: 6,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    _showHolographic3D = !_showHolographic3D;
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: _showHolographic3D ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(
-                                      color: _showHolographic3D ? const Color(0xFF00E5FF) : const Color(0xFFCBD5E1),
+                    // Right: Animated 3D Realistic Hand View (when 3D HUD enabled)
+                    if (_showHolographic3D)
+                      Expanded(
+                        flex: 6,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _showHolographic3D = !_showHolographic3D;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF1E1A14),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: const Color(0xFFF5A623),
+                                      ),
                                     ),
-                                  ),
-                                  child: Text(
-                                    _showHolographic3D ? '3D HUD' : '2D VIEW',
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
-                                      color: _showHolographic3D ? const Color(0xFF00E5FF) : const Color(0xFF475569),
+                                    child: const Text(
+                                      '3D HUD: ON',
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFFFFD38A),
+                                      ),
                                     ),
                                   ),
                                 ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            HandView(
+                              normalizedFlex: _displayFlex,
+                              imu: widget.deviceService.latestPacket?.imu,
+                              isConnected: widget.deviceService.state == DeviceConnectionState.streaming,
+                              height: 220,
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Expanded(
+                        flex: 2,
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _showHolographic3D = !_showHolographic3D;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: const Color(0xFFCBD5E1)),
                               ),
-                            ],
+                              child: const Text(
+                                '3D HUD: OFF',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF475569),
+                                ),
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Center(
-                            child: _showHolographic3D
-                                ? SizedBox(
-                                    width: 195,
-                                    height: 215,
-                                    child: HolographicHandScanWidget(
-                                      flexValues: _displayFlex,
-                                      fsrContact: (widget.deviceService.latestPacket?.fsr ?? 0) / 32767.0 * 100.0,
-                                      isDemo3: widget.deviceService.hardwareProfile == 'demo3',
-                                    ),
-                                  )
-                                : HandVisualizationWidget(
-                                    movement: HandMovement(
-                                      thumb: _displayFlex[0],
-                                      index: _displayFlex[1],
-                                      middle: _displayFlex[2],
-                                      ring: _displayFlex[3],
-                                      pinky: _displayFlex[4],
-                                    ),
-                                    width: 180,
-                                    height: 215,
-                                  ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -426,8 +439,10 @@ class _LiveSessionScreenState extends State<LiveSessionScreen> {
               padding: const EdgeInsets.all(H10Tokens.space12),
               child: FingerBarsWidget(
                 normalizedFlex: _displayFlex,
+                fsrContact: (widget.deviceService.latestPacket?.fsr ?? 0) / 32767.0 * 100.0,
                 targetRomMin: plan.targetRomMin,
                 targetRomMax: plan.targetRomMax,
+                isConnected: widget.deviceService.state == DeviceConnectionState.streaming,
               ),
             ),
           ],

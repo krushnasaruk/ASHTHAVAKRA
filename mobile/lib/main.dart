@@ -295,7 +295,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                                 ],
                               ),
                               child: const Text(
-                                'v2',
+                                'v3',
                                 style: TextStyle(
                                   fontSize: 9.5,
                                   fontWeight: FontWeight.w900,
@@ -490,10 +490,10 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                       ),
                     ],
                   ),
-                  child: Center(
+                  child: const Center(
                     child: VectorIcon.scanner(
                       size: 20,
-                      color: const Color(0xFF0B0F0E),
+                      color: Color(0xFF0B0F0E),
                     ),
                   ),
                 ),
