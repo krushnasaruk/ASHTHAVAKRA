@@ -96,6 +96,7 @@
       display: none;
       transform: translate(-50%, -100%);
       padding-bottom: 14px;
+      transition: opacity 0.15s ease-out;
     }
     .callout-box {
       background: rgba(8, 10, 12, 0.94);
@@ -200,7 +201,7 @@
       letter-spacing: 1.2px;
       text-transform: uppercase;
       cursor: pointer;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
       text-align: center;
     }
     .action-btn:active, .action-btn.active {
@@ -298,16 +299,17 @@
 
     // --- State Management ---
     let scene, camera, renderer, raycaster;
-    let handRoot;
+    let pivotGroup; // Outer interaction container (handles user drag rotate & PALM/BACK flip)
+    let handRoot;   // Inner model container (handles sensor IMU quaternion)
     let allBoneMeshes = [];
-    let boneNodes = {}; // Named joint Object3D nodes for hierarchical rotation
+    let boneNodes = {}; // Named joint Object3D nodes for hierarchical articulation
     let carpalCount = 0, metacarpalCount = 0, phalanxCount = 0;
 
     let selectedFinger = null; // 'thumb' | 'index' | 'middle' | 'ring' | 'pinky' | null
     let selectedBoneMesh = null;
     let isPalmView = true;
 
-    // Camera interaction state
+    // Camera / Viewer interaction state
     let isDragging = false;
     let prevMouseX = 0, prevMouseY = 0;
     let targetRotY = 0.22; // Slight natural 3/4 palm tilt
@@ -321,8 +323,8 @@
     const MIN_ZOOM = 0.75;
     const MAX_ZOOM = 2.4;
 
-    // Joint Rings map: finger -> array of Mesh
-    const jointRings = {};
+    // Joint Rings list
+    const jointRingMeshes = [];
 
     // Articulation targets (0.0 to 1.0)
     const targetFlex = { thumb: 0.0, index: 0.0, middle: 0.0, ring: 0.0, pinky: 0.0 };
@@ -366,7 +368,7 @@
         opacity: 0.35,
       });
 
-      // Faint semi-transparent skin silhouette outline (opacity 0.14, fine off-white rim)
+      // Faint semi-transparent skin silhouette outline (opacity 0.13, fine off-white rim)
       matSkin = new THREE.MeshPhysicalMaterial({
         color: 0xd8e4ea,
         transparent: true,
@@ -386,6 +388,10 @@
       scene = new THREE.Scene();
       scene.background = null;
 
+      // Outer pivot group: receives user view rotation & scale without conflicting with model IMU
+      pivotGroup = new THREE.Group();
+      scene.add(pivotGroup);
+
       // Camera: perfectly framed so the hand fills ~80% of 4:5 portrait frame
       camera = new THREE.PerspectiveCamera(36, w / h, 0.01, 100);
       camera.position.set(0.0, 0.065, 0.35);
@@ -399,7 +405,7 @@
 
       raycaster = new THREE.Raycaster();
 
-      // Lighting: Soft ambient + upper-left key light + soft rim light per spec
+      // Lighting: Soft ambient + upper-left key light + soft rim light
       const ambLight = new THREE.AmbientLight(0xfff6ea, 0.82);
       scene.add(ambLight);
 
@@ -424,11 +430,11 @@
 
       function onLoaded(gltf) {
         handRoot = gltf.scene;
-        scene.add(handRoot);
+        // Mount handRoot inside pivotGroup to isolate sensor IMU from user view rotation
+        pivotGroup.add(handRoot);
 
         handRoot.position.set(0, 0.0, 0);
-        handRoot.rotation.y = targetRotY;
-        handRoot.rotation.x = targetRotX;
+        handRoot.rotation.set(0, 0, 0);
 
         carpalCount = 0;
         metacarpalCount = 0;
@@ -461,16 +467,14 @@
                 applyBoneMaterials(obj, false);
               } else if (extras.boneType === 'phalanx' || nodeName.includes('phalanx')) {
                 phalanxCount++;
-                // Saturated Golden-Yellow Phalanx Shafts matching reference image!
                 applyBoneMaterials(obj, true);
               }
             }
           }
         });
 
-        // Create Small Amber Joint Rings (#f5a623) at finger joints
+        // Create Small Amber Joint Rings (#f5a623) directly inside phalanx nodes
         createJointRings();
-        updateJointRingsPositions();
 
         console.log(`[ANATOMY] Bones count verified: ${carpalCount} carpal, ${metacarpalCount} metacarpal, ${phalanxCount} phalanx. Total bones: ${carpalCount + metacarpalCount + phalanxCount}.`);
       }
@@ -524,7 +528,7 @@
     }
 
     function createJointRings() {
-      // Small Amber joint rings (#f5a623, 2-3px screen size)
+      jointRingMeshes.length = 0;
       const ringGeo = new THREE.TorusGeometry(0.0052, 0.00065, 8, 24);
       const ringMat = new THREE.MeshBasicMaterial({
         color: 0xf5a623,
@@ -532,43 +536,18 @@
         opacity: 0.95
       });
 
-      const fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky'];
-      fingerNames.forEach((f) => {
-        const ringsForFinger = [];
-        const count = (f === 'thumb') ? 2 : 3;
-        for (let i = 0; i < count; i++) {
+      // Attach rings directly to phalanx bone nodes so they move, rotate, and turn with the joint
+      Object.keys(boneNodes).forEach((k) => {
+        if (k.includes('phalanx')) {
+          const node = boneNodes[k];
           const ringMesh = new THREE.Mesh(ringGeo, ringMat);
           ringMesh.rotation.x = Math.PI * 0.5;
-          ringMesh.visible = true; // Visible by default as in reference image
-          scene.add(ringMesh);
-          ringsForFinger.push(ringMesh);
+          ringMesh.position.set(0, 0, 0);
+          ringMesh.visible = true;
+          ringMesh.userData.finger = inferFingerFromName(k);
+          node.add(ringMesh);
+          jointRingMeshes.push(ringMesh);
         }
-        jointRings[f] = ringsForFinger;
-      });
-    }
-
-    function updateJointRingsPositions() {
-      if (!handRoot) return;
-      const fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky'];
-      fingerNames.forEach((f) => {
-        const rings = jointRings[f];
-        if (!rings) return;
-
-        // Find phalanx nodes for this finger
-        const fingerNodes = Object.keys(boneNodes)
-          .filter(k => k.includes(f) && k.includes('phalanx'))
-          .map(k => boneNodes[k]);
-
-        fingerNodes.forEach((node, idx) => {
-          if (idx < rings.length) {
-            const ring = rings[idx];
-            const worldPos = new THREE.Vector3();
-            node.getWorldPosition(worldPos);
-            ring.position.copy(worldPos);
-            // If a specific finger is selected, make its rings slightly brighter; otherwise show all
-            ring.visible = (selectedFinger === null || selectedFinger === f);
-          }
-        });
       });
     }
 
@@ -635,13 +614,31 @@
         targetZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, targetZoom + zoomDelta));
       }, { passive: false });
 
-      // Buttons
-      document.getElementById('btn-palm-back').addEventListener('click', togglePalmBackView);
-      document.getElementById('btn-reset').addEventListener('click', resetView);
-      document.getElementById('btn-clear').addEventListener('click', clearSelection);
+      // Buttons with stopPropagation to completely isolate from canvas pointer handlers
+      const btnPalm = document.getElementById('btn-palm-back');
+      btnPalm.addEventListener('pointerdown', (e) => e.stopPropagation());
+      btnPalm.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePalmBackView();
+      });
+
+      const btnReset = document.getElementById('btn-reset');
+      btnReset.addEventListener('pointerdown', (e) => e.stopPropagation());
+      btnReset.addEventListener('click', (e) => {
+        e.stopPropagation();
+        resetView();
+      });
+
+      const btnClear = document.getElementById('btn-clear');
+      btnClear.addEventListener('pointerdown', (e) => e.stopPropagation());
+      btnClear.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearSelection();
+      });
 
       // Flexion Slider
       const slider = document.getElementById('flex-slider');
+      slider.addEventListener('pointerdown', (e) => e.stopPropagation());
       slider.addEventListener('input', (e) => {
         if (!selectedFinger) return;
         const val = parseInt(e.target.value) / 100.0;
@@ -706,11 +703,7 @@
         const isPhalanx = name.includes('phalanx');
 
         if (isTargetFinger) {
-          if (isPhalanx) {
-            applyBoneMaterials(mesh, true);
-          } else {
-            applyBoneMaterials(mesh, false);
-          }
+          applyBoneMaterials(mesh, isPhalanx);
         } else {
           if (Array.isArray(mesh.material)) {
             mesh.material[0] = matDimmed;
@@ -721,11 +714,10 @@
         }
       });
 
-      // Rings visibility
-      Object.keys(jointRings).forEach((f) => {
-        jointRings[f].forEach((r) => r.visible = (f === finger));
+      // Filter rings: show only selected finger
+      jointRingMeshes.forEach((r) => {
+        r.visible = (r.userData.finger === finger);
       });
-      updateJointRingsPositions();
 
       // Show Articulation Slider Strip
       const sliderStrip = document.getElementById('slider-strip');
@@ -757,7 +749,21 @@
 
       const worldPos = new THREE.Vector3();
       mesh.getWorldPosition(worldPos);
+
+      // Verify bone is in front of camera
+      const cameraDir = new THREE.Vector3();
+      camera.getWorldDirection(cameraDir);
+      const toBone = new THREE.Vector3().subVectors(worldPos, camera.position);
+      if (toBone.dot(cameraDir) <= 0) {
+        callout.style.display = 'none';
+        return;
+      }
+
       worldPos.project(camera);
+      if (worldPos.z > 1.0) {
+        callout.style.display = 'none';
+        return;
+      }
 
       const frame = document.getElementById('canvas-frame');
       const rect = frame.getBoundingClientRect();
@@ -781,20 +787,22 @@
         applyBoneMaterials(mesh, isPhalanx);
       });
 
-      // Show all joint rings
-      Object.keys(jointRings).forEach((f) => {
-        jointRings[f].forEach((r) => r.visible = true);
-      });
-      updateJointRingsPositions();
+      // Show all rings
+      jointRingMeshes.forEach((r) => r.visible = true);
 
       document.getElementById('slider-strip').style.display = 'none';
       document.getElementById('finger-badge').style.display = 'none';
-      document.getElementById('bone-callout').style.display = 'none';
+      const callout = document.getElementById('bone-callout');
+      if (callout) callout.style.display = 'none';
     }
 
     function togglePalmBackView() {
       isPalmView = !isPalmView;
+      // Flip exactly 180 degrees
       targetRotY = isPalmView ? 0.22 : (0.22 + Math.PI);
+      // Hide callout during view flip to prevent screen jitter
+      const callout = document.getElementById('bone-callout');
+      if (callout) callout.style.display = 'none';
     }
 
     function resetView() {
@@ -830,6 +838,7 @@
         targetFlex.pinky = data.curl.pinky != null ? data.curl.pinky : (targetFlex.middle * 0.75);
       }
 
+      // Sensor IMU is applied strictly to handRoot (inner group), NOT to pivotGroup
       if (data.imu && handRoot) {
         const qw = data.imu.qw ?? 1.0;
         const qx = data.imu.qx ?? 0.0;
@@ -902,15 +911,21 @@
         updateModeIndicator('NO DATA');
       }
 
-      // Smooth camera orientation lerp
-      currentRotY += (targetRotY - currentRotY) * 0.12;
-      currentRotX += (targetRotX - currentRotX) * 0.12;
+      // Smooth camera orientation lerp via shortest angular distance
+      let diffY = targetRotY - currentRotY;
+      while (diffY < -Math.PI) diffY += Math.PI * 2;
+      while (diffY > Math.PI) diffY -= Math.PI * 2;
+      currentRotY += diffY * 0.12;
+
+      let diffX = targetRotX - currentRotX;
+      currentRotX += diffX * 0.12;
+
       currentZoom += (targetZoom - currentZoom) * 0.15;
 
-      if (handRoot) {
-        handRoot.rotation.y = currentRotY;
-        handRoot.rotation.x = currentRotX;
-        handRoot.scale.setScalar(currentZoom);
+      if (pivotGroup) {
+        pivotGroup.rotation.y = currentRotY;
+        pivotGroup.rotation.x = currentRotX;
+        pivotGroup.scale.setScalar(currentZoom);
       }
 
       // Articulation lerp per finger (factor 0.25)
@@ -918,8 +933,6 @@
         currentFlex[f] += (targetFlex[f] - currentFlex[f]) * LERP_FACTOR;
         applyFingerArticulation(f, currentFlex[f]);
       });
-
-      updateJointRingsPositions();
 
       renderer.render(scene, camera);
     }
