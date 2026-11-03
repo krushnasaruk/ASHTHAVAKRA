@@ -204,12 +204,12 @@ class TodayScreen extends StatelessWidget {
           ),
           const SizedBox(height: 22),
 
-          // 2. Paytin 4 Squircle Quick Action Buttons
+          // 2. Paytin 4 Squircle Quick Action Buttons (Guaranteed Visible Icons)
           Row(
             children: [
               _buildSquircleAction(
                 context,
-                icon: Icons.verified_outlined,
+                iconWidget: const Icon(Icons.verified, color: Color(0xFF121715), size: 19),
                 label: 'TaskProof',
                 onTap: () {
                   Navigator.push(
@@ -227,8 +227,8 @@ class TodayScreen extends StatelessWidget {
               const SizedBox(width: 10),
               _buildSquircleAction(
                 context,
-                icon: Icons.gavel_outlined,
-                label: 'Judge',
+                iconWidget: const Icon(Icons.gavel, color: Color(0xFF121715), size: 19),
+                label: 'Judge View',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -245,14 +245,14 @@ class TodayScreen extends StatelessWidget {
               const SizedBox(width: 10),
               _buildSquircleAction(
                 context,
-                icon: Icons.fitness_center_outlined,
+                iconWidget: const Icon(Icons.fitness_center, color: Color(0xFF121715), size: 19),
                 label: 'Routines',
                 onTap: onStartExercise,
               ),
               const SizedBox(width: 10),
               _buildSquircleAction(
                 context,
-                icon: Icons.fact_check_outlined,
+                iconWidget: const Icon(Icons.fact_check, color: Color(0xFF121715), size: 19),
                 label: 'Preflight',
                 onTap: () => PreflightDialog.show(context),
               ),
@@ -264,14 +264,18 @@ class TodayScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Care Team',
-                style: TextStyle(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF161C19),
+              const Flexible(
+                child: Text(
+                  'Care Team & Investigators',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF161C19),
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: () => PreflightDialog.show(context),
                 child: const Text(
@@ -562,19 +566,31 @@ class TodayScreen extends StatelessWidget {
             badge: 'VERIFIED 4.2s',
             badgeColor: const Color(0xFFC8F05F),
             badgeTextColor: const Color(0xFF121715),
-            icon: Icons.fitness_center,
+            iconWidget: const Icon(Icons.fitness_center, color: Color(0xFFC8F05F), size: 18),
           ),
           const SizedBox(height: 10),
 
           _buildActivityCard(
-            title: 'TaskProof Transfer',
+            title: 'ArUco Marker Transfer',
             subtitle: 'Object Handover Task #42',
-            badge: '100% SCORE',
+            badge: 'JUDGE VERIFIED',
             badgeColor: const Color(0xFF121715),
             badgeTextColor: const Color(0xFFC8F05F),
-            icon: Icons.qr_code,
+            iconWidget: const Icon(Icons.qr_code, color: Color(0xFFC8F05F), size: 18),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 10),
+
+          _buildActivityCard(
+            title: 'Thumb-Index Pinch',
+            subtitle: 'Ch1 Thumb + Ch2 Index • 12 Reps',
+            badge: '+84% ROM',
+            badgeColor: const Color(0xFFE2E7DE),
+            badgeTextColor: const Color(0xFF161C19),
+            iconWidget: const Icon(Icons.touch_app, color: Color(0xFFC8F05F), size: 18),
+          ),
+
+          // Ample bottom breathing room so content scrolls completely above floating dock
+          const SizedBox(height: 80),
         ],
       ),
     );
@@ -582,7 +598,7 @@ class TodayScreen extends StatelessWidget {
 
   Widget _buildSquircleAction(
     BuildContext context, {
-    required IconData icon,
+    required Widget iconWidget,
     required String label,
     required VoidCallback onTap,
   }) {
@@ -614,13 +630,13 @@ class TodayScreen extends StatelessWidget {
                   color: Color(0xFFF4F6F0),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: const Color(0xFF121715), size: 18),
+                child: Center(child: iconWidget),
               ),
               const SizedBox(height: 6),
               Text(
                 label,
                 style: const TextStyle(
-                  fontSize: 10.5,
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF161C19),
                 ),
@@ -683,7 +699,7 @@ class TodayScreen extends StatelessWidget {
     required String badge,
     required Color badgeColor,
     required Color badgeTextColor,
-    required IconData icon,
+    required Widget iconWidget,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -701,7 +717,7 @@ class TodayScreen extends StatelessWidget {
               color: const Color(0xFF121715),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFFC8F05F), size: 18),
+            child: Center(child: iconWidget),
           ),
           const SizedBox(width: 12),
           Expanded(

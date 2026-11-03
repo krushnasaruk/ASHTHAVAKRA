@@ -181,7 +181,7 @@ class ExercisesScreen extends StatelessWidget {
             ),
           );
         }),
-        const SizedBox(height: 24),
+        const SizedBox(height: 80),
       ],
     );
   }

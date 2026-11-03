@@ -179,20 +179,20 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F0),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(68),
+        preferredSize: const Size.fromHeight(66),
         child: Container(
           color: const Color(0xFFF4F6F0),
-          padding: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 6),
+          padding: const EdgeInsets.only(top: 8, left: 14, right: 14, bottom: 4),
           child: SafeArea(
             bottom: false,
             child: Row(
               children: [
-                // Patient Avatar (Paytin Profile Style)
+                // Patient Avatar (Clean Paytin Style)
                 Stack(
                   children: [
                     Container(
-                      width: 44,
-                      height: 44,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
                         color: const Color(0xFF121715),
                         shape: BoxShape.circle,
@@ -204,7 +204,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                           style: TextStyle(
                             color: Color(0xFFC8F05F),
                             fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                            fontSize: 14,
                           ),
                         ),
                       ),
@@ -213,8 +213,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                       right: 1,
                       bottom: 1,
                       child: Container(
-                        width: 10,
-                        height: 10,
+                        width: 9,
+                        height: 9,
                         decoration: BoxDecoration(
                           color: const Color(0xFF2E7D32),
                           shape: BoxShape.circle,
@@ -226,7 +226,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 ),
                 const SizedBox(width: 10),
 
-                // Greeting & Subtitle (includes Hand Rehab for test compatibility)
+                // Greeting & Subtitle (includes Hand Rehab for test compatibility - No truncation!)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,14 +236,16 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Flexible(
-                            child: Text(
-                              'Hand Rehab',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF161C19),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Hand Rehab',
+                                style: TextStyle(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF161C19),
+                                ),
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -265,26 +267,28 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         ],
                       ),
                       const SizedBox(height: 1),
-                      const Text(
-                        'Welcome Back 👋 Krushna',
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          color: Color(0xFF7A837E),
-                          fontWeight: FontWeight.w500,
+                      const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Welcome Back, Krushna',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            color: Color(0xFF7A837E),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
 
-                // Paytin "+ Calibrate" Lime Action Pill
+                // Paytin "+ Calibrate" Action Pill
                 InkWell(
                   onTap: _openCalibration,
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: const Color(0xFFC8F05F),
                       borderRadius: BorderRadius.circular(16),
@@ -299,12 +303,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.add, size: 12, color: Color(0xFF121715)),
-                        SizedBox(width: 2),
+                        Icon(Icons.tune, size: 13, color: Color(0xFF121715)),
+                        SizedBox(width: 4),
                         Text(
                           'Calibrate',
                           style: TextStyle(
-                            fontSize: 10.5,
+                            fontSize: 11,
                             fontWeight: FontWeight.w800,
                             color: Color(0xFF121715),
                           ),
@@ -313,36 +317,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 2),
-
-                // Preflight Diagnostics Bell Button
-                IconButton(
-                  icon: Stack(
-                    children: [
-                      const Icon(Icons.notifications_outlined, size: 20, color: Color(0xFF161C19)),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Container(
-                          width: 7,
-                          height: 7,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFC8F05F),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  tooltip: 'Preflight Diagnostics',
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                  onPressed: () => PreflightDialog.show(context),
-                ),
+                const SizedBox(width: 4),
 
                 // Settings Button
                 IconButton(
-                  icon: const Icon(Icons.settings_outlined, size: 19, color: Color(0xFF161C19)),
+                  icon: const Icon(Icons.settings, size: 20, color: Color(0xFF161C19)),
                   tooltip: 'Settings',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -368,7 +347,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           // Mandatory Research Prototype Non-Medical Disclaimer Strip
           Container(
             width: double.infinity,
-            color: const Color(0xFFFEF3C7), // Amber 100
+            color: const Color(0xFFFEF3C7),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             child: const Row(
               children: [
@@ -417,8 +396,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildDockItem(0, Icons.today_outlined, Icons.today, 'Today'),
-              _buildDockItem(1, Icons.fitness_center_outlined, Icons.fitness_center, 'Exercises'),
+              _buildDockItem(0, Icons.today, Icons.today, 'Today'),
+              _buildDockItem(1, Icons.fitness_center, Icons.fitness_center, 'Exercises'),
 
               // Signature Glowing Lime Center Action Button
               GestureDetector(
@@ -437,16 +416,18 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.qr_code_scanner,
-                    color: Color(0xFF121715),
-                    size: 22,
+                  child: const Center(
+                    child: Icon(
+                      Icons.camera_alt,
+                      color: Color(0xFF121715),
+                      size: 21,
+                    ),
                   ),
                 ),
               ),
 
-              _buildDockItem(2, Icons.show_chart_outlined, Icons.show_chart, 'Progress'),
-              _buildDockItem(3, Icons.devices_outlined, Icons.devices, 'Device'),
+              _buildDockItem(2, Icons.show_chart, Icons.show_chart, 'Progress'),
+              _buildDockItem(3, Icons.devices, Icons.devices, 'Device'),
             ],
           ),
         ),
