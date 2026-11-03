@@ -98,3 +98,4 @@
 
 ## 8. Failure Script
 > "Judges, the visual stream is currently awaiting telemetry from the host process. Notice that our UI immediately renders an honest `NO DATA` state and displays the exact reason: 'Glove disconnected'. We intentionally refuse to show placeholder numbers or fake smooth curves. Our preflight diagnostic tool is built directly into the AppBar to isolate whether the fault is in the camera or serial bus."
+
