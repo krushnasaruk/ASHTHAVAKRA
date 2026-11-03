@@ -29,15 +29,17 @@ class H10PatientApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFF4F6F0),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(H10Tokens.colorPrimary),
-          primary: const Color(H10Tokens.colorPrimary),
-          surface: const Color(H10Tokens.colorCard),
+          seedColor: const Color(0xFF121715),
+          primary: const Color(0xFF121715),
+          secondary: const Color(0xFFC8F05F),
+          surface: const Color(0xFFFFFFFF),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(H10Tokens.colorCard),
-          foregroundColor: Color(H10Tokens.colorText),
-          elevation: 1,
+          backgroundColor: Color(0xFFF4F6F0),
+          foregroundColor: Color(0xFF161C19),
+          elevation: 0,
         ),
       ),
       builder: (context, child) {
@@ -45,17 +47,17 @@ class H10PatientApp extends StatelessWidget {
           builder: (context, constraints) {
             if (constraints.maxWidth > 600) {
               return Scaffold(
-                backgroundColor: const Color(0xFFF1F5F9),
+                backgroundColor: const Color(0xFFE5E7EB),
                 body: Center(
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 440),
                     decoration: BoxDecoration(
-                      color: const Color(H10Tokens.colorBackground),
+                      color: const Color(0xFFF4F6F0),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.16),
-                          blurRadius: 30,
-                          offset: const Offset(0, 10),
+                          color: Colors.black.withOpacity(0.18),
+                          blurRadius: 36,
+                          offset: const Offset(0, 12),
                         ),
                       ],
                       border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
@@ -175,114 +177,191 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(H10Tokens.colorPrimary),
-                  borderRadius: BorderRadius.circular(4),
+      backgroundColor: const Color(0xFFF4F6F0),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(68),
+        child: Container(
+          color: const Color(0xFFF4F6F0),
+          padding: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 6),
+          child: SafeArea(
+            bottom: false,
+            child: Row(
+              children: [
+                // Patient Avatar (Paytin Profile Style)
+                Stack(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF121715),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFFC8F05F), width: 1.5),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'KS',
+                          style: TextStyle(
+                            color: Color(0xFFC8F05F),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 1,
+                      bottom: 1,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2E7D32),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                child: const Text(
-                  'ASHTHAVAKRA',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 10.5,
-                    color: Colors.white,
-                    letterSpacing: 0.5,
+                const SizedBox(width: 10),
+
+                // Greeting & Subtitle (includes Hand Rehab for test compatibility)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Flexible(
+                            child: Text(
+                              'Hand Rehab',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF161C19),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF121715),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              '3-CH',
+                              style: TextStyle(
+                                fontSize: 8,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFC8F05F),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 1),
+                      const Text(
+                        'Welcome Back 👋 Krushna',
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: Color(0xFF7A837E),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(width: 6),
-              const Text(
-                'Hand Rehab',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(width: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.4)),
-                ),
-                child: const Text(
-                  '3-CH',
-                  style: TextStyle(
-                    fontSize: 8.5,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF00E5FF),
+
+                // Paytin "+ Calibrate" Lime Action Pill
+                InkWell(
+                  onTap: _openCalibration,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFC8F05F),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFC8F05F).withOpacity(0.35),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.add, size: 12, color: Color(0xFF121715)),
+                        SizedBox(width: 2),
+                        Text(
+                          'Calibrate',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF121715),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 2),
+
+                // Preflight Diagnostics Bell Button
+                IconButton(
+                  icon: Stack(
+                    children: [
+                      const Icon(Icons.notifications_outlined, size: 20, color: Color(0xFF161C19)),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          width: 7,
+                          height: 7,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFC8F05F),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  tooltip: 'Preflight Diagnostics',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  onPressed: () => PreflightDialog.show(context),
+                ),
+
+                // Settings Button
+                IconButton(
+                  icon: const Icon(Icons.settings_outlined, size: 19, color: Color(0xFF161C19)),
+                  tooltip: 'Settings',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SettingsScreen(
+                          deviceService: _deviceService,
+                          storageService: _storageService,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-        actions: [
-          ListenableBuilder(
-            listenable: _deviceService,
-            builder: (context, _) {
-              final isStreaming = _deviceService.state == DeviceConnectionState.streaming;
-              final isConnected = _deviceService.state == DeviceConnectionState.connected;
-              final color = isStreaming
-                  ? const Color(H10Tokens.colorSuccess)
-                  : isConnected
-                      ? const Color(H10Tokens.colorInfo)
-                      : const Color(H10Tokens.colorError);
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Chip(
-                  avatar: CircleAvatar(backgroundColor: color, radius: 4),
-                  label: Text(
-                    _deviceService.state.name.toUpperCase(),
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                  ),
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.fact_check_outlined),
-            tooltip: 'Preflight Diagnostics',
-            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-            onPressed: () => PreflightDialog.show(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.history),
-            tooltip: 'Session History',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => HistoryScreen(storageService: _storageService),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => SettingsScreen(
-                    deviceService: _deviceService,
-                    storageService: _storageService,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -318,35 +397,90 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.today_outlined),
-            selectedIcon: Icon(Icons.today),
-            label: 'Today',
+      // Paytin Floating Bottom Capsule Dock
+      bottomNavigationBar: Container(
+        color: const Color(0xFFF4F6F0),
+        padding: const EdgeInsets.only(left: 14, right: 14, bottom: 14, top: 4),
+        child: Container(
+          height: 64,
+          decoration: BoxDecoration(
+            color: const Color(0xFF121715),
+            borderRadius: BorderRadius.circular(32),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.24),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.fitness_center_outlined),
-            selectedIcon: Icon(Icons.fitness_center),
-            label: 'Exercises',
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildDockItem(0, Icons.today_outlined, Icons.today, 'Today'),
+              _buildDockItem(1, Icons.fitness_center_outlined, Icons.fitness_center, 'Exercises'),
+
+              // Signature Glowing Lime Center Action Button
+              GestureDetector(
+                onTap: () => _openTaskProof(),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFC8F05F),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFC8F05F).withOpacity(0.55),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.qr_code_scanner,
+                    color: Color(0xFF121715),
+                    size: 22,
+                  ),
+                ),
+              ),
+
+              _buildDockItem(2, Icons.show_chart_outlined, Icons.show_chart, 'Progress'),
+              _buildDockItem(3, Icons.devices_outlined, Icons.devices, 'Device'),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.show_chart),
-            selectedIcon: Icon(Icons.show_chart),
-            label: 'Progress',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.devices_outlined),
-            selectedIcon: Icon(Icons.devices),
-            label: 'Device',
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDockItem(int index, IconData icon, IconData activeIcon, String label) {
+    final isSelected = _currentIndex == index;
+    return InkWell(
+      onTap: () => setState(() => _currentIndex = index),
+      borderRadius: BorderRadius.circular(24),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 54, minHeight: 48),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected ? const Color(0xFFC8F05F) : const Color(0xFF8E958E),
+              size: 20,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? const Color(0xFFC8F05F) : const Color(0xFF8E958E),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

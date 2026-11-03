@@ -41,22 +41,28 @@ class _DeviceScreenState extends State<DeviceScreen> {
     final isConnected = dev.state == DeviceConnectionState.streaming;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(H10Tokens.space16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Connection Mode Selector
+          // 1. Connection Mode Selector (Preserves 'CONNECTION SOURCE' and 'Simulator (Localhost)')
           const Text(
             'CONNECTION SOURCE',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(H10Tokens.colorSecondaryText)),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(0xFF7A837E)),
           ),
-          const SizedBox(height: H10Tokens.space8),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
                 child: ChoiceChip(
                   label: const Text('Simulator (Localhost)'),
                   selected: dev.mode == ConnectionMode.simulator,
+                  selectedColor: const Color(0xFFC8F05F),
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11.5,
+                    color: dev.mode == ConnectionMode.simulator ? const Color(0xFF121715) : const Color(0xFF7A837E),
+                  ),
                   onSelected: (selected) {
                     if (selected) {
                       dev.setMode(ConnectionMode.simulator);
@@ -66,11 +72,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   },
                 ),
               ),
-              const SizedBox(width: H10Tokens.space8),
+              const SizedBox(width: 8),
               Expanded(
                 child: ChoiceChip(
                   label: const Text('ESP32 Glove (Wi-Fi)'),
                   selected: dev.mode == ConnectionMode.esp32,
+                  selectedColor: const Color(0xFFC8F05F),
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11.5,
+                    color: dev.mode == ConnectionMode.esp32 ? const Color(0xFF121715) : const Color(0xFF7A837E),
+                  ),
                   onSelected: (selected) {
                     if (selected) {
                       dev.setMode(ConnectionMode.esp32);
@@ -82,176 +94,223 @@ class _DeviceScreenState extends State<DeviceScreen> {
               ),
             ],
           ),
-          const SizedBox(height: H10Tokens.space16),
+          const SizedBox(height: 16),
 
-          // 2. IP & Port Entry
-          Card(
-            color: const Color(H10Tokens.colorCard),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(H10Tokens.radiusCard),
-              side: const BorderSide(color: Color(H10Tokens.colorBorder)),
+          // 2. IP & Port Entry Card
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(H10Tokens.space16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Device Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                  const SizedBox(height: H10Tokens.space12),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: TextField(
-                          controller: _ipController,
-                          decoration: const InputDecoration(
-                            labelText: 'IP / Host',
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        flex: 2,
-                        child: TextField(
-                          controller: _portController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Port',
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: H10Tokens.space12),
-                  if (dev.lastValidationError != null)
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Device Socket Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5, color: Color(0xFF161C19))),
                     Container(
-                      margin: const EdgeInsets.only(bottom: H10Tokens.space12),
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFEBEE),
+                        color: dev.state == DeviceConnectionState.streaming ? const Color(0xFFC8F05F) : const Color(0xFFF4F6F0),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.error_outline, color: Color(H10Tokens.colorError), size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              dev.lastValidationError!,
-                              style: const TextStyle(fontSize: 12, color: Color(H10Tokens.colorError)),
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        dev.state.name.toUpperCase(),
+                        style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Color(0xFF121715)),
                       ),
                     ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isConnected ? const Color(H10Tokens.colorError) : const Color(H10Tokens.colorPrimary),
-                        foregroundColor: Colors.white,
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        controller: _ipController,
+                        decoration: InputDecoration(
+                          labelText: 'IP / Host',
+                          labelStyle: const TextStyle(fontSize: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        ),
                       ),
-                      onPressed: () {
-                        if (isConnected) {
-                          dev.disconnect();
-                        } else {
-                          final portVal = int.tryParse(_portController.text.trim()) ?? 8000;
-                          dev.validateAndConnect(_ipController.text, portVal);
-                        }
-                      },
-                      child: Text(isConnected ? 'Disconnect' : 'Connect & Validate'),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        controller: _portController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Port',
+                          labelStyle: const TextStyle(fontSize: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                if (dev.lastValidationError != null)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFEBEE),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: Color(H10Tokens.colorError), size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            dev.lastValidationError!,
+                            style: const TextStyle(fontSize: 12, color: Color(H10Tokens.colorError)),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isConnected ? const Color(0xFFDC2626) : const Color(0xFF121715),
+                      foregroundColor: isConnected ? Colors.white : const Color(0xFFC8F05F),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      if (isConnected) {
+                        dev.disconnect();
+                      } else {
+                        final portVal = int.tryParse(_portController.text.trim()) ?? 8000;
+                        dev.validateAndConnect(_ipController.text, portVal);
+                      }
+                    },
+                    child: Text(
+                      isConnected ? 'Disconnect Device' : 'Connect & Validate Stream',
+                      style: const TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: H10Tokens.space16),
+          const SizedBox(height: 16),
 
-          // 3. Live Diagnostics Panel
-          Card(
-            color: const Color(H10Tokens.colorCard),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(H10Tokens.radiusCard),
-              side: const BorderSide(color: Color(H10Tokens.colorBorder)),
+          // 3. Live Diagnostics Panel (Obsidian Card)
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: const Color(0xFF121715),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0xFF232D28), width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.18),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(H10Tokens.space16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('LIVE DIAGNOSTICS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(H10Tokens.colorSecondaryText))),
-                  const SizedBox(height: H10Tokens.space12),
-                  _diagRow('Controller', dev.controllerModel),
-                  _diagRow('Hardware Profile', '${dev.hardwareProfile.toUpperCase()} (${dev.hardwareProfile == "demo3" ? "3-Flex + FSR + IMU" : "5-Flex + FSR + IMU"})'),
-                  _diagRow('ADC Subsystem', dev.adcModel),
-                  _diagRow('IMU Subsystem', dev.imuModel),
-                  _diagRow('Serial Baud Rate', '${dev.baudRate} baud'),
-                  _diagRow('Power Source', dev.batteryStatus),
-                  _diagRow('Stream Rate', '${dev.currentPacketRateHz} Hz (Target: 25 Hz)'),
-                  _diagRow('Total Packets', '${dev.decoder.diagnostics.totalPacketsDecoded}'),
-                  _diagRow('Decode Errors', '${dev.decoder.diagnostics.decodeErrors}'),
-                  _diagRow('Gaps Detected', '${dev.decoder.diagnostics.gapsDetected}'),
-                  _diagRow('Last Packet Age', '${dev.lastPacketAgeMs} ms'),
-                  _diagRow('Data Source', dev.isSimulated ? 'SIMULATOR / REPLAY' : 'REAL ESP32-S3 GLOVE'),
-                ],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('LIVE DIAGNOSTICS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(0xFFC8F05F))),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E2822),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text('ESP32-S3 N16R8', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.white)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _diagRow('Controller', dev.controllerModel),
+                _diagRow('Hardware Profile', '${dev.hardwareProfile.toUpperCase()} (${dev.hardwareProfile == "demo3" ? "3-Flex + FSR + IMU" : "5-Flex + FSR + IMU"})'),
+                _diagRow('ADC Subsystem', dev.adcModel),
+                _diagRow('IMU Subsystem', dev.imuModel),
+                _diagRow('Serial Baud Rate', '${dev.baudRate} baud'),
+                _diagRow('Power Source', dev.batteryStatus),
+                _diagRow('Stream Rate', '${dev.currentPacketRateHz} Hz (Target: 25 Hz)'),
+                _diagRow('Total Packets', '${dev.decoder.diagnostics.totalPacketsDecoded}'),
+                _diagRow('Decode Errors', '${dev.decoder.diagnostics.decodeErrors}'),
+                _diagRow('Gaps Detected', '${dev.decoder.diagnostics.gapsDetected}'),
+                _diagRow('Last Packet Age', '${dev.lastPacketAgeMs} ms'),
+                _diagRow('Data Source', dev.isSimulated ? 'SIMULATOR / REPLAY' : 'REAL ESP32-S3 GLOVE'),
+              ],
             ),
           ),
-          const SizedBox(height: H10Tokens.space16),
+          const SizedBox(height: 16),
 
           // 4. Hardware Controls (Haptics & Calibration)
-          Card(
-            color: const Color(H10Tokens.colorCard),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(H10Tokens.radiusCard),
-              side: const BorderSide(color: Color(H10Tokens.colorBorder)),
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(H10Tokens.space16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('HARDWARE CONTROLS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(H10Tokens.colorSecondaryText))),
-                  const SizedBox(height: H10Tokens.space12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          icon: const Icon(Icons.vibration),
-                          label: Text(_isTestingHaptic ? 'Pulsing...' : 'Test Haptic'),
-                          onPressed: isConnected && !_isTestingHaptic
-                              ? () async {
-                                  setState(() => _isTestingHaptic = true);
-                                  await dev.sendHapticPulse();
-                                  if (mounted) setState(() => _isTestingHaptic = false);
-                                }
-                              : null,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('HARDWARE CONTROLS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Color(0xFF7A837E))),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.vibration, size: 18),
+                        label: Text(_isTestingHaptic ? 'Pulsing...' : 'Test Haptic', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF121715),
+                          side: const BorderSide(color: Color(0xFFE2E7DE), width: 1.2),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          minimumSize: const Size(0, 44),
                         ),
+                        onPressed: isConnected && !_isTestingHaptic
+                            ? () async {
+                                setState(() => _isTestingHaptic = true);
+                                await dev.sendHapticPulse();
+                                if (mounted) setState(() => _isTestingHaptic = false);
+                              }
+                            : null,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.tune),
-                          label: const Text('Calibration Wizard'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(H10Tokens.colorPrimary),
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: widget.onOpenCalibration,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.tune, size: 18),
+                        label: const Text('Calibration Wizard', style: TextStyle(fontWeight: FontWeight.w900)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFC8F05F),
+                          foregroundColor: const Color(0xFF121715),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          minimumSize: const Size(0, 44),
+                          elevation: 0,
                         ),
+                        onPressed: widget.onOpenCalibration,
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -259,22 +318,24 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Widget _diagRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 3.5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(fontSize: 13, color: Color(H10Tokens.colorSecondaryText)),
+              style: const TextStyle(fontSize: 12.5, color: Color(0xFFA0AAB0)),
               overflow: TextOverflow.ellipsis,
             ),
           ),
           const SizedBox(width: 8),
-          Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()])),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
         ],
       ),
     );
   }
 }
-

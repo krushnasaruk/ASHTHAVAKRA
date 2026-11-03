@@ -82,74 +82,85 @@ class ExercisesScreen extends StatelessWidget {
     ];
 
     return ListView(
-      padding: const EdgeInsets.all(H10Tokens.space16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       children: [
         if (onLaunchTaskProof != null) ...[
-          Card(
-            color: const Color(0xFFF0FDF4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(H10Tokens.radiusCard),
-              side: const BorderSide(color: Color(0xFF86EFAC), width: 1.5),
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0FDF4),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0xFFBBF7D0), width: 1.2),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(H10Tokens.space16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(H10Tokens.colorPrimary),
-                          borderRadius: BorderRadius.circular(4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF121715),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'EVENT TASKPROOF',
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFC8F05F),
                         ),
-                        child: const Text(
-                          'EVENT TASKPROOF',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
                       ),
-                      const Spacer(),
-                      const Chip(
-                        label: Text('Camera + Glove', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                        visualDensity: VisualDensity.compact,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Object Transfer Verification',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF14532D)),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Pick up object in Zone A, transfer across the boundary, and place steadily into Zone B. Real-time deterministic verdict verification.',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF166534)),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(H10Tokens.colorPrimary),
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: onLaunchTaskProof,
-                      icon: const Icon(Icons.verified_outlined, size: 18),
-                      label: const Text('Open TaskProof Verification'),
                     ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFBBF7D0)),
+                      ),
+                      child: const Text(
+                        'Camera + Glove',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF166534)),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Object Transfer Verification',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF14532D)),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Pick up object in Zone A, transfer across the boundary, and place steadily into Zone B. Real-time deterministic verdict verification.',
+                  style: TextStyle(fontSize: 11.5, color: Color(0xFF166534)),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF121715),
+                      foregroundColor: const Color(0xFFC8F05F),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                    ),
+                    onPressed: onLaunchTaskProof,
+                    icon: const Icon(Icons.verified_outlined, size: 18),
+                    label: const Text('Open TaskProof Verification', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: H10Tokens.space16),
+          const SizedBox(height: 16),
           const Text(
             'H10 EXERCISE LIBRARY',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF7A837E), letterSpacing: 1.1),
           ),
-          const SizedBox(height: H10Tokens.space12),
+          const SizedBox(height: 10),
         ],
         ...exercises.map((ex) {
           final code = ex['code'] as ExerciseCode;
@@ -159,14 +170,21 @@ class ExercisesScreen extends StatelessWidget {
           final target = ex['defaultTarget'] as String;
           final instructions = ex['instructions'] as List<String>;
 
-        return Card(
-          color: const Color(H10Tokens.colorCard),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(H10Tokens.radiusCard),
-            side: const BorderSide(color: Color(H10Tokens.colorBorder)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(H10Tokens.space16),
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0xFFE2E7DE), width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -176,42 +194,68 @@ class ExercisesScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15.5, color: Color(0xFF161C19)),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(H10Tokens.colorSurfaceTint),
-                        borderRadius: BorderRadius.circular(4),
+                        color: const Color(0xFFF4F6F0),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         target,
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(H10Tokens.colorPrimary)),
+                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFF121715)),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(desc, style: const TextStyle(fontSize: 13, color: Color(H10Tokens.colorSecondaryText))),
+                Text(desc, style: const TextStyle(fontSize: 12.5, color: Color(0xFF7A837E))),
                 const SizedBox(height: 8),
-                Text('Channels: $channels', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(H10Tokens.colorSecondaryText))),
-                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF121715),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text('3-CH ACTIVE', style: TextStyle(color: Color(0xFFC8F05F), fontSize: 8.5, fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Channels: $channels',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF7A837E)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF121715),
+                          side: const BorderSide(color: Color(0xFFE2E7DE), width: 1.2),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          minimumSize: const Size(0, 44),
+                        ),
                         onPressed: () {
                           showDialog(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: Text(title),
+                              backgroundColor: Colors.white,
+                              title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: instructions.map((i) => Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 4),
-                                  child: Text(i),
+                                  child: Text(i, style: const TextStyle(fontSize: 13)),
                                 )).toList(),
                               ),
                               actions: [
@@ -220,28 +264,30 @@ class ExercisesScreen extends StatelessWidget {
                             ),
                           );
                         },
-                        child: const Text('Instructions', overflow: TextOverflow.ellipsis),
+                        child: const Text('Instructions', overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(H10Tokens.colorPrimary),
-                          foregroundColor: Colors.white,
+                          backgroundColor: const Color(0xFFC8F05F),
+                          foregroundColor: const Color(0xFF121715),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          minimumSize: const Size(0, 44),
+                          elevation: 0,
                         ),
                         onPressed: () => onSelectExercise(code),
-                        child: const Text('Start Exercise', overflow: TextOverflow.ellipsis),
+                        child: const Text('Start Exercise', overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w900)),
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-          ),
-        );
-      }),
-    ],
-  );
-}
+          );
+        }),
+      ],
+    );
+  }
 }
