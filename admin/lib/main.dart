@@ -127,8 +127,13 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
     // Disclaimer Banner
     final disclaimerBanner = Container(
       width: double.infinity,
-      color: const Color(0xFF1B160C),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4.5),
+      margin: const EdgeInsets.only(top: 8, left: 24, right: 24, bottom: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF9E6),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFFFE082), width: 0.8),
+      ),
       child: const Text(
         'PROTOTYPE MONITORING TOOL — NOT A MEDICAL DEVICE. Strictly for clinical research and demonstration monitoring. Never diagnose, prescribe, or predict recovery.',
         textAlign: TextAlign.center,
@@ -136,7 +141,7 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
           fontSize: 8.5,
           fontWeight: FontWeight.bold,
           letterSpacing: 0.3,
-          color: Color(0xFFFFD38A),
+          color: Color(0xFF5A4420),
         ),
       ),
     );

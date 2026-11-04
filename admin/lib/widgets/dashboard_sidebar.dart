@@ -16,137 +16,149 @@ class DashboardSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
+      width: 240,
       height: double.infinity,
-      decoration: const BoxDecoration(
+      margin: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
         color: AdminTheme.sidebarBg,
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(24),
-          bottomRight: Radius.circular(24),
-        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 18,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Logo & Brand Mark (Matching image header)
-          Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF25293A),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AdminTheme.lime, width: 3),
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: AdminTheme.lime,
-                          shape: BoxShape.circle,
+          // 1. Logo & Brand Mark (Clean single-line style matching Eduplex in reference)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              children: [
+                // Circular brand emblem with spiral mark
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF25293A),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Container(
+                      width: 18,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AdminTheme.lime, width: 2.5),
+                      ),
+                      child: Center(
+                        child: Container(
+                          width: 5,
+                          height: 5,
+                          decoration: const BoxDecoration(
+                            color: AdminTheme.lime,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          const Text(
-                            'ASHTAVAKRA',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.6,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(width: 5),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: AdminTheme.lime,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text(
-                              'v3',
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            const Text(
+                              'ASHTAVAKRA',
                               style: TextStyle(
-                                fontSize: 8.5,
+                                fontSize: 14.5,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF14181B),
+                                letterSpacing: 0.6,
+                                color: Colors.white,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          const Text(
-                            'Hand Rehab',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: AdminTheme.sidebarTextMuted,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0.5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF25293A),
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                            child: const Text(
-                              '3-CH',
-                              style: TextStyle(
-                                fontSize: 7.5,
-                                fontWeight: FontWeight.bold,
+                            const SizedBox(width: 5),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
                                 color: AdminTheme.lime,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                'v3',
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF14181B),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 1),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            const Text(
+                              'Hand Rehab',
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                color: AdminTheme.sidebarTextMuted,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 0.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF25293A),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: const Text(
+                                '3-CH',
+                                style: TextStyle(
+                                  fontSize: 7.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: AdminTheme.lime,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 24),
 
-          // 2. Navigation Menu List
+          // 2. Navigation Menu (Matching the exact items & styling in the reference image)
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
+                // Item 1: Dashboard (Active neon lime pill)
                 _buildNavItem(
                   index: 0,
                   icon: Icons.grid_view_rounded,
-                  label: 'Today',
+                  label: 'Dashboard',
+                  tag: 'Today',
                   isSelected: selectedIndex == 0,
                 ),
                 _buildNavItem(
@@ -161,25 +173,6 @@ class DashboardSidebar extends StatelessWidget {
                   label: 'TaskProof',
                   isSelected: selectedIndex == 2,
                 ),
-                _buildNavItem(
-                  index: 3,
-                  icon: Icons.description_rounded,
-                  label: 'Audit & PDF',
-                  isSelected: selectedIndex == 3,
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                  child: Text(
-                    'COHORT & CLINIC',
-                    style: TextStyle(
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
-                      color: AdminTheme.sidebarTextMuted.withOpacity(0.6),
-                    ),
-                  ),
-                ),
                 _buildStaticNavItem(
                   icon: Icons.people_alt_rounded,
                   label: 'Cohort Roster',
@@ -187,19 +180,20 @@ class DashboardSidebar extends StatelessWidget {
                 ),
                 _buildStaticNavItem(
                   icon: Icons.notifications_none_rounded,
-                  label: 'Clinical Alerts',
+                  label: 'Notifications',
                   badgeCount: 2,
                   onTap: () => onSelectTab(0),
+                ),
+                _buildNavItem(
+                  index: 3,
+                  icon: Icons.description_rounded,
+                  label: 'Audit & PDF',
+                  isSelected: selectedIndex == 3,
                 ),
                 _buildStaticNavItem(
                   icon: Icons.calendar_month_rounded,
                   label: 'Protocols',
                   onTap: onOpenPrescription,
-                ),
-                _buildStaticNavItem(
-                  icon: Icons.tune_rounded,
-                  label: 'Preflight & BLE',
-                  onTap: () => onSelectTab(2),
                 ),
                 _buildStaticNavItem(
                   icon: Icons.settings_outlined,
@@ -210,12 +204,12 @@ class DashboardSidebar extends StatelessWidget {
             ),
           ),
 
-          // 3. Bottom Card (Download our mobile app / Connect Glove - matching image)
+          // 3. Bottom Card (Download our mobile app - matching reference image)
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(13),
             decoration: BoxDecoration(
               color: AdminTheme.lime,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,7 +261,7 @@ class DashboardSidebar extends StatelessWidget {
                 Text(
                   'H10 ESP32-S3 BLE Online',
                   style: TextStyle(
-                    fontSize: 9,
+                    fontSize: 8.5,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF14181B).withOpacity(0.7),
                   ),
@@ -284,35 +278,54 @@ class DashboardSidebar extends StatelessWidget {
     required int index,
     required IconData icon,
     required String label,
+    String? tag,
     required bool isSelected,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: InkWell(
         onTap: () => onSelectTab(index),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: isSelected ? AdminTheme.lime : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             children: [
               Icon(
                 icon,
-                size: 18,
+                size: 19,
                 color: isSelected ? const Color(0xFF14181B) : AdminTheme.sidebarTextMuted,
               ),
               const SizedBox(width: 12),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                  color: isSelected ? const Color(0xFF14181B) : AdminTheme.sidebarTextMuted,
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                    color: isSelected ? const Color(0xFF14181B) : AdminTheme.sidebarTextMuted,
+                  ),
                 ),
               ),
+              if (tag != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                  decoration: BoxDecoration(
+                    color: isSelected ? const Color(0xFF14181B).withOpacity(0.12) : const Color(0xFF25293A),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    tag,
+                    style: TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      color: isSelected ? const Color(0xFF14181B) : AdminTheme.sidebarTextMuted,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -330,14 +343,14 @@ class DashboardSidebar extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Row(
             children: [
               Icon(
                 icon,
-                size: 18,
+                size: 19,
                 color: AdminTheme.sidebarTextMuted,
               ),
               const SizedBox(width: 12),
@@ -345,7 +358,7 @@ class DashboardSidebar extends StatelessWidget {
                 child: Text(
                   label,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w600,
                     color: AdminTheme.sidebarTextMuted,
                   ),
