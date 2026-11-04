@@ -77,24 +77,24 @@ class ClinicalFlagBadge extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Text(
-                          'Patient ${flag.patientId}',
-                          style: const TextStyle(
-                            color: AdminTheme.textPrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        'Patient ${flag.patientId}',
+                        style: const TextStyle(
+                          color: AdminTheme.textPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12.5,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        flag.type.replaceAll('_', ' ').toUpperCase(),
-                        style: const TextStyle(
-                          color: AdminTheme.textSecondary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          flag.type.replaceAll('_', ' ').toUpperCase(),
+                          style: const TextStyle(
+                            color: AdminTheme.textSecondary,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],

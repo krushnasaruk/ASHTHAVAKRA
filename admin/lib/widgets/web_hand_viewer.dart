@@ -2,16 +2,20 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../theme/admin_theme.dart';
 
+enum HandRenderMode { skin, mesh, xray }
+
 class WebHandViewer extends StatelessWidget {
   final List<double> normalizedFlex; // [thumb, index, middle, ring, pinky] in 0-100%
   final double height;
-  final bool isStreaming;
+  final bool isConnected;
+  final HandRenderMode renderMode;
 
   const WebHandViewer({
     super.key,
     required this.normalizedFlex,
     this.height = 320,
-    this.isStreaming = true,
+    this.isConnected = true,
+    this.renderMode = HandRenderMode.skin,
   });
 
   @override
@@ -46,47 +50,48 @@ class WebHandViewer extends StatelessWidget {
             size: Size(double.infinity, height),
             painter: _KinematicHandPainter(
               normalizedFlex: normalizedFlex,
-              isStreaming: isStreaming,
+              isStreaming: isConnected,
             ),
           ),
 
           // Top Header Overlay
           Positioned(
-            top: 14,
-            left: 16,
-            right: 16,
+            top: 10,
+            left: 12,
+            right: 12,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.view_in_ar, color: AdminTheme.lime, size: 14),
-                    SizedBox(width: 6),
+                    Icon(Icons.view_in_ar, color: AdminTheme.lime, size: 13),
+                    SizedBox(width: 4),
                     Text(
-                      '3D KINEMATIC HAND MONITOR',
+                      '3D HAND MONITOR',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 9.5,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
+                        letterSpacing: 0.8,
                         color: AdminTheme.textPrimary,
                       ),
                     ),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: isStreaming ? AdminTheme.lime.withOpacity(0.12) : const Color(0xFF222624),
+                    color: isConnected ? AdminTheme.lime.withOpacity(0.12) : const Color(0xFF222624),
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: isStreaming ? AdminTheme.lime.withOpacity(0.3) : AdminTheme.border),
+                    border: Border.all(color: isConnected ? AdminTheme.lime.withOpacity(0.3) : AdminTheme.border),
                   ),
                   child: Text(
-                    isStreaming ? 'STREAMING 25 HZ' : 'NO STREAM',
+                    isConnected ? '25 HZ' : 'OFFLINE',
                     style: TextStyle(
-                      fontSize: 8.5,
+                      fontSize: 8,
                       fontWeight: FontWeight.w900,
-                      letterSpacing: 0.8,
-                      color: isStreaming ? AdminTheme.lime : AdminTheme.textSecondary,
+                      letterSpacing: 0.6,
+                      color: isConnected ? AdminTheme.lime : AdminTheme.textSecondary,
                     ),
                   ),
                 ),

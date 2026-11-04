@@ -123,45 +123,48 @@ class _AuditExportScreenState extends State<AuditExportScreen> {
                   ),
                 ],
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DropdownButton<String>(
-                    value: _selectedPatientForExport,
-                    dropdownColor: AdminTheme.surfaceElevated,
-                    style: const TextStyle(color: AdminTheme.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
-                    items: patients.map((p) => DropdownMenuItem(value: p.pseudonym, child: Text('Patient ${p.pseudonym}'))).toList(),
-                    onChanged: (val) {
-                      if (val != null) setState(() => _selectedPatientForExport = val);
-                    },
-                  ),
-                  const SizedBox(width: 14),
-                  ElevatedButton.icon(
-                    onPressed: _isGeneratingPdf ? null : _exportPdf,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AdminTheme.lime,
-                      foregroundColor: AdminTheme.limeDark,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButton<String>(
+                      value: _selectedPatientForExport,
+                      dropdownColor: AdminTheme.surfaceElevated,
+                      style: const TextStyle(color: AdminTheme.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
+                      items: patients.map((p) => DropdownMenuItem(value: p.pseudonym, child: Text('Patient ${p.pseudonym}'))).toList(),
+                      onChanged: (val) {
+                        if (val != null) setState(() => _selectedPatientForExport = val);
+                      },
                     ),
-                    icon: _isGeneratingPdf
-                        ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.picture_as_pdf, size: 16),
-                    label: const Text('Generate 1-Page Summary PDF', style: TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                  const SizedBox(width: 10),
-                  OutlinedButton.icon(
-                    onPressed: _downloadCsv,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AdminTheme.cyan,
-                      side: const BorderSide(color: AdminTheme.cyan),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    const SizedBox(width: 14),
+                    ElevatedButton.icon(
+                      onPressed: _isGeneratingPdf ? null : _exportPdf,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AdminTheme.lime,
+                        foregroundColor: AdminTheme.limeDark,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      icon: _isGeneratingPdf
+                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.picture_as_pdf, size: 16),
+                      label: const Text('Generate 1-Page Summary PDF', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
-                    icon: const Icon(Icons.download, size: 16),
-                    label: const Text('Download CSV Telemetry'),
-                  ),
-                ],
+                    const SizedBox(width: 10),
+                    OutlinedButton.icon(
+                      onPressed: _downloadCsv,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AdminTheme.cyan,
+                        side: const BorderSide(color: AdminTheme.cyan),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      icon: const Icon(Icons.download, size: 16),
+                      label: const Text('Download CSV Telemetry'),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -181,17 +184,21 @@ class _AuditExportScreenState extends State<AuditExportScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'PRESCRIPTION MODIFICATION & EVENT AUDIT TRAIL',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.0,
-                        color: AdminTheme.textPrimary,
+                    const Flexible(
+                      child: Text(
+                        'PRESCRIPTION AUDIT TRAIL',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                          color: AdminTheme.textPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
-                      '${auditLogs.length} LOG ENTRIES',
+                      '${auditLogs.length} LOGS',
                       style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AdminTheme.textSecondary),
                     ),
                   ],

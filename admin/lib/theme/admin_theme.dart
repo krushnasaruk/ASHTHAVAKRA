@@ -13,6 +13,7 @@ class AdminTheme {
   static const Color amber = Color(0xFFF5A623);
   static const Color amberMuted = Color(0xFF1E170C);
   static const Color red = Color(0xFFE05D5D);
+  static const Color crimson = Color(0xFFEF4444);
   static const Color green = Color(0xFF2E7D32);
 
   static const Color textPrimary = Color(0xFFFFFFFF);
@@ -61,3 +62,4 @@ class AdminTheme {
     );
   }
 }
+

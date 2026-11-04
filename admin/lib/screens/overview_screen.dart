@@ -1,353 +1,611 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../theme/admin_theme.dart';
-import '../widgets/metric_stat_card.dart';
+import '../widgets/vector_icons.dart';
 import '../widgets/clinical_flag_badge.dart';
 
 class OverviewScreen extends StatelessWidget {
   final ApiService apiService;
   final ValueChanged<String> onSelectPatient;
   final VoidCallback onOpenLiveMonitor;
+  final VoidCallback onOpenTaskProof;
 
   const OverviewScreen({
     super.key,
     required this.apiService,
     required this.onSelectPatient,
     required this.onOpenLiveMonitor,
+    required this.onOpenTaskProof,
   });
 
   @override
   Widget build(BuildContext context) {
     final patients = apiService.patients;
     final flags = apiService.flags;
+    final defaultPlan = apiService.getPatientActivePlan('P-014');
+    final p014Sessions = apiService.getPatientSessions('P-014');
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Screen Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+          // 1. Paytin Master Telemetry Hero Card (Obsidian Black) (Screenshot 1)
+          InkWell(
+            onTap: onOpenLiveMonitor,
+            borderRadius: BorderRadius.circular(22),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              decoration: BoxDecoration(
+                color: const Color(0xFF121715),
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.35),
+                    blurRadius: 20,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+                border: Border.all(color: const Color(0xFF232D28), width: 1.2),
+              ),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Top Row: Brand + Wave Chip
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Text(
+                            'ASHTAVAKRA',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.4,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          Icon(
+                            Icons.auto_awesome,
+                            color: AdminTheme.lime,
+                            size: 13,
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                        decoration: BoxDecoration(
+                          color: AdminTheme.lime,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.wifi, color: Color(0xFF121715), size: 11),
+                            SizedBox(width: 3),
+                            Text(
+                              '3-CH LIVE',
+                              style: TextStyle(
+                                color: Color(0xFF121715),
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Telemetry Stream Value
                   const Text(
-                    'CLINICAL REHABILITATION OVERVIEW',
+                    'TELEMETRY STREAM',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.4,
-                      color: AdminTheme.textPrimary,
+                      color: Color(0xFF7A837E),
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Real-time supervisor monitor for neurological & hand motor rehabilitation.',
+                  const Row(
+                    children: [
+                      Text(
+                        '921,600',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      SizedBox(width: 6),
+                      Text(
+                        'BAUD',
+                        style: TextStyle(
+                          color: AdminTheme.lime,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'ESP32-S3 N16R8 • 16-BIT ADS1115',
                     style: TextStyle(
-                      fontSize: 13,
-                      color: AdminTheme.textSecondary.withOpacity(0.9),
+                      color: Color(0xFFA0AAB0),
+                      fontSize: 11,
+                      letterSpacing: 0.5,
                     ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Bottom Card Details: Profile & Power
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'PROFILE',
+                              style: TextStyle(color: Color(0xFF6B7280), fontSize: 8.5, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'demo3 (3-CH Measured, 2-CH Est.)',
+                              style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'POWER',
+                              style: TextStyle(color: Color(0xFF6B7280), fontSize: 8.5, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 2),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.usb, color: AdminTheme.lime, size: 13),
+                                SizedBox(width: 3),
+                                Text(
+                                  'USB-C 5.0V',
+                                  style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              ElevatedButton.icon(
-                onPressed: onOpenLiveMonitor,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AdminTheme.lime,
-                  foregroundColor: AdminTheme.limeDark,
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                icon: const Icon(Icons.sensors, size: 18),
-                label: const Text(
-                  'Open Live Cockpit',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-              ),
-            ],
+            ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
 
-          // 4 Top Metrics Cards
+          // 2. Paytin 4 Squircle Quick Action Buttons (Screenshot 1)
           Row(
             children: [
-              MetricStatCard(
-                title: 'Enrolled Cohort',
-                value: '${patients.length}',
-                subtitle: 'Active research patients',
-                icon: Icons.people_outline,
-                accentColor: AdminTheme.cyan,
+              _buildSquircleAction(
+                iconWidget: const VectorIcon.taskProof(size: 18, color: AdminTheme.lime),
+                label: 'TaskProof™',
+                onTap: onOpenTaskProof,
               ),
-              const SizedBox(width: 16),
-              MetricStatCard(
-                title: 'Active Streams',
-                value: '1 LIVE',
-                subtitle: 'Patient P-014 streaming @ 25Hz',
-                icon: Icons.sensors,
-                accentColor: AdminTheme.lime,
+              const SizedBox(width: 8),
+              _buildSquircleAction(
+                iconWidget: const VectorIcon.judge(size: 18, color: AdminTheme.cyan),
+                label: 'Judge View',
+                onTap: onOpenTaskProof,
+              ),
+              const SizedBox(width: 8),
+              _buildSquircleAction(
+                iconWidget: const VectorIcon.routines(size: 18, color: AdminTheme.amber),
+                label: 'Live Stream',
                 onTap: onOpenLiveMonitor,
               ),
-              const SizedBox(width: 16),
-              const MetricStatCard(
-                title: 'Cohort Adherence',
-                value: '84.2%',
-                subtitle: 'Target session completion',
-                icon: Icons.check_circle_outline,
-                accentColor: AdminTheme.green,
-              ),
-              const SizedBox(width: 16),
-              MetricStatCard(
-                title: 'Clinical Flags',
-                value: '${flags.length}',
-                subtitle: 'Fatigue & pain alerts',
-                icon: Icons.warning_amber_rounded,
-                accentColor: AdminTheme.amber,
+              const SizedBox(width: 8),
+              _buildSquircleAction(
+                iconWidget: const VectorIcon.preflight(size: 18, color: Color(0xFF009E73)),
+                label: 'Preflight',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Preflight Check: BLE Online, ADS1115 Calibrated (16-bit), IMU Quaternion Locked.'),
+                      backgroundColor: Color(0xFF141A17),
+                    ),
+                  );
+                },
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 20),
 
-          // Two-Column Grid: Patient Cohort List (Left) + Urgent Clinical Flags (Right)
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Left Column: Active Cohort
-              Expanded(
-                flex: 6,
-                child: Container(
-                  padding: const EdgeInsets.all(22),
-                  decoration: BoxDecoration(
-                    color: AdminTheme.surface,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: AdminTheme.border),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // 3. Prescribed Plan Card (Screenshot 1 style)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: const Color(0xFF121715),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFF222B26), width: 1.1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                      decoration: BoxDecoration(
+                        color: AdminTheme.lime,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'PRESCRIPTION',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF0B0F0E),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: Text(
+                        'Target: ${defaultPlan?.targetReps ?? 10} reps',
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                          color: AdminTheme.textPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1A221E),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Center(
+                        child: VectorIcon.routines(size: 20, color: AdminTheme.lime),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'ENROLLED RESEARCH PATIENTS',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
+                          Text(
+                            (defaultPlan?.exerciseId ?? 'fist_clench').replaceAll('_', ' ').toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
                               color: AdminTheme.textPrimary,
                             ),
                           ),
-                          Text(
-                            '${patients.length} PATIENTS',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: 2),
+                          const Text(
+                            'Patient P-014 • Right Hand Paresis',
+                            style: TextStyle(
+                              fontSize: 11,
                               color: AdminTheme.textSecondary,
                             ),
                           ),
                         ],
                       ),
-                      const Divider(height: 24),
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: patients.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final p = patients[index];
-                          final isLive = (p.pseudonym == 'P-014');
-                          final plan = apiService.getPatientActivePlan(p.pseudonym);
-                          final sessions = apiService.getPatientSessions(p.pseudonym);
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
 
-                          return InkWell(
-                            onTap: () => onSelectPatient(p.pseudonym),
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: AdminTheme.surfaceElevated,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isLive ? AdminTheme.lime.withOpacity(0.4) : AdminTheme.borderSubtle,
-                                ),
-                              ),
+                // Adherence progress indicator
+                Row(
+                  children: [
+                    Text(
+                      '${p014Sessions.length} / ${defaultPlan?.sessionsPerWeek ?? 5}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: AdminTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Expanded(
+                      child: Text(
+                        'sessions completed this week',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: AdminTheme.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: (p014Sessions.length / (defaultPlan?.sessionsPerWeek ?? 5)).clamp(0.0, 1.0),
+                    backgroundColor: const Color(0xFF1A221E),
+                    color: AdminTheme.lime,
+                    minHeight: 7,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Glowing Neon Lime Button (Screenshot 1)
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: ElevatedButton(
+                    onPressed: onOpenLiveMonitor,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AdminTheme.lime,
+                      foregroundColor: const Color(0xFF0B0F0E),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                      elevation: 0,
+                    ),
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Launch Real-Time Live HUD',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          Icon(Icons.arrow_forward, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 22),
+
+          // 4. Enrolled Cohort List (Mobile Card Style)
+          const Text(
+            'ENROLLED COHORT',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.1,
+              color: AdminTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: patients.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final p = patients[index];
+              final isLive = (p.pseudonym == 'P-014');
+              final plan = apiService.getPatientActivePlan(p.pseudonym);
+
+              return InkWell(
+                onTap: () => onSelectPatient(p.pseudonym),
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF121715),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isLive ? AdminTheme.lime.withOpacity(0.3) : const Color(0xFF222B26),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 17,
+                        backgroundColor: isLive ? AdminTheme.lime.withOpacity(0.2) : const Color(0xFF1A221E),
+                        child: Text(
+                          p.pseudonym.replaceAll('-', ''),
+                          style: TextStyle(
+                            color: isLive ? AdminTheme.lime : AdminTheme.textPrimary,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 10.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
                               child: Row(
                                 children: [
-                                  CircleAvatar(
-                                    radius: 18,
-                                    backgroundColor: isLive ? AdminTheme.lime.withOpacity(0.2) : const Color(0xFF1E2622),
+                                  Text(
+                                    'Patient ${p.pseudonym}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      color: AdminTheme.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF161E1A),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
                                     child: Text(
-                                      p.pseudonym.replaceAll('-', ''),
-                                      style: TextStyle(
-                                        color: isLive ? AdminTheme.lime : AdminTheme.textPrimary,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 11,
+                                      '${p.affectedHand.toUpperCase()} HAND',
+                                      style: const TextStyle(
+                                        fontSize: 8.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: AdminTheme.textSecondary,
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'Patient ${p.pseudonym}',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 13,
-                                                color: AdminTheme.textPrimary,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFF161E1A),
-                                                borderRadius: BorderRadius.circular(4),
-                                              ),
-                                              child: Text(
-                                                '${p.affectedHand.toUpperCase()} HAND',
-                                                style: const TextStyle(
-                                                  fontSize: 9,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AdminTheme.textSecondary,
-                                                ),
-                                              ),
-                                            ),
-                                            if (isLive) ...[
-                                              const SizedBox(width: 6),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: AdminTheme.lime.withOpacity(0.2),
-                                                  borderRadius: BorderRadius.circular(4),
-                                                ),
-                                                child: const Text(
-                                                  'LIVE 25Hz',
-                                                  style: TextStyle(
-                                                    fontSize: 9,
-                                                    fontWeight: FontWeight.w900,
-                                                    color: AdminTheme.lime,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          p.notes.isNotEmpty ? p.notes : 'General motor rehabilitation protocol',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            color: Color(0xFF909B95),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        'Plan v${plan?.version ?? 1}',
-                                        style: const TextStyle(
+                                  if (isLive) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                      decoration: BoxDecoration(
+                                        color: AdminTheme.lime.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: const Text(
+                                        'LIVE',
+                                        style: TextStyle(
+                                          fontSize: 8.5,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 11,
                                           color: AdminTheme.lime,
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        '${sessions.length} sessions',
-                                        style: const TextStyle(
-                                          fontSize: 10,
-                                          color: AdminTheme.textSecondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.chevron_right, color: AdminTheme.textSecondary, size: 18),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 24),
-
-              // Right Column: Priority Movement Flags & Alerts
-              Expanded(
-                flex: 5,
-                child: Container(
-                  padding: const EdgeInsets.all(22),
-                  decoration: BoxDecoration(
-                    color: AdminTheme.surface,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: AdminTheme.border),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'MOVEMENT FLAGS & ALERTS',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
-                              color: AdminTheme.textPrimary,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: AdminTheme.amber.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '${flags.length} REVIEWS PENDING',
+                            const SizedBox(height: 2),
+                            Text(
+                              'Target: ${plan?.targetRomMin.toInt()}%+ ROM • ${(plan?.exerciseId ?? "fist_clench").replaceAll("_", " ")}',
                               style: const TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                                color: AdminTheme.amber,
+                                fontSize: 11,
+                                color: AdminTheme.textSecondary,
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      const Divider(height: 24),
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: flags.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final f = flags[index];
-                          return ClinicalFlagBadge(
-                            flag: f,
-                            onTap: () => onSelectPatient(f.patientId),
-                          );
-                        },
-                      ),
+                      const Icon(Icons.chevron_right, color: AdminTheme.textSecondary, size: 18),
                     ],
                   ),
                 ),
+              );
+            },
+          ),
+          const SizedBox(height: 20),
+
+          // 5. Clinical Safety & Fatigue Flags Feed
+          const Text(
+            'ACTIVE CLINICAL FLAGS',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.1,
+              color: AdminTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (flags.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF121715),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFF222B26)),
+              ),
+              child: const Center(
+                child: Text(
+                  'No active clinical flags. All patient sessions within safe bounds.',
+                  style: TextStyle(fontSize: 12, color: AdminTheme.textSecondary),
+                ),
+              ),
+            )
+          else
+            ...flags.take(3).map(
+                  (f) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: ClinicalFlagBadge(flag: f),
+                  ),
+                ),
+
+          const SizedBox(height: 70), // breathing room above floating dock
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSquircleAction({
+    required Widget iconWidget,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
+          decoration: BoxDecoration(
+            color: const Color(0xFF121715),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFF222B26), width: 1.1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF161E1A),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(child: iconWidget),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: AdminTheme.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

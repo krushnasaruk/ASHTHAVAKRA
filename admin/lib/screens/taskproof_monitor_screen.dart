@@ -62,41 +62,44 @@ class _TaskProofMonitorScreenState extends State<TaskProofMonitorScreen> {
                   ),
                 ],
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // View Switcher (Operator vs Judge)
-                  Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      color: AdminTheme.surface,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AdminTheme.border),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // View Switcher (Operator vs Judge)
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: AdminTheme.surface,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AdminTheme.border),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildModeTab('OPERATOR DIAGNOSTIC', !_isJudgeView, () => setState(() => _isJudgeView = false)),
+                          const SizedBox(width: 4),
+                          _buildModeTab('JUDGE VERDICT', _isJudgeView, () => setState(() => _isJudgeView = true)),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildModeTab('OPERATOR DIAGNOSTIC', !_isJudgeView, () => setState(() => _isJudgeView = false)),
-                        const SizedBox(width: 4),
-                        _buildModeTab('JUDGE VERDICT', _isJudgeView, () => setState(() => _isJudgeView = true)),
-                      ],
+                    const SizedBox(width: 12),
+                    // Occlusion Test Button
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        setState(() => _simulateOcclusion = !_simulateOcclusion);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _simulateOcclusion ? AdminTheme.amber : AdminTheme.textSecondary,
+                        side: BorderSide(color: _simulateOcclusion ? AdminTheme.amber : AdminTheme.border),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      icon: Icon(_simulateOcclusion ? Icons.visibility_off : Icons.visibility, size: 16),
+                      label: Text(_simulateOcclusion ? 'Marker Occluded (Active)' : 'Test Occlusion Guard'),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Occlusion Test Button
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      setState(() => _simulateOcclusion = !_simulateOcclusion);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: _simulateOcclusion ? AdminTheme.amber : AdminTheme.textSecondary,
-                      side: BorderSide(color: _simulateOcclusion ? AdminTheme.amber : AdminTheme.border),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    icon: Icon(_simulateOcclusion ? Icons.visibility_off : Icons.visibility, size: 16),
-                    label: Text(_simulateOcclusion ? 'Marker Occluded (Active)' : 'Test Occlusion Guard'),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -105,7 +108,7 @@ class _TaskProofMonitorScreenState extends State<TaskProofMonitorScreen> {
           // High-Impact Verdict Banner (Judge View feature)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
               color: AdminTheme.surface,
               borderRadius: BorderRadius.circular(18),
@@ -118,13 +121,13 @@ class _TaskProofMonitorScreenState extends State<TaskProofMonitorScreen> {
                 ),
               ],
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: verdictColor.withOpacity(0.15),
                         shape: BoxShape.circle,
@@ -132,35 +135,39 @@ class _TaskProofMonitorScreenState extends State<TaskProofMonitorScreen> {
                       child: Icon(
                         _simulateOcclusion ? Icons.help_outline : (_activeStateIndex == 6 ? Icons.check_circle : Icons.sync),
                         color: verdictColor,
-                        size: 28,
+                        size: 24,
                       ),
                     ),
-                    const SizedBox(width: 18),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'DETERMINISTIC VERDICT: $verdictState',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
-                            color: verdictColor,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'VERDICT: $verdictState',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.8,
+                              color: verdictColor,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _simulateOcclusion
-                              ? 'HONESTY GUARD ACTIVE: ArUco marker occluded >500ms. Engine strictly refuses to fabricate success.'
-                              : 'Active State: ${_states[_activeStateIndex]['name']} — ${_states[_activeStateIndex]['desc']}',
-                          style: const TextStyle(fontSize: 12, color: Color(0xFFC0CAC4)),
-                        ),
-                      ],
+                          const SizedBox(height: 2),
+                          Text(
+                            _simulateOcclusion
+                                ? 'HONESTY GUARD: Marker occluded.'
+                                : 'State: ${_states[_activeStateIndex]['name']}',
+                            style: const TextStyle(fontSize: 11, color: Color(0xFFC0CAC4)),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: AdminTheme.surfaceElevated,
                     borderRadius: BorderRadius.circular(8),
@@ -168,7 +175,7 @@ class _TaskProofMonitorScreenState extends State<TaskProofMonitorScreen> {
                   ),
                   child: const Text(
                     'SHA-256 HASH VERIFIED',
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.8, color: AdminTheme.textSecondary),
+                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.8, color: AdminTheme.textSecondary),
                   ),
                 ),
               ],
@@ -269,40 +276,66 @@ class _TaskProofMonitorScreenState extends State<TaskProofMonitorScreen> {
           const SizedBox(height: 28),
 
           // Physical Guard Checklist Cards
-          Row(
-            children: [
-              _buildGuardCard(
-                title: 'PALMAR CONTACT FORCE',
-                status: _activeStateIndex >= 2 ? 'PASS (1,840 ADC)' : 'PENDING',
-                desc: 'FSR contact pressure sustained >500ms',
-                isPassed: _activeStateIndex >= 2,
-                icon: Icons.compress,
-              ),
-              const SizedBox(width: 16),
-              _buildGuardCard(
-                title: 'VERTICAL OBJECT LIFT',
-                status: _activeStateIndex >= 3 ? 'PASS (+62mm)' : 'PENDING',
-                desc: 'Cleared table boundary plane',
-                isPassed: _activeStateIndex >= 3,
-                icon: Icons.arrow_upward,
-              ),
-              const SizedBox(width: 16),
-              _buildGuardCard(
-                title: 'ARUCO ZONE ALIGNMENT',
-                status: _simulateOcclusion ? 'FAIL (OCCLUSION)' : (_activeStateIndex >= 5 ? 'PASS (ZONE B)' : '25.0 Hz TRACKING'),
-                desc: 'Continuous optical centroid verification',
-                isPassed: !_simulateOcclusion && _activeStateIndex >= 5,
-                icon: Icons.center_focus_strong,
-              ),
-              const SizedBox(width: 16),
-              _buildGuardCard(
-                title: 'TARGET RELEASE',
-                status: _activeStateIndex >= 6 ? 'CONFIRMED' : 'WAITING',
-                desc: 'Controlled release inside perimeter',
-                isPassed: _activeStateIndex >= 6,
-                icon: Icons.done_all,
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow = constraints.maxWidth < 600;
+              final cards = [
+                _buildGuardCard(
+                  title: 'PALMAR CONTACT FORCE',
+                  status: _activeStateIndex >= 2 ? 'PASS (1,840 ADC)' : 'PENDING',
+                  desc: 'FSR contact pressure sustained >500ms',
+                  isPassed: _activeStateIndex >= 2,
+                  icon: Icons.compress,
+                ),
+                _buildGuardCard(
+                  title: 'VERTICAL OBJECT LIFT',
+                  status: _activeStateIndex >= 3 ? 'PASS (+62mm)' : 'PENDING',
+                  desc: 'Cleared table boundary plane',
+                  isPassed: _activeStateIndex >= 3,
+                  icon: Icons.arrow_upward,
+                ),
+                _buildGuardCard(
+                  title: 'ARUCO ZONE ALIGNMENT',
+                  status: _simulateOcclusion ? 'FAIL (OCCLUSION)' : (_activeStateIndex >= 5 ? 'PASS (ZONE B)' : '25.0 Hz TRACKING'),
+                  desc: 'Continuous optical centroid verification',
+                  isPassed: !_simulateOcclusion && _activeStateIndex >= 5,
+                  icon: Icons.center_focus_strong,
+                ),
+                _buildGuardCard(
+                  title: 'TARGET RELEASE',
+                  status: _activeStateIndex >= 6 ? 'CONFIRMED' : 'WAITING',
+                  desc: 'Controlled release inside perimeter',
+                  isPassed: _activeStateIndex >= 6,
+                  icon: Icons.done_all,
+                ),
+              ];
+
+              if (isNarrow) {
+                return Column(
+                  children: [
+                    cards[0],
+                    const SizedBox(height: 10),
+                    cards[1],
+                    const SizedBox(height: 10),
+                    cards[2],
+                    const SizedBox(height: 10),
+                    cards[3],
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: cards[0]),
+                  const SizedBox(width: 14),
+                  Expanded(child: cards[1]),
+                  const SizedBox(width: 14),
+                  Expanded(child: cards[2]),
+                  const SizedBox(width: 14),
+                  Expanded(child: cards[3]),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -341,39 +374,37 @@ class _TaskProofMonitorScreenState extends State<TaskProofMonitorScreen> {
   }) {
     final color = isPassed ? AdminTheme.green : AdminTheme.textSecondary;
 
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: AdminTheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AdminTheme.border),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AdminTheme.textSecondary),
-                ),
-                Icon(icon, color: color, size: 16),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              status,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: isPassed ? AdminTheme.lime : AdminTheme.textPrimary),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              desc,
-              style: const TextStyle(fontSize: 11, color: Color(0xFF8A9590)),
-            ),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AdminTheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AdminTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AdminTheme.textSecondary),
+              ),
+              Icon(icon, color: color, size: 16),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            status,
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: isPassed ? AdminTheme.lime : AdminTheme.textPrimary),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            desc,
+            style: const TextStyle(fontSize: 10.5, color: Color(0xFF8A9590)),
+          ),
+        ],
       ),
     );
   }
