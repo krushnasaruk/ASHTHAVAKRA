@@ -48,6 +48,16 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
   void initState() {
     super.initState();
     _apiService = ApiService();
+    try {
+      final tab = Uri.base.queryParameters['tab'];
+      if (tab == 'live' || tab == 'hud') {
+        _selectedIndex = 1;
+      } else if (tab == 'taskproof') {
+        _selectedIndex = 2;
+      } else if (tab == 'audit') {
+        _selectedIndex = 3;
+      }
+    } catch (_) {}
   }
 
   @override

@@ -6,20 +6,30 @@ import 'package:flutter/material.dart';
 import '../theme/admin_theme.dart';
 import 'hand_view_platform_stub.dart'
     if (dart.library.html) 'hand_view_platform_web.dart';
+import 'holographic_hand_scan.dart';
 
-enum HandRenderMode { skin, mesh, xray }
+/// All available hand visualization modes and skins matching the mobile patient app.
+enum HandRenderMode {
+  skin,        // Realistic 3D Human Hand Model with skin & flesh texture (hand.glb)
+  mesh,        // 3D Polygonal Wireframe Mesh on realistic hand
+  xray,        // 3D Translucent X-Ray with glowing joints
+  skeleton,    // 3D 27-Bone Anatomical Osteology Skeleton (anatomy.html / skeleton.glb)
+  holographic, // Glowing Cybernetic Kinematic HUD Scanner (Okabe-Ito colors + FSR)
+}
 
-/// 3D Interactive Anatomical Hand WebGL Viewer for Laptop Admin Cockpit.
+/// 3D Interactive Multi-Skin Hand WebGL & Kinematic Viewer for Admin Cockpit.
 ///
-/// Embeds the Three.js 27-bone anatomical hand skeleton model from assets/hand/anatomy.html
-/// with translucent skin envelope, glowing yellow phalanx shafts, amber joint rings,
-/// and live 25 Hz telemetry frame stream bridge.
+/// Seamlessly supports all hand representations from the mobile app:
+/// 1. Realistic 3D Human Hand Mesh (Skin, Mesh, X-Ray) from assets/hand/hand_view.html
+/// 2. 27-Bone Anatomical Hand Skeleton from assets/hand/anatomy.html
+/// 3. Cybernetic Holographic Kinematics Scanner with palmar FSR pressure field
 class WebHandViewer extends StatefulWidget {
   final List<double> normalizedFlex; // [thumb, index, middle, ring, pinky] in 0-100%
   final double? height;
   final bool isConnected;
   final HandRenderMode renderMode;
   final List<int>? imu;
+  final double fsrContact;
   final bool showControls;
 
   const WebHandViewer({
@@ -29,6 +39,7 @@ class WebHandViewer extends StatefulWidget {
     this.isConnected = true,
     this.renderMode = HandRenderMode.skin,
     this.imu,
+    this.fsrContact = 0.0,
     this.showControls = true,
   });
 
@@ -38,6 +49,8 @@ class WebHandViewer extends StatefulWidget {
 
 class _WebHandViewerState extends State<WebHandViewer> {
   Timer? _telemetryBridgeTimer;
+  Timer? _modeTimer1;
+  Timer? _modeTimer2;
   DateTime _lastPacketTime = DateTime.now();
 
   @override
@@ -49,17 +62,40 @@ class _WebHandViewerState extends State<WebHandViewer> {
         _dispatchFramePayload();
       }
     });
+
+    // Ensure mode is applied once web iframe initializes
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _applyRenderMode();
+        _modeTimer1 = Timer(const Duration(milliseconds: 250), _applyRenderMode);
+        _modeTimer2 = Timer(const Duration(milliseconds: 700), _applyRenderMode);
+      });
+    }
+  }
+
+  void _applyRenderMode() {
+    if (!mounted) return;
+    if (widget.renderMode == HandRenderMode.skin ||
+        widget.renderMode == HandRenderMode.mesh ||
+        widget.renderMode == HandRenderMode.xray) {
+      _sendRenderMode(widget.renderMode.name);
+    }
   }
 
   @override
   void didUpdateWidget(covariant WebHandViewer oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.renderMode != widget.renderMode) {
+      _applyRenderMode();
+    }
     _dispatchFramePayload();
   }
 
   @override
   void dispose() {
     _telemetryBridgeTimer?.cancel();
+    _modeTimer1?.cancel();
+    _modeTimer2?.cancel();
     super.dispose();
   }
 
@@ -115,16 +151,24 @@ class _WebHandViewerState extends State<WebHandViewer> {
       },
     });
 
-    postPlatformMessage(payload, 'admin-hand-anatomy-3d');
+    // Broadcasts frame to all mounted Three.js webgl iframes
+    postPlatformMessage(payload);
+  }
+
+  void _sendRenderMode(String mode) {
+    final payload = jsonEncode({'action': 'setRenderMode', 'mode': mode});
+    postPlatformMessage(payload, 'admin-hand-realistic-3d');
   }
 
   void _sendAction(String action) {
     final payload = jsonEncode({'action': action});
-    postPlatformMessage(payload, 'admin-hand-anatomy-3d');
+    postPlatformMessage(payload);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isHolographic = widget.renderMode == HandRenderMode.holographic;
+
     final content = Container(
       height: widget.height,
       decoration: BoxDecoration(
@@ -156,24 +200,57 @@ class _WebHandViewerState extends State<WebHandViewer> {
             ),
           ),
 
-          // 1. WebGL 3D Anatomical Three.js Hand Iframe on Web
+          // 1. WebGL 3D Hand Views & Holographic Scanner on Web
           if (kIsWeb)
             Positioned.fill(
-              child: buildPlatformHandView(
-                viewType: 'admin-hand-anatomy-3d',
-                assetUrl: 'assets/hand/anatomy.html',
+              child: Stack(
+                children: [
+                  // Realistic 3D Human Hand (Skin, Mesh, X-Ray) from hand.glb
+                  Offstage(
+                    offstage: widget.renderMode == HandRenderMode.skeleton || isHolographic,
+                    child: buildPlatformHandView(
+                      viewType: 'admin-hand-realistic-3d',
+                      assetUrl: 'assets/hand/hand_view.html',
+                    ),
+                  ),
+
+                  // 27-Bone Anatomical Skeleton from anatomy.html
+                  Offstage(
+                    offstage: widget.renderMode != HandRenderMode.skeleton,
+                    child: buildPlatformHandView(
+                      viewType: 'admin-hand-anatomy-3d',
+                      assetUrl: 'assets/hand/anatomy.html',
+                    ),
+                  ),
+
+                  // Cybernetic Holographic Kinematics Scanner
+                  if (isHolographic)
+                    Positioned.fill(
+                      child: HolographicHandScanWidget(
+                        flexValues: widget.normalizedFlex,
+                        fsrContact: widget.fsrContact,
+                        isDemo3: true,
+                      ),
+                    ),
+                ],
               ),
             ),
 
-          // 2. Custom Biomechanical Painter (Fallback for VM tests or loading)
+          // 2. Biomechanical Painter (Fallback for VM tests or non-web)
           if (!kIsWeb)
             Positioned.fill(
-              child: CustomPaint(
-                painter: _KinematicHandPainter(
-                  normalizedFlex: widget.normalizedFlex,
-                  isStreaming: widget.isConnected,
-                ),
-              ),
+              child: isHolographic
+                  ? HolographicHandScanWidget(
+                      flexValues: widget.normalizedFlex,
+                      fsrContact: widget.fsrContact,
+                      isDemo3: true,
+                    )
+                  : CustomPaint(
+                      painter: _KinematicHandPainter(
+                        normalizedFlex: widget.normalizedFlex,
+                        isStreaming: widget.isConnected,
+                      ),
+                    ),
             ),
 
           // 3. Top HUD Status Header Overlay
@@ -299,17 +376,21 @@ class _WebHandViewerState extends State<WebHandViewer> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF101614).withOpacity(0.85),
+                  color: const Color(0xFF141A17).withOpacity(0.85),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: const Color(0xFF222E28)),
+                  border: Border.all(color: const Color(0xFF26332C)),
                 ),
-                child: const Text(
-                  '27 BONES: 8 CARPALS • 5 METACARPALS • 14 PHALANGES',
-                  style: TextStyle(
-                    fontSize: 7.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
-                    color: Color(0xFF8C9B94),
+                child: Text(
+                  widget.renderMode == HandRenderMode.skeleton
+                      ? '27 BONES • CARPALS + PHALANGES'
+                      : (isHolographic
+                          ? '27 BONES • CYBERNETIC KINEMATICS'
+                          : '27 BONES • 3D RIG & SKIN'),
+                  style: const TextStyle(
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                    color: AdminTheme.textSecondary,
                   ),
                 ),
               ),

@@ -151,6 +151,14 @@
       // 5. Build Reusable Materials for 3 Render Modes
       createMaterials();
 
+      // Check initial URL param for render mode (e.g. ?mode=skin, ?mode=mesh, ?mode=xray)
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('mode')) {
+          currentRenderMode = params.get('mode').toLowerCase();
+        }
+      } catch (e) {}
+
       // 6. Load 3D Hand Model
       loadHandModel();
 
@@ -345,6 +353,16 @@
       updateMaterials();
     };
 
+    function resetView() {
+      targetRotY = -0.22;
+      targetRotX = 3.05;
+    }
+
+    function togglePalmBackView() {
+      // Toggle 180 degrees to view palm or dorsum (back of hand)
+      targetRotY = (Math.abs(targetRotY - (-0.22)) < 0.5) ? (Math.PI - 0.22) : -0.22;
+    }
+
     function updateMaterials() {
       if (!handMesh) return;
 
@@ -515,6 +533,10 @@
           window.setFrame(payload.data);
         } else if (payload.action === 'setRenderMode' && payload.mode) {
           window.setRenderMode(payload.mode);
+        } else if (payload.action === 'togglePalmBack') {
+          togglePalmBackView();
+        } else if (payload.action === 'resetView') {
+          resetView();
         } else if (payload.curl) {
           window.setFrame(payload);
         }

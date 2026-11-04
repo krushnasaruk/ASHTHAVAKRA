@@ -280,7 +280,7 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                 ),
                 child: Stack(
                   children: [
-                    // Forward Kinematic 3D Anatomical Hand Viewer (WebGL Three.js)
+                    // Forward Kinematic 3D Multi-Skin Hand Viewer (WebGL Three.js)
                     Positioned.fill(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
@@ -288,13 +288,14 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                           normalizedFlex: _liveFlex,
                           isConnected: _isLiveStreaming,
                           renderMode: _currentMode,
+                          fsrContact: _fsrContact,
                           height: isWidescreen ? 540 : 320,
                           showControls: true,
                         ),
                       ),
                     ),
 
-                    // Top Mode Selector: SKIN | MESH | XRAY + 3D HUD: ON
+                    // Top Multi-Skin Selector: SKIN | MESH | XRAY | SKELETON | HOLOGRAPHIC
                     Positioned(
                       top: 10,
                       left: 10,
@@ -302,24 +303,36 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF14120E).withOpacity(0.92),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xFF2E261A), width: 0.8),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildModeButton(HandRenderMode.skin, 'SKIN'),
-                                _buildModeButton(HandRenderMode.mesh, 'MESH'),
-                                _buildModeButton(HandRenderMode.xray, 'XRAY'),
-                              ],
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.all(2.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF14120E).withOpacity(0.92),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFF2E261A), width: 0.8),
+                              ),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _buildModeButton(HandRenderMode.skin, 'SKIN'),
+                                    const SizedBox(width: 2),
+                                    _buildModeButton(HandRenderMode.mesh, 'MESH'),
+                                    const SizedBox(width: 2),
+                                    _buildModeButton(HandRenderMode.xray, 'XRAY'),
+                                    const SizedBox(width: 2),
+                                    _buildModeButton(HandRenderMode.skeleton, 'SKELETON'),
+                                    const SizedBox(width: 2),
+                                    _buildModeButton(HandRenderMode.holographic, 'HOLOGRAPHIC'),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
+                          const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
                             decoration: BoxDecoration(
                               color: const Color(0xFF141A17).withOpacity(0.92),
                               borderRadius: BorderRadius.circular(6),
