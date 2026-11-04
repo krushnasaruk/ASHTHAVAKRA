@@ -117,11 +117,18 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
         children: [
           // 1. Session Protocol Header with Patient Selector, Protocol Name, Pause, Stop
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFF121715),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF222B26), width: 1.0),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AdminTheme.cardBorder, width: 1.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,17 +138,17 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                     children: [
                       // Patient selector pill
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF161E1A),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFF2C3932)),
+                          color: const Color(0xFFF5F6FA),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AdminTheme.cardBorder),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             value: _selectedPatient,
-                            dropdownColor: const Color(0xFF161E1A),
-                            icon: const Icon(Icons.arrow_drop_down, color: AdminTheme.lime, size: 18),
+                            dropdownColor: Colors.white,
+                            icon: const Icon(Icons.arrow_drop_down, color: AdminTheme.textPrimary, size: 18),
                             style: const TextStyle(
                               color: AdminTheme.textPrimary,
                               fontWeight: FontWeight.bold,
@@ -150,7 +157,7 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                             items: patients.map((p) {
                               return DropdownMenuItem(
                                 value: p.pseudonym,
-                                child: Text('Patient ${p.pseudonym}'),
+                                child: Text('Patient ${p.pseudonym}', style: const TextStyle(color: AdminTheme.textPrimary)),
                               );
                             }).toList(),
                             onChanged: (val) {
@@ -174,17 +181,17 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                       ),
                       const SizedBox(width: 10),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                         decoration: BoxDecoration(
-                          color: AdminTheme.lime.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(4),
+                          color: AdminTheme.lime,
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text(
                           'ACTIVE PROTOCOL',
                           style: TextStyle(
                             fontSize: 8.5,
                             fontWeight: FontWeight.w900,
-                            color: AdminTheme.lime,
+                            color: Color(0xFF14181B),
                           ),
                         ),
                       ),
@@ -198,7 +205,7 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                     IconButton(
                       icon: Icon(
                         _isPaused ? Icons.play_arrow : Icons.pause,
-                        color: _isPaused ? AdminTheme.lime : AdminTheme.textPrimary,
+                        color: _isPaused ? AdminTheme.green : AdminTheme.textPrimary,
                         size: 20,
                       ),
                       tooltip: _isPaused ? 'Resume Session' : 'Pause Session',
@@ -345,9 +352,16 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF121715),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFF222B26), width: 1.0),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: AdminTheme.cardBorder, width: 1.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.02),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Center(
                       child: RepetitionRingWidget(

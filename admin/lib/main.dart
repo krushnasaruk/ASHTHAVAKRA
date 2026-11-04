@@ -6,6 +6,8 @@ import 'screens/live_monitor_screen.dart';
 import 'screens/patient_detail_screen.dart';
 import 'screens/taskproof_monitor_screen.dart';
 import 'screens/audit_export_screen.dart';
+import 'widgets/dashboard_sidebar.dart';
+import 'widgets/dashboard_top_bar.dart';
 import 'widgets/mobile_app_bar.dart';
 import 'widgets/floating_dock.dart';
 import 'widgets/plan_editor_dialog.dart';
@@ -23,7 +25,7 @@ class H10ClinicianAdminApp extends StatelessWidget {
     return MaterialApp(
       title: 'ASHTAVAKRA Clinician Monitoring System',
       debugShowCheckedModeBanner: false,
-      theme: AdminTheme.darkTheme,
+      theme: AdminTheme.lightTheme,
       home: const AdminDashboardShell(),
     );
   }
@@ -122,107 +124,121 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
       }
     }
 
-    final mobileAppShell = Scaffold(
-      backgroundColor: const Color(0xFF0B0F0E),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                // Mandatory Research Disclaimer Banner
-                Container(
-                  width: double.infinity,
-                  color: const Color(0xFF1B160C),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  child: const Text(
-                    'PROTOTYPE MONITORING TOOL — NOT A MEDICAL DEVICE. Strictly for clinical research and demonstration monitoring. Never diagnose, prescribe, or predict recovery.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.3,
-                      color: Color(0xFFFFD38A),
-                    ),
-                  ),
-                ),
-
-                // Mobile App Bar (Screenshot 1)
-                MobileAppBar(
-                  patientId: activePatient,
-                  isWidescreenMode: _isWidescreenMode,
-                  onToggleWidescreen: () {
-                    setState(() => _isWidescreenMode = !_isWidescreenMode);
-                  },
-                  onActionTap: _openPrescriptionModal,
-                ),
-
-                // Main Content View
-                Expanded(
-                  child: ListenableBuilder(
-                    listenable: _apiService,
-                    builder: (context, _) => currentBody,
-                  ),
-                ),
-              ],
-            ),
-
-            // Floating Bottom Dock (Screenshot 1)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 8,
-              child: Center(
-                child: FloatingBottomDock(
-                  selectedIndex: _selectedPatientId != null ? -1 : _selectedIndex,
-                  onSelectTab: (idx) {
-                    setState(() {
-                      _selectedIndex = idx;
-                      _selectedPatientId = null;
-                    });
-                  },
-                  onCenterTap: () {
-                    setState(() {
-                      _selectedIndex = 1;
-                      _selectedPatientId = null;
-                    });
-                  },
-                ),
-              ),
-            ),
-          ],
+    // Disclaimer Banner
+    final disclaimerBanner = Container(
+      width: double.infinity,
+      color: const Color(0xFF1B160C),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4.5),
+      child: const Text(
+        'PROTOTYPE MONITORING TOOL — NOT A MEDICAL DEVICE. Strictly for clinical research and demonstration monitoring. Never diagnose, prescribe, or predict recovery.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 8.5,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.3,
+          color: Color(0xFFFFD38A),
         ),
       ),
     );
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (!_isWidescreenMode && constraints.maxWidth > 500) {
+        final isDesktop = constraints.maxWidth >= 850;
+
+        // Desktop Widescreen Layout (Matching the user's reference image exactly)
+        if (isDesktop && _isWidescreenMode) {
           return Scaffold(
-            backgroundColor: const Color(0xFF050706),
-            body: Center(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 440),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0B0F0E),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.55),
-                      blurRadius: 36,
-                      offset: const Offset(0, 12),
-                    ),
-                  ],
-                  border: Border.all(
-                    color: const Color(0xFF1E2822),
-                    width: 1.5,
+            backgroundColor: AdminTheme.canvasBg,
+            body: SafeArea(
+              child: Row(
+                children: [
+                  // 1. Fixed Left Sidebar (Dark slate with neon lime active pill)
+                  DashboardSidebar(
+                    selectedIndex: _selectedPatientId != null ? -1 : _selectedIndex,
+                    onSelectTab: (idx) {
+                      setState(() {
+                        _selectedIndex = idx;
+                        _selectedPatientId = null;
+                      });
+                    },
+                    onOpenPrescription: _openPrescriptionModal,
                   ),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: mobileAppShell,
+
+                  // 2. Right Main Dashboard Canvas
+                  Expanded(
+                    child: Column(
+                      children: [
+                        disclaimerBanner,
+                        DashboardTopBar(
+                          clinicianName: 'Dr. Sarah Chen',
+                          onPrescribe: _openPrescriptionModal,
+                        ),
+                        Expanded(
+                          child: ListenableBuilder(
+                            listenable: _apiService,
+                            builder: (context, _) => currentBody,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           );
         }
-        return mobileAppShell;
+
+        // Mobile / Compact Layout Fallback
+        return Scaffold(
+          backgroundColor: const Color(0xFF0B0F0E),
+          body: SafeArea(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    disclaimerBanner,
+                    MobileAppBar(
+                      patientId: activePatient,
+                      isWidescreenMode: _isWidescreenMode,
+                      onToggleWidescreen: () {
+                        setState(() => _isWidescreenMode = !_isWidescreenMode);
+                      },
+                      onActionTap: _openPrescriptionModal,
+                    ),
+                    Expanded(
+                      child: ListenableBuilder(
+                        listenable: _apiService,
+                        builder: (context, _) => currentBody,
+                      ),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 8,
+                  child: Center(
+                    child: FloatingBottomDock(
+                      selectedIndex: _selectedPatientId != null ? -1 : _selectedIndex,
+                      onSelectTab: (idx) {
+                        setState(() {
+                          _selectedIndex = idx;
+                          _selectedPatientId = null;
+                        });
+                      },
+                      onCenterTap: () {
+                        setState(() {
+                          _selectedIndex = 1;
+                          _selectedPatientId = null;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }

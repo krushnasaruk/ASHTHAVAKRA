@@ -387,10 +387,14 @@ class _TaskProofMonitorScreenState extends State<TaskProofMonitorScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AdminTheme.textSecondary),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AdminTheme.textSecondary),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              const SizedBox(width: 4),
               Icon(icon, color: color, size: 16),
             ],
           ),

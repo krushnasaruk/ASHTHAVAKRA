@@ -294,21 +294,23 @@ class _WebHandViewerState extends State<WebHandViewer> {
           // 5. Anatomical Specs Pill
           Positioned(
             right: 12,
-            bottom: 12,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF101614).withOpacity(0.85),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFF222E28)),
-              ),
-              child: const Text(
-                '27 BONES: 8 CARPALS • 5 METACARPALS • 14 PHALANGES',
-                style: TextStyle(
-                  fontSize: 7.5,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.8,
-                  color: Color(0xFF8C9B94),
+            bottom: 44,
+            child: IgnorePointer(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF101614).withOpacity(0.85),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: const Color(0xFF222E28)),
+                ),
+                child: const Text(
+                  '27 BONES: 8 CARPALS • 5 METACARPALS • 14 PHALANGES',
+                  style: TextStyle(
+                    fontSize: 7.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                    color: Color(0xFF8C9B94),
+                  ),
                 ),
               ),
             ),
