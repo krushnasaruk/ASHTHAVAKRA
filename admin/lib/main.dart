@@ -39,7 +39,7 @@ class AdminDashboardShell extends StatefulWidget {
 class _AdminDashboardShellState extends State<AdminDashboardShell> {
   int _selectedIndex = 0; // 0: Today/Overview, 1: Live HUD, 2: TaskProof, 3: Audit & Export
   String? _selectedPatientId;
-  bool _isWidescreenMode = false;
+  bool _isWidescreenMode = true; // Laptop Widescreen Dashboard by default
   late final ApiService _apiService;
 
   @override

@@ -111,110 +111,137 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
     final elapsedStr = '$minutes:$seconds';
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Session Protocol Header with Back, Title, Pause, Stop (Screenshot 3)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    // Patient selector pill
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF141A17),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFF222B26)),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: _selectedPatient,
-                          dropdownColor: const Color(0xFF161E1A),
-                          icon: const Icon(Icons.arrow_drop_down, color: AdminTheme.lime, size: 16),
-                          style: const TextStyle(
-                            color: AdminTheme.textPrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
+          // 1. Session Protocol Header with Patient Selector, Protocol Name, Pause, Stop
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF121715),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFF222B26), width: 1.0),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      // Patient selector pill
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF161E1A),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFF2C3932)),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedPatient,
+                            dropdownColor: const Color(0xFF161E1A),
+                            icon: const Icon(Icons.arrow_drop_down, color: AdminTheme.lime, size: 18),
+                            style: const TextStyle(
+                              color: AdminTheme.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                            items: patients.map((p) {
+                              return DropdownMenuItem(
+                                value: p.pseudonym,
+                                child: Text('Patient ${p.pseudonym}'),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              if (val != null) setState(() => _selectedPatient = val);
+                            },
                           ),
-                          items: patients.map((p) {
-                            return DropdownMenuItem(
-                              value: p.pseudonym,
-                              child: Text('Patient ${p.pseudonym}'),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            if (val != null) setState(() => _selectedPatient = val);
-                          },
                         ),
                       ),
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: Text(
+                          (plan?.exerciseId ?? 'FINGERTAP').replaceAll('_', ' ').toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.1,
+                            color: AdminTheme.textPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AdminTheme.lime.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'ACTIVE PROTOCOL',
+                          style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w900,
+                            color: AdminTheme.lime,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Pause / Play
+                    IconButton(
+                      icon: Icon(
+                        _isPaused ? Icons.play_arrow : Icons.pause,
+                        color: _isPaused ? AdminTheme.lime : AdminTheme.textPrimary,
+                        size: 20,
+                      ),
+                      tooltip: _isPaused ? 'Resume Session' : 'Pause Session',
+                      onPressed: () => setState(() => _isPaused = !_isPaused),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        (plan?.exerciseId ?? 'FINGERTAP').replaceAll('_', '').toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.1,
-                          color: AdminTheme.textPrimary,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    const SizedBox(width: 4),
+                    // Stop Button
+                    IconButton(
+                      icon: const Icon(Icons.stop_rounded, color: AdminTheme.crimson, size: 20),
+                      tooltip: 'Emergency Stop',
+                      onPressed: () {
+                        setState(() {
+                          _isLiveStreaming = false;
+                          _liveFlex = [0, 0, 0, 0, 0];
+                          _fsrContact = 0.0;
+                        });
+                      },
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     ),
                   ],
                 ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Pause / Play
-                  IconButton(
-                    icon: Icon(
-                      _isPaused ? Icons.play_arrow : Icons.pause,
-                      color: _isPaused ? AdminTheme.lime : AdminTheme.textPrimary,
-                      size: 18,
-                    ),
-                    onPressed: () => setState(() => _isPaused = !_isPaused),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                  ),
-                  const SizedBox(width: 2),
-                  // Stop Button
-                  IconButton(
-                    icon: const Icon(Icons.stop_rounded, color: AdminTheme.crimson, size: 18),
-                    onPressed: () {
-                      setState(() {
-                        _isLiveStreaming = false;
-                        _liveFlex = [0, 0, 0, 0, 0];
-                        _fsrContact = 0.0;
-                      });
-                    },
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 10),
 
-          // 2. Safety Stop Instruction Banner (Screenshot 3)
+          // 2. Safety Stop Instruction Banner
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               color: const Color(0xFFFFF9E6),
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFFFE082), width: 1.0),
             ),
             child: Text(
               plan?.stopInstruction ?? 'Stop if you feel sharp pain. Rest as needed.',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 11,
+                fontSize: 11.5,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF5A4420),
               ),
@@ -222,7 +249,7 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
           ),
           const SizedBox(height: 10),
 
-          // 3. Stream Quality Strip (Screenshot 3)
+          // 3. Stream Quality Strip
           QualityStripWidget(
             isConnected: _isLiveStreaming,
             isSimulated: true,
@@ -232,31 +259,21 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
           ),
           const SizedBox(height: 14),
 
-          // 4. Main Cockpit Row: Repetition Ring (Left) + 3D Hand HUD Stage (Right) (Screenshot 3)
+          // 4. Laptop Clinical Cockpit: Expansive 3D Anatomical Hand (Left) + Telemetry / Ring (Right)
           LayoutBuilder(
             builder: (context, constraints) {
-              final isNarrow = constraints.maxWidth < 420;
-
-              final ringWidget = Center(
-                child: RepetitionRingWidget(
-                  completedReps: _currentRep,
-                  targetReps: plan?.targetReps ?? _targetReps,
-                  state: _repState,
-                  elapsedText: elapsedStr,
-                  size: isNarrow ? 150 : 170,
-                ),
-              );
+              final isWidescreen = constraints.maxWidth >= 768;
 
               final handWidget = Container(
-                height: 250,
+                height: isWidescreen ? 540 : 320,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF070A09),
+                  color: const Color(0xFF040605),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: const Color(0xFF222B26), width: 1.0),
                 ),
                 child: Stack(
                   children: [
-                    // Forward Kinematic Anatomical Hand Viewer
+                    // Forward Kinematic 3D Anatomical Hand Viewer (WebGL Three.js)
                     Positioned.fill(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
@@ -264,22 +281,24 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                           normalizedFlex: _liveFlex,
                           isConnected: _isLiveStreaming,
                           renderMode: _currentMode,
+                          height: isWidescreen ? 540 : 320,
+                          showControls: true,
                         ),
                       ),
                     ),
 
-                    // Top Mode Selector: SKIN | MESH | XRAY + NO DEVICE / 3D HUD ON (Screenshot 3)
+                    // Top Mode Selector: SKIN | MESH | XRAY + 3D HUD: ON
                     Positioned(
-                      top: 8,
-                      left: 8,
-                      right: 8,
+                      top: 10,
+                      left: 10,
+                      right: 10,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
                             padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF14120E),
+                              color: const Color(0xFF14120E).withOpacity(0.92),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: const Color(0xFF2E261A), width: 0.8),
                             ),
@@ -293,18 +312,20 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF141A17),
+                              color: const Color(0xFF141A17).withOpacity(0.92),
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
-                                color: _isLiveStreaming ? AdminTheme.lime.withOpacity(0.4) : const Color(0xFFF5A623).withOpacity(0.4),
+                                color: _isLiveStreaming
+                                    ? AdminTheme.lime.withOpacity(0.5)
+                                    : const Color(0xFFF5A623).withOpacity(0.5),
                               ),
                             ),
                             child: Text(
-                              _isLiveStreaming ? '3D HUD: ON' : 'NO DEVICE',
+                              _isLiveStreaming ? 'STREAM: 25 HZ' : 'NO DEVICE',
                               style: TextStyle(
-                                fontSize: 8.5,
+                                fontSize: 9,
                                 fontWeight: FontWeight.bold,
                                 color: _isLiveStreaming ? AdminTheme.lime : const Color(0xFFF5A623),
                               ),
@@ -317,37 +338,67 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
                 ),
               );
 
-              if (isNarrow) {
-                return Column(
+              final telemetryPanel = Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Repetition Ring Card
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF121715),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFF222B26), width: 1.0),
+                    ),
+                    child: Center(
+                      child: RepetitionRingWidget(
+                        completedReps: _currentRep,
+                        targetReps: plan?.targetReps ?? _targetReps,
+                        state: _repState,
+                        elapsedText: elapsedStr,
+                        size: isWidescreen ? 190 : 160,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Finger Flexion & Palmar Contact Card
+                  FingerBarsWidget(
+                    normalizedFlex: _liveFlex,
+                    fsrContact: _isLiveStreaming ? _fsrContact : null,
+                    targetRomMin: plan?.targetRomMin ?? 70.0,
+                    targetRomMax: plan?.targetRomMax ?? 100.0,
+                    isConnected: _isLiveStreaming,
+                  ),
+                ],
+              );
+
+              if (isWidescreen) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ringWidget,
-                    const SizedBox(height: 14),
-                    handWidget,
+                    Expanded(
+                      flex: 6,
+                      child: handWidget,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 4,
+                      child: telemetryPanel,
+                    ),
                   ],
                 );
               }
 
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+              return Column(
                 children: [
-                  Expanded(flex: 4, child: ringWidget),
-                  const SizedBox(width: 14),
-                  Expanded(flex: 5, child: handWidget),
+                  handWidget,
+                  const SizedBox(height: 14),
+                  telemetryPanel,
                 ],
               );
             },
           ),
-          const SizedBox(height: 16),
-
-          // 5. Finger Flexion & Palmar Contact Card (Screenshot 3)
-          FingerBarsWidget(
-            normalizedFlex: _liveFlex,
-            fsrContact: _isLiveStreaming ? _fsrContact : null,
-            targetRomMin: plan?.targetRomMin ?? 70.0,
-            targetRomMax: plan?.targetRomMax ?? 100.0,
-            isConnected: _isLiveStreaming,
-          ),
-          const SizedBox(height: 70), // breathing room above floating dock
+          const SizedBox(height: 60),
         ],
       ),
     );

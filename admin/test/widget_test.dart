@@ -50,14 +50,25 @@ void main() {
     await tester.tap(find.text('Live HUD'));
     await tester.pump(const Duration(milliseconds: 100));
 
-    // Check Live HUD Elements (Screenshot 3)
+    // Check Live HUD Elements (Screenshot 3 & 3D Anatomical Skeleton)
     expect(find.textContaining('Stop'), findsOneWidget);
     expect(find.text('3D HUD: ON'), findsOneWidget);
+    expect(find.text('3D HAND MONITOR'), findsOneWidget);
+    expect(find.text('PALM / BACK'), findsOneWidget);
+    expect(find.text('RESET VIEW'), findsOneWidget);
+    expect(find.text('CLEAR SELECTION'), findsOneWidget);
+    expect(find.textContaining('27 BONES'), findsOneWidget);
     expect(find.text('FINGER FLEXION'), findsOneWidget);
     expect(find.text('PALMAR FSR CONTACT'), findsOneWidget);
     expect(find.text('Thumb'), findsOneWidget);
     expect(find.text('Index'), findsOneWidget);
     expect(find.text('Middle'), findsOneWidget);
+
+    // Test camera orientation toggle on 3D HUD
+    await tester.tap(find.text('PALM / BACK'));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.text('RESET VIEW'));
+    await tester.pump(const Duration(milliseconds: 50));
 
     // 8. Test Navigation to TaskProof Screen
     await tester.tap(find.text('TaskProof'));

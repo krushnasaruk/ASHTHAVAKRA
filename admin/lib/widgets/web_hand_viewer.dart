@@ -1,14 +1,26 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../theme/admin_theme.dart';
+import 'hand_view_platform_stub.dart'
+    if (dart.library.html) 'hand_view_platform_web.dart';
 
 enum HandRenderMode { skin, mesh, xray }
 
-class WebHandViewer extends StatelessWidget {
+/// 3D Interactive Anatomical Hand WebGL Viewer for Laptop Admin Cockpit.
+///
+/// Embeds the Three.js 27-bone anatomical hand skeleton model from assets/hand/anatomy.html
+/// with translucent skin envelope, glowing yellow phalanx shafts, amber joint rings,
+/// and live 25 Hz telemetry frame stream bridge.
+class WebHandViewer extends StatefulWidget {
   final List<double> normalizedFlex; // [thumb, index, middle, ring, pinky] in 0-100%
-  final double height;
+  final double? height;
   final bool isConnected;
   final HandRenderMode renderMode;
+  final List<int>? imu;
+  final bool showControls;
 
   const WebHandViewer({
     super.key,
@@ -16,45 +28,155 @@ class WebHandViewer extends StatelessWidget {
     this.height = 320,
     this.isConnected = true,
     this.renderMode = HandRenderMode.skin,
+    this.imu,
+    this.showControls = true,
   });
 
   @override
+  State<WebHandViewer> createState() => _WebHandViewerState();
+}
+
+class _WebHandViewerState extends State<WebHandViewer> {
+  Timer? _telemetryBridgeTimer;
+  DateTime _lastPacketTime = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    // 25 Hz telemetry packet dispatcher bridge
+    _telemetryBridgeTimer = Timer.periodic(const Duration(milliseconds: 40), (_) {
+      if (mounted && widget.isConnected) {
+        _dispatchFramePayload();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant WebHandViewer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _dispatchFramePayload();
+  }
+
+  @override
+  void dispose() {
+    _telemetryBridgeTimer?.cancel();
+    super.dispose();
+  }
+
+  void _dispatchFramePayload() {
+    final now = DateTime.now();
+    if (now.difference(_lastPacketTime).inMilliseconds < 30) return;
+    _lastPacketTime = now;
+
+    final flex = widget.normalizedFlex;
+    final thumb = (flex.isNotEmpty ? flex[0] : 0.0) / 100.0;
+    final index = (flex.length > 1 ? flex[1] : 0.0) / 100.0;
+    final middle = (flex.length > 2 ? flex[2] : 0.0) / 100.0;
+    final ring = flex.length > 3 ? (flex[3] / 100.0) : (middle * 0.90);
+    final pinky = flex.length > 4 ? (flex[4] / 100.0) : (middle * 0.75);
+
+    double qw = 1.0, qx = 0.0, qy = 0.0, qz = 0.0;
+    if (widget.imu != null && widget.imu!.length >= 4) {
+      qw = widget.imu![0] / 1000.0;
+      qx = widget.imu![1] / 1000.0;
+      qy = widget.imu![2] / 1000.0;
+      qz = widget.imu![3] / 1000.0;
+    }
+
+    final payload = jsonEncode({
+      'action': 'setFrame',
+      'data': {
+        'curl': {
+          'thumb': thumb.clamp(0.0, 1.0),
+          'index': index.clamp(0.0, 1.0),
+          'middle': middle.clamp(0.0, 1.0),
+          'ring': ring.clamp(0.0, 1.0),
+          'pinky': pinky.clamp(0.0, 1.0),
+        },
+        'imu': {
+          'qw': qw,
+          'qx': qx,
+          'qy': qy,
+          'qz': qz,
+        },
+      },
+      'curl': {
+        'thumb': thumb.clamp(0.0, 1.0),
+        'index': index.clamp(0.0, 1.0),
+        'middle': middle.clamp(0.0, 1.0),
+        'ring': ring.clamp(0.0, 1.0),
+        'pinky': pinky.clamp(0.0, 1.0),
+      },
+      'imu': {
+        'qw': qw,
+        'qx': qx,
+        'qy': qy,
+        'qz': qz,
+      },
+    });
+
+    postPlatformMessage(payload, 'admin-hand-anatomy-3d');
+  }
+
+  void _sendAction(String action) {
+    final payload = jsonEncode({'action': action});
+    postPlatformMessage(payload, 'admin-hand-anatomy-3d');
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
+    final content = Container(
+      height: widget.height,
       decoration: BoxDecoration(
-        color: const Color(0xFF070908),
+        color: const Color(0xFF040605),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AdminTheme.border, width: 1.0),
+        border: Border.all(color: const Color(0xFF1E2822), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.6),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
+      clipBehavior: Clip.antiAlias,
       child: Stack(
-        alignment: Alignment.center,
         children: [
-          // Radial Vignette
+          // Background vignette
           Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
+            decoration: const BoxDecoration(
               gradient: RadialGradient(
-                center: const Alignment(0, 0.1),
-                radius: 0.9,
+                center: Alignment(0, 0.05),
+                radius: 0.95,
                 colors: [
-                  const Color(0xFF141A17).withOpacity(0.4),
-                  const Color(0xFF070908),
+                  Color(0xFF0E1412),
+                  Color(0xFF040605),
                 ],
               ),
             ),
           ),
 
-          // Custom Biomechanical 2D/3D Kinematic Skeleton Renderer
-          CustomPaint(
-            size: Size(double.infinity, height),
-            painter: _KinematicHandPainter(
-              normalizedFlex: normalizedFlex,
-              isStreaming: isConnected,
+          // 1. WebGL 3D Anatomical Three.js Hand Iframe on Web
+          if (kIsWeb)
+            Positioned.fill(
+              child: buildPlatformHandView(
+                viewType: 'admin-hand-anatomy-3d',
+                assetUrl: 'assets/hand/anatomy.html',
+              ),
             ),
-          ),
 
-          // Top Header Overlay
+          // 2. Custom Biomechanical Painter (Fallback for VM tests or loading)
+          if (!kIsWeb)
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _KinematicHandPainter(
+                  normalizedFlex: widget.normalizedFlex,
+                  isStreaming: widget.isConnected,
+                ),
+              ),
+            ),
+
+          // 3. Top HUD Status Header Overlay
           Positioned(
             top: 10,
             left: 12,
@@ -62,57 +184,173 @@ class WebHandViewer extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.view_in_ar, color: AdminTheme.lime, size: 13),
-                    SizedBox(width: 4),
-                    Text(
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: widget.isConnected ? AdminTheme.lime : AdminTheme.crimson,
+                        shape: BoxShape.circle,
+                        boxShadow: widget.isConnected
+                            ? [
+                                BoxShadow(
+                                  color: AdminTheme.lime.withOpacity(0.6),
+                                  blurRadius: 6,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
                       '3D HAND MONITOR',
                       style: TextStyle(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
                         letterSpacing: 0.8,
                         color: AdminTheme.textPrimary,
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AdminTheme.lime.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: AdminTheme.lime.withOpacity(0.3)),
+                      ),
+                      child: const Text(
+                        '3D HUD: ON',
+                        style: TextStyle(
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.6,
+                          color: AdminTheme.lime,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: isConnected ? AdminTheme.lime.withOpacity(0.12) : const Color(0xFF222624),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: isConnected ? AdminTheme.lime.withOpacity(0.3) : AdminTheme.border),
-                  ),
-                  child: Text(
-                    isConnected ? '25 HZ' : 'OFFLINE',
-                    style: TextStyle(
-                      fontSize: 8,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.6,
-                      color: isConnected ? AdminTheme.lime : AdminTheme.textSecondary,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: widget.isConnected ? const Color(0xFF16201B) : const Color(0xFF222624),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: widget.isConnected ? AdminTheme.lime.withOpacity(0.3) : AdminTheme.border,
+                        ),
+                      ),
+                      child: Text(
+                        widget.isConnected ? '25 HZ SENSOR STREAM' : 'OFFLINE',
+                        style: TextStyle(
+                          fontSize: 8,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.6,
+                          color: widget.isConnected ? AdminTheme.lime : AdminTheme.textSecondary,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          // Nonclinical Notice
-          const Positioned(
-            bottom: 10,
-            child: Text(
-              'ENGINEERING DEMONSTRATION • BIOMECHANICAL KINEMATICS',
-              style: TextStyle(
-                fontSize: 8,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.2,
-                color: Color(0xFF4A5550),
+          // 4. Clinician Camera & Orientation Controls Overlay
+          if (widget.showControls)
+            Positioned(
+              left: 12,
+              bottom: 12,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildHudButton(
+                    icon: Icons.flip_camera_android,
+                    label: 'PALM / BACK',
+                    onTap: () => _sendAction('togglePalmBack'),
+                  ),
+                  const SizedBox(width: 6),
+                  _buildHudButton(
+                    icon: Icons.refresh,
+                    label: 'RESET VIEW',
+                    onTap: () => _sendAction('resetView'),
+                  ),
+                  const SizedBox(width: 6),
+                  _buildHudButton(
+                    icon: Icons.layers_clear,
+                    label: 'CLEAR SELECTION',
+                    onTap: () => _sendAction('clearSelection'),
+                  ),
+                ],
+              ),
+            ),
+
+          // 5. Anatomical Specs Pill
+          Positioned(
+            right: 12,
+            bottom: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF101614).withOpacity(0.85),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: const Color(0xFF222E28)),
+              ),
+              child: const Text(
+                '27 BONES: 8 CARPALS • 5 METACARPALS • 14 PHALANGES',
+                style: TextStyle(
+                  fontSize: 7.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                  color: Color(0xFF8C9B94),
+                ),
               ),
             ),
           ),
         ],
+      ),
+    );
+
+    return content;
+  }
+
+  Widget _buildHudButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFF141C18).withOpacity(0.88),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFF2B3A32)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 11, color: AdminTheme.lime),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 8,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.6,
+                color: AdminTheme.textPrimary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -130,16 +368,16 @@ class _KinematicHandPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
-    final cy = size.height * 0.72; // Wrist center
+    final cy = size.height * 0.76;
 
     final bonePaint = Paint()
       ..color = const Color(0xFFC9D0D4)
-      ..strokeWidth = 3.5
+      ..strokeWidth = 4.0
       ..strokeCap = StrokeCap.round;
 
     final yellowShaftPaint = Paint()
       ..color = const Color(0xFFFFD54A)
-      ..strokeWidth = 4.5
+      ..strokeWidth = 5.0
       ..strokeCap = StrokeCap.round;
 
     final ringPaint = Paint()
@@ -148,90 +386,73 @@ class _KinematicHandPainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     final carpalPaint = Paint()
-      ..color = const Color(0xFF7A868C)
+      ..color = const Color(0xFF8B9B9D)
       ..style = PaintingStyle.fill;
 
-    final skinPaint = Paint()
-      ..color = const Color(0xFFD8E4EA).withOpacity(0.12)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2;
-
-    // Draw 8 Carpal bones in two rows at wrist base
+    // 8 Carpal Bones representation
     final carpalOffsets = [
-      Offset(cx - 24, cy - 4), Offset(cx - 8, cy - 6), Offset(cx + 8, cy - 6), Offset(cx + 22, cy - 4),
-      Offset(cx - 20, cy + 12), Offset(cx - 6, cy + 14), Offset(cx + 8, cy + 14), Offset(cx + 22, cy + 12),
+      Offset(cx - 30, cy + 18), Offset(cx - 10, cy + 18), Offset(cx + 10, cy + 18), Offset(cx + 30, cy + 18),
+      Offset(cx - 32, cy - 2),  Offset(cx - 12, cy - 2),  Offset(cx + 12, cy - 2),  Offset(cx + 32, cy - 2),
     ];
     for (final pt in carpalOffsets) {
-      canvas.drawCircle(pt, 4.5, carpalPaint);
+      canvas.drawCircle(pt, 5.0, carpalPaint);
     }
 
-    // Finger parameters
-    final fingerConfigs = [
-      // Thumb
-      {'baseX': cx - 26.0, 'baseY': cy - 8.0, 'angle': -0.75, 'len': [24.0, 18.0, 14.0], 'flex': normalizedFlex.isNotEmpty ? normalizedFlex[0] : 0.0},
-      // Index
-      {'baseX': cx - 14.0, 'baseY': cy - 18.0, 'angle': -0.15, 'len': [28.0, 20.0, 14.0], 'flex': normalizedFlex.length > 1 ? normalizedFlex[1] : 0.0},
-      // Middle
-      {'baseX': cx - 0.0, 'baseY': cy - 22.0, 'angle': 0.0, 'len': [32.0, 22.0, 16.0], 'flex': normalizedFlex.length > 2 ? normalizedFlex[2] : 0.0},
-      // Ring
-      {'baseX': cx + 14.0, 'baseY': cy - 18.0, 'angle': 0.12, 'len': [29.0, 20.0, 14.0], 'flex': normalizedFlex.length > 3 ? normalizedFlex[3] : 0.0},
-      // Pinky
-      {'baseX': cx + 26.0, 'baseY': cy - 10.0, 'angle': 0.28, 'len': [24.0, 16.0, 12.0], 'flex': normalizedFlex.length > 4 ? normalizedFlex[4] : 0.0},
+    // 5 Metacarpals & Phalanges
+    final fingerBases = [
+      Offset(cx - 48, cy - 12), // Thumb
+      Offset(cx - 24, cy - 22), // Index
+      Offset(cx, cy - 28),      // Middle
+      Offset(cx + 24, cy - 22), // Ring
+      Offset(cx + 46, cy - 12), // Pinky
     ];
 
-    for (final cfg in fingerConfigs) {
-      final double baseX = cfg['baseX'] as double;
-      final double baseY = cfg['baseY'] as double;
-      final double baseAngle = cfg['angle'] as double;
-      final List<double> lens = cfg['len'] as List<double>;
-      final double flex = isStreaming ? ((cfg['flex'] as double) / 100.0).clamp(0.0, 1.0) : 0.0;
+    final fingerAngles = [-0.55, -0.15, 0.0, 0.15, 0.40];
+    final lengths = [24.0, 32.0, 36.0, 32.0, 26.0];
 
-      // Draw Metacarpal (from carpal to knuckle MCP)
-      canvas.drawLine(Offset(cx, cy), Offset(baseX, baseY), bonePaint);
-      canvas.drawCircle(Offset(baseX, baseY), 4.5, carpalPaint);
-      canvas.drawCircle(Offset(baseX, baseY), 5.5, ringPaint);
+    for (int i = 0; i < 5; i++) {
+      final flex = (normalizedFlex.length > i ? normalizedFlex[i] : 0.0) / 100.0;
+      final base = fingerBases[i];
+      final angle = fingerAngles[i];
+      final len = lengths[i];
 
-      // Articulate Phalanx chain with forward kinematics
-      double curX = baseX;
-      double curY = baseY;
-      double curAngle = -1.57 + baseAngle;
+      // Metacarpal shaft
+      final mcp = Offset(
+        base.dx + math.sin(angle) * len * 1.2,
+        base.dy - math.cos(angle) * len * 1.2,
+      );
+      canvas.drawLine(base, mcp, bonePaint);
+      canvas.drawCircle(mcp, 3.2, ringPaint);
 
-      final curls = [flex * 0.85, flex * 1.1, flex * 0.7];
+      // Proximal Phalanx
+      final bend = flex * 1.3;
+      final pip = Offset(
+        mcp.dx + math.sin(angle - bend * 0.4) * len,
+        mcp.dy - math.cos(angle - bend * 0.4) * len,
+      );
+      canvas.drawLine(mcp, pip, yellowShaftPaint);
+      canvas.drawCircle(pip, 3.0, ringPaint);
 
-      for (int i = 0; i < 3; i++) {
-        curAngle += curls[i] * 0.45;
-        final segLen = lens[i] * 1.6;
-        final nextX = curX + math.cos(curAngle) * segLen;
-        final nextY = curY + math.sin(curAngle) * segLen;
+      // Middle Phalanx
+      final dip = Offset(
+        pip.dx + math.sin(angle - bend * 0.8) * (len * 0.75),
+        pip.dy - math.cos(angle - bend * 0.8) * (len * 0.75),
+      );
+      canvas.drawLine(pip, dip, yellowShaftPaint);
+      canvas.drawCircle(dip, 2.5, ringPaint);
 
-        // Yellow Shaft with glowing highlight
-        canvas.drawLine(Offset(curX, curY), Offset(nextX, nextY), yellowShaftPaint);
-        // Joint End Epiphysis
-        canvas.drawCircle(Offset(nextX, nextY), 3.5, carpalPaint);
-
-        // Amber Joint Ring
-        if (i < 2) {
-          canvas.drawCircle(Offset(nextX, nextY), 4.5, ringPaint);
-        }
-
-        // Translucent Skin Outline envelope around segment
-        canvas.drawOval(
-          Rect.fromCenter(
-            center: Offset((curX + nextX) / 2, (curY + nextY) / 2),
-            width: 14.0 * (1.0 - i * 0.15),
-            height: (lens[i] * 1.8),
-          ),
-          skinPaint,
-        );
-
-        curX = nextX;
-        curY = nextY;
-      }
+      // Distal Phalanx
+      final tip = Offset(
+        dip.dx + math.sin(angle - bend * 1.2) * (len * 0.55),
+        dip.dy - math.cos(angle - bend * 1.2) * (len * 0.55),
+      );
+      canvas.drawLine(dip, tip, bonePaint);
+      canvas.drawCircle(tip, 2.0, ringPaint);
     }
   }
 
   @override
   bool shouldRepaint(covariant _KinematicHandPainter oldDelegate) {
-    return true;
+    return oldDelegate.normalizedFlex != normalizedFlex || oldDelegate.isStreaming != isStreaming;
   }
 }

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ASHTAVAKRA 3D Anatomical Hand Viewer</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Mono", Menlo, Consolas, "Courier New", monospace;
+      color: #e8efef;
+    }
+    #viewer-root {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 14px 10px 14px;
+      position: relative;
+      background: radial-gradient(circle at 50% 45%, #0e1214 0%, #050708 75%, #000000 100%);
+    }
+
+    /* Responsive Anatomical Viewport */
+    #canvas-frame {
+      width: 100%;
+      height: 100%;
+      flex: 1;
+      min-height: 280px;
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: #000000;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* Top Monospace Title & Status Pill */
+    .header-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 6px;
+      z-index: 10;
+    }
+    .header-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      color: #c9d0d4;
+      text-transform: uppercase;
+    }
+    .mode-indicator {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      padding: 2.5px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #a8b2b8;
+    }
+    .mode-indicator.sensor {
+      color: #ffd54a;
+      border-color: rgba(255, 213, 74, 0.4);
+      background: rgba(255, 213, 74, 0.08);
+    }
+
+    /* Floating Monospace Bone Info Callout with Leader Line */
+    #bone-callout {
+      position: absolute;
+      pointer-events: none;
+      z-index: 20;
+      display: none;
+      transform: translate(-50%, -100%);
+      padding-bottom: 14px;
+      transition: opacity 0.15s ease-out;
+    }
+    .callout-box {
+      background: rgba(8, 10, 12, 0.94);
+      border: 1px solid #ffd54a;
+      padding: 5px 9px;
+      border-radius: 4px;
+      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
+      font-size: 9.5px;
+      line-height: 1.35;
+      color: #e8efef;
+      white-space: nowrap;
+    }
+    .callout-bone-name {
+      font-weight: 700;
+      color: #ffd54a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .callout-sub {
+      color: #9aa4a8;
+      font-size: 8.5px;
+      margin-top: 1px;
+    }
+    .callout-pointer {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 8px;
+      background: #ffd54a;
+    }
+    .callout-dot {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ffd54a;
+      box-shadow: 0 0 6px #ffd54a;
+    }
+
+    /* Articulation Slider Strip */
+    #slider-strip {
+      width: 100%;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+      padding: 6px 12px;
+      background: rgba(16, 20, 22, 0.75);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 10;
+    }
+    .slider-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #ffd54a;
+      text-transform: uppercase;
+      min-width: 72px;
+    }
+    .slider-input {
+      flex: 1;
+      accent-color: #ffd54a;
+      height: 4px;
+      cursor: pointer;
+    }
+    .slider-val {
+      font-size: 10px;
+      font-weight: 700;
+      color: #c9d0d4;
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* Bottom Minimal Controls Row */
+    .controls-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      z-index: 10;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 8px 4px;
+      background: rgba(18, 22, 24, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 5px;
+      color: #c9d0d4;
+      font-family: inherit;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      text-align: center;
+    }
+    .action-btn:active, .action-btn.active {
+      background: rgba(255, 213, 74, 0.14);
+      border-color: #ffd54a;
+      color: #ffd54a;
+    }
+
+    /* Selected Finger Indicator Badge */
+    #finger-badge {
+      font-size: 9px;
+      font-weight: 700;
+      color: #ffd54a;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: none;
+      align-items: center;
+      gap: 5px;
+    }
+    #finger-badge-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #ffd54a;
+      box-shadow: 0 0 6px #ffd54a;
+    }
+
+    /* Footer Nonclinical Notice */
+    .footer-notice {
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 1.6px;
+      color: #555e62;
+      text-transform: uppercase;
+      margin-top: 6px;
+      text-align: center;
+      z-index: 10;
+    }
+  </style>
+  <script src="three.min.js"></script>
+  <script src="GLTFLoader.js"></script>
+  <script src="skeleton_b64.js"></script>
+</head>
+<body>
+  <div id="viewer-root">
+    <!-- Header Bar -->
+    <div class="header-bar">
+      <div class="header-title">HAND / ANATOMY</div>
+      <div id="mode-indicator" class="mode-indicator">READY</div>
+    </div>
+
+    <!-- 4:5 Portrait Framing Viewport -->
+    <div id="canvas-frame">
+      <div id="canvas-container"></div>
+
+      <!-- Floating Monospace Bone Callout -->
+      <div id="bone-callout">
+        <div class="callout-box">
+          <div id="callout-title" class="callout-bone-name">PROXIMAL PHALANX</div>
+          <div id="callout-detail" class="callout-sub">INDEX FINGER &bull; MCP, PIP</div>
+        </div>
+        <div class="callout-pointer"></div>
+        <div class="callout-dot"></div>
+      </div>
+    </div>
+
+    <!-- Articulation Manual Slider Strip (Shown when finger selected) -->
+    <div id="slider-strip">
+      <div id="slider-finger-name" class="slider-label">INDEX</div>
+      <input type="range" id="flex-slider" class="slider-input" min="0" max="100" value="0">
+      <div id="slider-pct" class="slider-val">0%</div>
+    </div>
+
+    <!-- Bottom Controls Row -->
+    <div class="controls-row">
+      <button id="btn-palm-back" class="action-btn">PALM / BACK</button>
+      <button id="btn-reset" class="action-btn">RESET VIEW</button>
+      <button id="btn-clear" class="action-btn">CLEAR</button>
+      <div id="finger-badge">
+        <span id="finger-badge-dot"></span>
+        <span id="finger-badge-text">INDEX</span>
+      </div>
+    </div>
+
+    <!-- Mandatory Demo / Nonclinical Notice -->
+    <div class="footer-notice">DEMO / NONCLINICAL</div>
+  </div>
+
+  <script>
+    // --- Biomechanical Joint Constants (rad) ---
+    const ANGLE_MCP = 1.4; // MCP joint max curl
+    const ANGLE_PIP = 1.6; // PIP joint max curl
+    const ANGLE_DIP = 0.9; // DIP joint max curl
+    const LERP_FACTOR = 0.25;
+
+    // --- State Management ---
+    let scene, camera, renderer, raycaster;
+    let pivotGroup; // Outer interaction container (handles user drag rotate & PALM/BACK flip)
+    let handRoot;   // Inner model container (handles sensor IMU quaternion)
+    let allBoneMeshes = [];
+    let boneNodes = {}; // Named joint Object3D nodes for hierarchical articulation
+    let carpalCount = 0, metacarpalCount = 0, phalanxCount = 0;
+
+    let selectedFinger = null; // 'thumb' | 'index' | 'middle' | 'ring' | 'pinky' | null
+    let selectedBoneMesh = null;
+    let isPalmView = true;
+
+    // Camera / Viewer interaction state
+    let isDragging = false;
+    let prevMouseX = 0, prevMouseY = 0;
+    let targetRotY = 0.22; // Slight natural 3/4 palm tilt
+    let targetRotX = 0.04;
+    let currentRotY = 0.22;
+    let currentRotX = 0.04;
+
+    let initialPinchDist = null;
+    let targetZoom = 1.0;
+    let currentZoom = 1.0;
+    const MIN_ZOOM = 0.75;
+    const MAX_ZOOM = 2.4;
+
+    // Joint Rings list
+    const jointRingMeshes = [];
+
+    // Articulation targets (0.0 to 1.0)
+    const targetFlex = { thumb: 0.0, index: 0.0, middle: 0.0, ring: 0.0, pinky: 0.0 };
+    const currentFlex = { thumb: 0.0, index: 0.0, middle: 0.0, ring: 0.0, pinky: 0.0 };
+    let isSensorDriven = false;
+    let lastSensorPacketTime = 0;
+
+    // Materials
+    let matShaftDefault, matShaftHighlight, matEpiphysisDefault, matDimmed, matSkin;
+
+    function initMaterials() {
+      // Metacarpals shaft: mid-grey to off-white (#c9d0d4)
+      matShaftDefault = new THREE.MeshStandardMaterial({
+        color: 0xc9d0d4,
+        roughness: 0.45,
+        metalness: 0.08,
+      });
+
+      // Highlighted Phalanx bone shafts: Saturated vivid golden yellow (#ffd54a) matching reference
+      matShaftHighlight = new THREE.MeshStandardMaterial({
+        color: 0xffd54a,
+        roughness: 0.32,
+        metalness: 0.05,
+        emissive: 0xffd54a,
+        emissiveIntensity: 0.32,
+      });
+
+      // Joint ends (epiphyses) & Carpal bones: soft neutral pale grey (#b5bec4)
+      matEpiphysisDefault = new THREE.MeshStandardMaterial({
+        color: 0xb5bec4,
+        roughness: 0.55,
+        metalness: 0.04,
+      });
+
+      // Dimmed non-selected bones (when a single finger is isolated)
+      matDimmed = new THREE.MeshStandardMaterial({
+        color: 0x5a6368,
+        roughness: 0.65,
+        metalness: 0.02,
+        transparent: true,
+        opacity: 0.35,
+      });
+
+      // Faint semi-transparent skin silhouette outline (opacity 0.13, fine off-white rim)
+      matSkin = new THREE.MeshPhysicalMaterial({
+        color: 0xd8e4ea,
+        transparent: true,
+        opacity: 0.13,
+        roughness: 0.40,
+        metalness: 0.02,
+        depthWrite: false,
+        side: THREE.FrontSide,
+      });
+    }
+
+    function initScene() {
+      const container = document.getElementById('canvas-container');
+      const w = container.clientWidth || 360;
+      const h = container.clientHeight || 450;
+
+      scene = new THREE.Scene();
+      scene.background = null;
+
+      // Outer pivot group: receives user view rotation & scale without conflicting with model IMU
+      pivotGroup = new THREE.Group();
+      scene.add(pivotGroup);
+
+      // Camera: perfectly framed so the hand fills ~80% of 4:5 portrait frame
+      camera = new THREE.PerspectiveCamera(36, w / h, 0.01, 100);
+      camera.position.set(0.0, 0.065, 0.35);
+      camera.lookAt(0.0, 0.065, 0.0);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      container.appendChild(renderer.domElement);
+
+      raycaster = new THREE.Raycaster();
+
+      // Lighting: Soft ambient + upper-left key light + soft rim light
+      const ambLight = new THREE.AmbientLight(0xfff6ea, 0.82);
+      scene.add(ambLight);
+
+      const keyLight = new THREE.DirectionalLight(0xffeedd, 1.05);
+      keyLight.position.set(-0.35, 0.60, 0.45);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.DirectionalLight(0x90a8b4, 0.40);
+      rimLight.position.set(0.35, -0.20, -0.35);
+      scene.add(rimLight);
+
+      initMaterials();
+      loadSkeletonModel();
+      setupEventListeners(container);
+
+      window.addEventListener('resize', onWindowResize);
+      animate();
+    }
+
+    function loadSkeletonModel() {
+      const loader = new THREE.GLTFLoader();
+
+      function onLoaded(gltf) {
+        handRoot = gltf.scene;
+        // Mount handRoot inside pivotGroup to isolate sensor IMU from user view rotation
+        pivotGroup.add(handRoot);
+
+        handRoot.position.set(0, 0.0, 0);
+        handRoot.rotation.set(0, 0, 0);
+
+        carpalCount = 0;
+        metacarpalCount = 0;
+        phalanxCount = 0;
+        allBoneMeshes = [];
+        boneNodes = {};
+
+        handRoot.traverse((obj) => {
+          if (obj.name) {
+            boneNodes[obj.name] = obj;
+          }
+
+          if (obj.isMesh) {
+            const nodeName = (obj.name || (obj.parent ? obj.parent.name : '')).toLowerCase();
+            const extras = obj.userData || (obj.parent ? obj.parent.userData : {}) || {};
+
+            if (nodeName.includes('skin')) {
+              obj.material = matSkin;
+              obj.renderOrder = 10;
+            } else {
+              allBoneMeshes.push(obj);
+
+              if (extras.boneType === 'carpal' || nodeName.includes('scaphoid') || nodeName.includes('lunate') ||
+                  nodeName.includes('triquetrum') || nodeName.includes('pisiform') || nodeName.includes('trapezium') ||
+                  nodeName.includes('trapezoid') || nodeName.includes('capitate') || nodeName.includes('hamate')) {
+                carpalCount++;
+                obj.material = matEpiphysisDefault;
+              } else if (extras.boneType === 'metacarpal' || nodeName.includes('metacarpal')) {
+                metacarpalCount++;
+                applyBoneMaterials(obj, false);
+              } else if (extras.boneType === 'phalanx' || nodeName.includes('phalanx')) {
+                phalanxCount++;
+                applyBoneMaterials(obj, true);
+              }
+            }
+          }
+        });
+
+        // Create Small Amber Joint Rings (#f5a623) directly inside phalanx nodes
+        createJointRings();
+
+        console.log(`[ANATOMY] Bones count verified: ${carpalCount} carpal, ${metacarpalCount} metacarpal, ${phalanxCount} phalanx. Total bones: ${carpalCount + metacarpalCount + phalanxCount}.`);
+      }
+
+      // Try local Base64 zero-latency bridge first, then file load
+      if (window.SKELETON_GLB_B64 && window.SKELETON_GLB_B64.length > 100) {
+        try {
+          const binStr = atob(window.SKELETON_GLB_B64);
+          const len = binStr.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binStr.charCodeAt(i);
+          }
+          loader.parse(bytes.buffer, '', onLoaded, (err) => {
+            console.warn("Base64 parse fallback:", err);
+            loader.load('skeleton.glb', onLoaded);
+          });
+          return;
+        } catch(e) {
+          console.warn("Base64 decode error:", e);
+        }
+      }
+
+      loader.load('skeleton.glb', onLoaded, undefined, () => {
+        loader.load('assets/hand/skeleton.glb', onLoaded);
+      });
+    }
+
+    function applyBoneMaterials(mesh, isPhalanx = true) {
+      if (isPhalanx) {
+        // Phalanx: Shaft is vivid saturated golden yellow (#ffd54a), ends are pale grey
+        if (Array.isArray(mesh.material)) {
+          mesh.material[0] = matShaftHighlight;
+          if (mesh.material.length > 1) {
+            mesh.material[1] = matEpiphysisDefault;
+          }
+        } else {
+          mesh.material = matShaftHighlight;
+        }
+      } else {
+        // Metacarpal: Mid-grey shaft
+        if (Array.isArray(mesh.material)) {
+          mesh.material[0] = matShaftDefault;
+          if (mesh.material.length > 1) {
+            mesh.material[1] = matEpiphysisDefault;
+          }
+        } else {
+          mesh.material = matShaftDefault;
+        }
+      }
+    }
+
+    function createJointRings() {
+      jointRingMeshes.length = 0;
+      const ringGeo = new THREE.TorusGeometry(0.0052, 0.00065, 8, 24);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xf5a623,
+        transparent: true,
+        opacity: 0.95
+      });
+
+      // Attach rings directly to phalanx bone nodes so they move, rotate, and turn with the joint
+      Object.keys(boneNodes).forEach((k) => {
+        if (k.includes('phalanx')) {
+          const node = boneNodes[k];
+          const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+          ringMesh.rotation.x = Math.PI * 0.5;
+          ringMesh.position.set(0, 0, 0);
+          ringMesh.visible = true;
+          ringMesh.userData.finger = inferFingerFromName(k);
+          node.add(ringMesh);
+          jointRingMeshes.push(ringMesh);
+        }
+      });
+    }
+
+    // --- Interaction & Raycasting Selection ---
+    function setupEventListeners(container) {
+      let isPointerMoved = false;
+
+      container.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        isPointerMoved = false;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevMouseX;
+        const dy = e.clientY - prevMouseY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+          isPointerMoved = true;
+        }
+
+        targetRotY += dx * 0.008;
+        targetRotX = Math.max(-0.65, Math.min(0.65, targetRotX + dy * 0.008));
+
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (isDragging && !isPointerMoved) {
+          handleTap(e);
+        }
+        isDragging = false;
+        initialPinchDist = null;
+      });
+
+      // Pinch-to-zoom
+      container.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+          isDragging = false;
+          const dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          if (initialPinchDist !== null) {
+            const zoomDelta = (dist - initialPinchDist) * 0.005;
+            targetZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, targetZoom + zoomDelta));
+          }
+          initialPinchDist = dist;
+        }
+      }, { passive: true });
+
+      container.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2) {
+          initialPinchDist = null;
+        }
+      });
+
+      // Mouse Wheel Zoom
+      container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const zoomDelta = -e.deltaY * 0.0015;
+        targetZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, targetZoom + zoomDelta));
+      }, { passive: false });
+
+      // Buttons with stopPropagation to completely isolate from canvas pointer handlers
+      const btnPalm = document.getElementById('btn-palm-back');
+      btnPalm.addEventListener('pointerdown', (e) => e.stopPropagation());
+      btnPalm.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePalmBackView();
+      });
+
+      const btnReset = document.getElementById('btn-reset');
+      btnReset.addEventListener('pointerdown', (e) => e.stopPropagation());
+      btnReset.addEventListener('click', (e) => {
+        e.stopPropagation();
+        resetView();
+      });
+
+      const btnClear = document.getElementById('btn-clear');
+      btnClear.addEventListener('pointerdown', (e) => e.stopPropagation());
+      btnClear.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearSelection();
+      });
+
+      // Flexion Slider
+      const slider = document.getElementById('flex-slider');
+      slider.addEventListener('pointerdown', (e) => e.stopPropagation());
+      slider.addEventListener('input', (e) => {
+        if (!selectedFinger) return;
+        const val = parseInt(e.target.value) / 100.0;
+        targetFlex[selectedFinger] = val;
+        document.getElementById('slider-pct').textContent = `${e.target.value}%`;
+        isSensorDriven = false;
+        updateModeIndicator('MANUAL');
+      });
+    }
+
+    function handleTap(event) {
+      const container = document.getElementById('canvas-container');
+      const rect = container.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1
+      );
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(allBoneMeshes, true);
+      const hit = intersects.find((h) => !h.object.name.toLowerCase().includes('skin'));
+
+      if (hit) {
+        const obj = hit.object;
+        const extras = obj.userData || (obj.parent ? obj.parent.userData : {}) || {};
+        const fingerId = extras.finger || inferFingerFromName(obj.name || (obj.parent ? obj.parent.name : ''));
+
+        if (fingerId && fingerId !== 'wrist') {
+          if (selectedFinger === fingerId) {
+            clearSelection();
+          } else {
+            selectFinger(fingerId, obj, extras);
+          }
+        } else {
+          showBoneCallout(obj, extras, 'wrist');
+        }
+      } else {
+        clearSelection();
+      }
+    }
+
+    function inferFingerFromName(name) {
+      if (!name) return null;
+      const lower = name.toLowerCase();
+      if (lower.includes('thumb')) return 'thumb';
+      if (lower.includes('index')) return 'index';
+      if (lower.includes('middle')) return 'middle';
+      if (lower.includes('ring')) return 'ring';
+      if (lower.includes('pinky')) return 'pinky';
+      return null;
+    }
+
+    function selectFinger(finger, tappedBone, extras) {
+      selectedFinger = finger;
+      selectedBoneMesh = tappedBone;
+
+      allBoneMeshes.forEach((mesh) => {
+        const name = (mesh.name || (mesh.parent ? mesh.parent.name : '')).toLowerCase();
+        if (name.includes('skin')) return;
+
+        const isTargetFinger = name.includes(finger);
+        const isPhalanx = name.includes('phalanx');
+
+        if (isTargetFinger) {
+          applyBoneMaterials(mesh, isPhalanx);
+        } else {
+          if (Array.isArray(mesh.material)) {
+            mesh.material[0] = matDimmed;
+            if (mesh.material.length > 1) mesh.material[1] = matDimmed;
+          } else {
+            mesh.material = matDimmed;
+          }
+        }
+      });
+
+      // Filter rings: show only selected finger
+      jointRingMeshes.forEach((r) => {
+        r.visible = (r.userData.finger === finger);
+      });
+
+      // Show Articulation Slider Strip
+      const sliderStrip = document.getElementById('slider-strip');
+      sliderStrip.style.display = 'flex';
+      document.getElementById('slider-finger-name').textContent = finger.toUpperCase();
+      const curPct = Math.round((currentFlex[finger] || 0) * 100);
+      document.getElementById('flex-slider').value = curPct;
+      document.getElementById('slider-pct').textContent = `${curPct}%`;
+
+      // Update Bottom Badge
+      const badge = document.getElementById('finger-badge');
+      badge.style.display = 'flex';
+      document.getElementById('finger-badge-text').textContent = finger.toUpperCase();
+
+      showBoneCallout(tappedBone, extras, finger);
+    }
+
+    function showBoneCallout(mesh, extras, finger) {
+      const callout = document.getElementById('bone-callout');
+      const title = document.getElementById('callout-title');
+      const detail = document.getElementById('callout-detail');
+
+      const boneName = extras.name || (mesh.name || 'BONE').replace(/_/g, ' ');
+      const jointsList = (extras.joints || ['CMC', 'MCP']).join(', ');
+      const estTag = (finger === 'ring' || finger === 'pinky') ? ' [EST.]' : '';
+
+      title.textContent = boneName.toUpperCase();
+      detail.textContent = `${finger.toUpperCase()}${estTag} \u2022 JOINTS: ${jointsList}`;
+
+      const worldPos = new THREE.Vector3();
+      mesh.getWorldPosition(worldPos);
+
+      // Verify bone is in front of camera
+      const cameraDir = new THREE.Vector3();
+      camera.getWorldDirection(cameraDir);
+      const toBone = new THREE.Vector3().subVectors(worldPos, camera.position);
+      if (toBone.dot(cameraDir) <= 0) {
+        callout.style.display = 'none';
+        return;
+      }
+
+      worldPos.project(camera);
+      if (worldPos.z > 1.0) {
+        callout.style.display = 'none';
+        return;
+      }
+
+      const frame = document.getElementById('canvas-frame');
+      const rect = frame.getBoundingClientRect();
+      const x = ((worldPos.x + 1) * 0.5) * rect.width;
+      const y = ((-worldPos.y + 1) * 0.5) * rect.height;
+
+      callout.style.left = `${Math.max(40, Math.min(rect.width - 40, x))}px`;
+      callout.style.top = `${Math.max(30, Math.min(rect.height - 30, y))}px`;
+      callout.style.display = 'block';
+    }
+
+    function clearSelection() {
+      selectedFinger = null;
+      selectedBoneMesh = null;
+
+      // Restore all bone materials (Phalanges yellow, Metacarpals grey)
+      allBoneMeshes.forEach((mesh) => {
+        const name = (mesh.name || (mesh.parent ? mesh.parent.name : '')).toLowerCase();
+        if (name.includes('skin')) return;
+        const isPhalanx = name.includes('phalanx');
+        applyBoneMaterials(mesh, isPhalanx);
+      });
+
+      // Show all rings
+      jointRingMeshes.forEach((r) => r.visible = true);
+
+      document.getElementById('slider-strip').style.display = 'none';
+      document.getElementById('finger-badge').style.display = 'none';
+      const callout = document.getElementById('bone-callout');
+      if (callout) callout.style.display = 'none';
+    }
+
+    function togglePalmBackView() {
+      isPalmView = !isPalmView;
+      // Flip exactly 180 degrees
+      targetRotY = isPalmView ? 0.22 : (0.22 + Math.PI);
+      // Hide callout during view flip to prevent screen jitter
+      const callout = document.getElementById('bone-callout');
+      if (callout) callout.style.display = 'none';
+    }
+
+    function resetView() {
+      targetRotY = 0.22;
+      targetRotX = 0.04;
+      targetZoom = 1.0;
+      isPalmView = true;
+      clearSelection();
+    }
+
+    function updateModeIndicator(modeText) {
+      const pill = document.getElementById('mode-indicator');
+      pill.textContent = modeText;
+      if (modeText === 'SENSOR') {
+        pill.classList.add('sensor');
+      } else {
+        pill.classList.remove('sensor');
+      }
+    }
+
+    // --- Sensor Bridge API (`window.setFrame` and cross-window postMessage) ---
+    window.setFrame = function(frameData) {
+      const data = typeof frameData === 'string' ? JSON.parse(frameData) : frameData;
+      lastSensorPacketTime = performance.now();
+      isSensorDriven = true;
+      updateModeIndicator('SENSOR');
+
+      if (data.curl) {
+        targetFlex.thumb = Math.max(0, Math.min(1, data.curl.thumb ?? 0));
+        targetFlex.index = Math.max(0, Math.min(1, data.curl.index ?? 0));
+        targetFlex.middle = Math.max(0, Math.min(1, data.curl.middle ?? 0));
+        targetFlex.ring = data.curl.ring != null ? data.curl.ring : (targetFlex.middle * 0.90);
+        targetFlex.pinky = data.curl.pinky != null ? data.curl.pinky : (targetFlex.middle * 0.75);
+      }
+
+      // Sensor IMU is applied strictly to handRoot (inner group), NOT to pivotGroup
+      if (data.imu && handRoot) {
+        const qw = data.imu.qw ?? 1.0;
+        const qx = data.imu.qx ?? 0.0;
+        const qy = data.imu.qy ?? 0.0;
+        const qz = data.imu.qz ?? 0.0;
+        const q = new THREE.Quaternion(qx, qy, qz, qw);
+        handRoot.quaternion.slerp(q, 0.2);
+      }
+    };
+
+    window.addEventListener('message', (event) => {
+      try {
+        const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (payload.action === 'setFrame' && payload.data) {
+          window.setFrame(payload.data);
+        } else if (payload.curl) {
+          window.setFrame(payload);
+        } else if (payload.action === 'togglePalmBack') {
+          togglePalmBackView();
+        } else if (payload.action === 'resetView') {
+          resetView();
+        } else if (payload.action === 'selectFinger' && payload.finger) {
+          selectFinger(payload.finger);
+        } else if (payload.action === 'clearSelection') {
+          clearFingerSelection();
+        }
+      } catch (err) {}
+    });
+
+    // --- Articulation Kinematics ---
+    function applyFingerArticulation(finger, t) {
+      if (!handRoot) return;
+
+      const mcpAngle = t * ANGLE_MCP;
+      const pipAngle = t * ANGLE_PIP;
+      const dipAngle = t * ANGLE_DIP;
+
+      // Rotate hierarchical joint nodes
+      const proxNode = boneNodes[`proximal_phalanx_${finger}`];
+      if (proxNode) {
+        proxNode.rotation.x = -mcpAngle;
+      }
+
+      const midNode = boneNodes[`middle_phalanx_${finger}`];
+      if (midNode) {
+        midNode.rotation.x = -pipAngle;
+      }
+
+      const distNode = boneNodes[`distal_phalanx_${finger}`];
+      if (distNode) {
+        distNode.rotation.x = -dipAngle;
+      }
+    }
+
+    // --- Main Render Loop ---
+    let lastFrameTime = performance.now();
+    let slowFrameCounter = 0;
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+
+      if (now) {
+        const dt = now - lastFrameTime;
+        lastFrameTime = now;
+        if (dt > 33) {
+          slowFrameCounter++;
+          if (slowFrameCounter > 60) {
+            renderer.setPixelRatio(1.0);
+          }
+        } else {
+          slowFrameCounter = Math.max(0, slowFrameCounter - 1);
+        }
+      }
+
+      // Sensor timeout (fallback after 1.5s)
+      if (isSensorDriven && performance.now() - lastSensorPacketTime > 1500) {
+        isSensorDriven = false;
+        updateModeIndicator('NO DATA');
+      }
+
+      // Smooth camera orientation lerp via shortest angular distance
+      let diffY = targetRotY - currentRotY;
+      while (diffY < -Math.PI) diffY += Math.PI * 2;
+      while (diffY > Math.PI) diffY -= Math.PI * 2;
+      currentRotY += diffY * 0.12;
+
+      let diffX = targetRotX - currentRotX;
+      currentRotX += diffX * 0.12;
+
+      currentZoom += (targetZoom - currentZoom) * 0.15;
+
+      if (pivotGroup) {
+        pivotGroup.rotation.y = currentRotY;
+        pivotGroup.rotation.x = currentRotX;
+        pivotGroup.scale.setScalar(currentZoom);
+      }
+
+      // Articulation lerp per finger (factor 0.25)
+      ['thumb', 'index', 'middle', 'ring', 'pinky'].forEach((f) => {
+        currentFlex[f] += (targetFlex[f] - currentFlex[f]) * LERP_FACTOR;
+        applyFingerArticulation(f, currentFlex[f]);
+      });
+
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('canvas-container');
+      if (!container || !camera || !renderer) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w > 0 && h > 0) {
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', initScene);
+  </script>
+</body>
+</html>

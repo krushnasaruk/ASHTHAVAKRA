@@ -182,3 +182,4 @@ class _RingPainter extends CustomPainter {
     return oldDelegate.progress != progress || oldDelegate.activeColor != activeColor;
   }
 }
+
