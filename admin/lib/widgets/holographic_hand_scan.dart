@@ -376,3 +376,4 @@ class _HolographicHandPainter extends CustomPainter {
         oldDelegate.selectedFinger != selectedFinger;
   }
 }
+

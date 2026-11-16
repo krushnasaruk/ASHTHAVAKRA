@@ -1,0 +1,7 @@
+/*
+  Access-Control-Allow-Origin: *
+  X-Frame-Options: SAMEORIGIN
+/canvaskit/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/*
+  Cache-Control: public, max-age=86400
