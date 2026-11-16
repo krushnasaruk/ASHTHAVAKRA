@@ -74,7 +74,20 @@ interface TelemetryPayload {
 }
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<"scifi_hud" | "operator" | "judge" | "mobile_preview">("mobile_preview");
+  const getInitialViewMode = (): "scifi_hud" | "operator" | "judge" | "mobile_preview" => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const view = params.get("view")?.toLowerCase();
+      if (view === "mobile" || view === "app" || view === "preview") return "mobile_preview";
+      if (view === "hud" || view === "scifi") return "scifi_hud";
+      if (view === "judge") return "judge";
+      if (view === "doctor" || view === "operator" || view === "admin") return "operator";
+    }
+    // Default to the Doctor / Clinician Cockpit Dashboard
+    return "operator";
+  };
+
+  const [viewMode, setViewMode] = useState<"scifi_hud" | "operator" | "judge" | "mobile_preview">(getInitialViewMode);
   const [dataSource, setDataSource] = useState<"live" | "replay" | "simulated">("live");
 
   // Mobile App Preview Navigation State
@@ -332,6 +345,12 @@ export default function App() {
 
             <div className="flex items-center space-x-1.5 pl-2 border-l border-black/10">
               <button
+                onClick={() => setViewMode("operator")}
+                className="text-[11px] font-bold px-3 py-1 rounded-full bg-[#121715] text-[#C8F05F] hover:bg-black/80 transition shadow-sm"
+              >
+                🩺 Doctor Cockpit
+              </button>
+              <button
                 onClick={() => setViewMode("scifi_hud")}
                 className="text-[11px] font-bold px-3 py-1 rounded-full bg-black/5 hover:bg-black/10 text-[#121715] transition"
               >
@@ -400,27 +419,43 @@ export default function App() {
         {/* View Mode Navigation Switcher */}
         <div className="flex items-center space-x-2">
           <button
+            onClick={() => setViewMode("operator")}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+              viewMode === "operator"
+                ? "bg-[#C8F05F] text-[#121715] shadow-sm font-black"
+                : "border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700"
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+            <span>Doctor Dashboard</span>
+          </button>
+
+          <button
             onClick={() => setViewMode("scifi_hud")}
             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-amber-600/70 bg-amber-950/40 text-amber-300 hover:bg-amber-900/60 shadow-[0_0_10px_rgba(251,191,36,0.25)]"
           >
             <Radio className="w-4 h-4 text-amber-400" />
-            <span>Sci-Fi Holographic HUD</span>
+            <span>Sci-Fi 3D HUD</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode(viewMode === "judge" ? "operator" : "judge")}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+              viewMode === "judge"
+                ? "bg-purple-600 text-white shadow-sm"
+                : "border border-slate-700 bg-slate-800 text-purple-300 hover:bg-slate-700"
+            }`}
+          >
+            <Tv className="w-4 h-4" />
+            <span>Judge View</span>
           </button>
 
           <button
             onClick={() => setViewMode("mobile_preview")}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-[#C8F05F] text-[#121715] hover:bg-[#b8e64c] shadow-sm"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-slate-700 bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700"
           >
             <Smartphone className="w-4 h-4" />
-            <span>Mobile UI Showcase</span>
-          </button>
-
-          <button
-            onClick={() => setViewMode(viewMode === "operator" ? "judge" : "operator")}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-slate-700 bg-slate-800 text-sky-400 hover:bg-slate-700"
-          >
-            <Tv className="w-4 h-4" />
-            <span>{viewMode === "judge" ? "Operator View" : "Judge View"}</span>
+            <span>App Preview</span>
           </button>
         </div>
       </header>
